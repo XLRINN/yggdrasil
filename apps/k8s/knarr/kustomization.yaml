@@ -1,0 +1,6 @@
+# apps/k8s/knarr/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./infrastructure 
+  - ./stack
