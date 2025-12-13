@@ -1,0 +1,6 @@
+# apps/k8s/knarr/infrastructure/namespace.yaml
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: media
