@@ -1,0 +1,10 @@
+# apps/k8s/knarr/infrastructure/helm-sources.yaml
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: bjw-s
+  namespace: flux-system # Flux controllers need to read this
+spec:
+  interval: 30m
+  url: https://bjw-s-labs.github.io/helm-charts/
