@@ -1,5 +1,7 @@
-# apps/k8s/knarr/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./stack
+  - ./prowlarr
+  - ./radarr
+  - ./sonarr
+  - ./nginx
