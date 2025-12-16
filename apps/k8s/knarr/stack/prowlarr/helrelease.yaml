@@ -28,7 +28,7 @@ spec:
       repository: ghcr.io/onedr0p/prowlarr
       tag: 1.20.1.4429 # Use a specific tag for stability (current stable is a good choice)
     env:
-      TZ: "America/Chicago" # Set your timezone
+      TZ: "America/Detroit" # Set your timezone
       PUID: "1000" # Replace with your user ID
       PGID: "1000" # Replace with your group ID
 
