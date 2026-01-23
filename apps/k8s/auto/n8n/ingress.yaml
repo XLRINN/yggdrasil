@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n-ingress
+  namespace: auto
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    # This line triggers the robot to get a cert
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  # This section tells Kubernetes "This domain uses this secret for SSL"
+  tls:
+  - hosts:
+    - n8n.drip.heimdal.rip
+    secretName: n8n-tls-secret
+  rules:
+  - host: "n8n.drip.heimdal.rip"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: n8n-svc
+            port:
+              number: 80

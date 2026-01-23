@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sabnzbd
+  namespace: knarr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  
+  # --- CRITICAL SECTION 1: THE SELECTOR ---
+  # This tells the Deployment: "I own any pod with the tag app=sabnzbd"
+  selector:
+    matchLabels:
+      app: sabnzbd
+      
+  template:
+    metadata:
+      # --- CRITICAL SECTION 2: THE LABELS ---
+      # This puts the tag "app=sabnzbd" on the actual Pods
+      labels:
+        app: sabnzbd
+    spec:
+      containers:
+      - name: sabnzbd
+        image: lscr.io/linuxserver/sabnzbd:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/New_York"
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: incomplete
+          mountPath: /incomplete
+        - name: media
+          mountPath: /media
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: sabnzbd-config-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
+      - name: incomplete
+        hostPath:
+          path: /home/david/k8s/knarr/sabnzb/incomplete  # <--- Create this folder on your host!
+          type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sabnzbd
+  namespace: knarr
+spec:
+  type: ClusterIP
+  selector:
+    app: sabnzbd
+  ports:
+    - port: 80
+      targetPort: 8080
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sabnzbd-config-pvc
+  namespace: knarr
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi

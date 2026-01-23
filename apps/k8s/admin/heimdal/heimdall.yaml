@@ -1,0 +1,94 @@
+# 1. THE NAMESPACE
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: admin
+
+---
+# 2. THE STORAGE TICKET (PVC)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: heimdall-pvc
+  namespace: admin
+spec:
+  accessModes:
+    - ReadWriteOnce      # Only one node can mount this (standard for block storage)
+  storageClassName: local-path # Default k3s storage
+  resources:
+    requests:
+      storage: 1Gi       # We request 1 Gigabyte
+
+---
+# 3. THE DEPLOYMENT (With Volume)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heimdall
+  namespace: admin
+  labels:
+    app: heimdall
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heimdall
+  template:
+    metadata:
+      labels:
+        app: heimdall
+    spec:
+      containers:
+      - name: heimdall
+        image: lscr.io/linuxserver/heimdall:latest
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/New_York"
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: config-storage   # Must match the volume name below
+          mountPath: /config     # Where Heimdall stores data internally
+      volumes:
+      - name: config-storage
+        persistentVolumeClaim:
+          claimName: heimdall-pvc # Matches the PVC name above
+
+---
+# 4. THE SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: heimdall-svc
+  namespace: admin
+spec:
+  selector:
+    app: heimdall
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+# 5. THE INGRESS (Traefik)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: heimdall-ingress
+  namespace: admin
+spec:
+  rules:
+  - host: "drip.heimdal.rip"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: heimdall-svc
+            port:
+              number: 80

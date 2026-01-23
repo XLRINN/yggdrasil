@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sabnzbd-ingress
+  namespace: knarr
+  annotations:
+    # Use your Traefik/Nginx class here. usually 'traefik' or 'nginx'
+    kubernetes.io/ingress.class: traefik
+    
+    # Optional: If you use Cert-Manager for SSL
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+  - host: sabnzb.drip.heimdal.rip   # <--- UPDATE: Your actual domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sabnzbd
+            port:
+              number: 80

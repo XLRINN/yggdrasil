@@ -1,0 +1,34 @@
+# ---------------------------------------------------
+# 1. THE ARCHIVE (The Cloud Bridge)
+# Apps see this as /data. Files here live on the host at /njord
+# ---------------------------------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: njord-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 100Ti  # Arbitrary "unlimited" size
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/njord/" 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-pvc
+  namespace: knarr
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Ti
+  volumeName: njord-pv
+
+---

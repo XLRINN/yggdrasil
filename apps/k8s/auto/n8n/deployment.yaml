@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+  namespace: auto
+  labels:
+    app: n8n
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      # 1. THE JANITOR (Fixes permissions)
+      initContainers:
+      - name: volume-permissions
+        image: busybox:latest
+        # Give ownership of the folder to user 1000 (node)
+        command: ["sh", "-c", "chown -R 1000:1000 /home/node/.n8n"]
+        volumeMounts:
+        - name: n8n-storage
+          mountPath: /home/node/.n8n
+
+      # 2. THE APP (n8n)
+      containers:
+      - name: n8n
+        image: n8nio/n8n:latest
+        ports:
+        - containerPort: 5678
+        env:
+        - name: GENERIC_TIMEZONE
+          value: "America/New_York"
+        - name: N8N_HOST
+          value: "n8n.drip.heimdal.rip"
+        - name: WEBHOOK_URL
+          value: "http://n8n.drip.heimdal.rip"
+        volumeMounts:
+        - name: n8n-storage
+          mountPath: /home/node/.n8n
+      volumes:
+      - name: n8n-storage
+        persistentVolumeClaim:
+          claimName: n8n-pvc
