@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: List
+items:
+  # --- PVC for Tunarr Configuration ---
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: tunarr-config-pvc
+      namespace: knarr
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      # storageClassName: local-path # Uncomment if you use a specific class
+
+  # --- Deployment ---
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: tunarr
+      namespace: knarr
+      labels:
+        app: tunarr
+    spec:
+      replicas: 1
+      strategy:
+        type: Recreate
+      selector:
+        matchLabels:
+          app: tunarr
+      template:
+        metadata:
+          labels:
+            app: tunarr
+        spec:
+          # --- Disable IPv6 (Just like Prowlarr, to prevent timeouts) ---
+          dnsConfig:
+            options:
+              - name: ndots
+                value: "1"
+          containers:
+            - name: tunarr
+              image: ghcr.io/chrisbenincasa/tunarr:latest
+              imagePullPolicy: Always
+              env:
+                - name: TZ
+                  value: "America/New_York"
+                - name: PUID
+                  value: "1000"
+                - name: PGID
+                  value: "1000"
+                - name: LOG_LEVEL
+                  value: "info"
+              ports:
+                - containerPort: 8000
+                  name: http
+              volumeMounts:
+                # Mount for Tunarr's internal database/settings
+                - name: config
+                  mountPath: /app/tunarr/config
+                # Mount for your Media (Movies/TV) so Tunarr can stream files directly
+                - name: media
+                  mountPath: /mnt/njord
+              # --- Hardware Acceleration (Optional) ---
+              # Uncomment below if you want to use VAAPI/QuickSync for transcoding
+              # securityContext:
+              #   privileged: true
+          volumes:
+            - name: config
+              persistentVolumeClaim:
+                claimName: tunarr-config-pvc
+            - name: media
+              persistentVolumeClaim:
+                # Using the PVC you referenced in your first prompt
+                claimName: media-pvc
+
+  # --- Service ---
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: tunarr
+      namespace: knarr
+    spec:
+      selector:
+        app: tunarr
+      ports:
+        - port: 8000
+          targetPort: 8000
+          name: http
+
+  # --- Ingress ---
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: tunarr-ingress
+      namespace: knarr
+      annotations:
+        # Standard Nginx ingress annotations
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    spec:
+      rules:
+        # CHANGE THIS to your actual domain
+        - host: tunarr.drip.heimdal.rip
+          http:
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: tunarr
+                    port:
+                      number: 8000

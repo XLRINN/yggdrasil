@@ -11,11 +11,11 @@ metadata:
 spec:
   storageClassName: manual
   capacity:
-    storage: 100Ti  # Arbitrary "unlimited" size
+    storage: 100Ti # Arbitrary "unlimited" size
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/mnt/njord/" 
+    path: "/mnt/njord/"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
