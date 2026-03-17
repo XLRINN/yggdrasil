@@ -30,6 +30,17 @@ spec:
       labels:
         app: sonarr
     spec:
+      initContainers:
+      - name: inotify-sysctl
+        image: busybox
+        securityContext:
+          privileged: true
+        command:
+        - sh
+        - -c
+        - |
+          sysctl -w fs.inotify.max_user_watches=524288
+          sysctl -w fs.inotify.max_user_instances=512
       containers:
       - name: sonarr
         image: lscr.io/linuxserver/sonarr:latest
