@@ -83,11 +83,13 @@ items:
       name: tunarr
       namespace: knarr
     spec:
+      type: NodePort
       selector:
         app: tunarr
       ports:
         - port: 8000
           targetPort: 8000
+          nodePort: 30800
           name: http
 
   # --- Ingress ---
