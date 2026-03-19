@@ -21,6 +21,24 @@ spec:
       labels:
         app: sabnzbd
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      initContainers:
+      - name: sysctl-tuning
+        image: busybox
+        securityContext:
+          privileged: true
+        command:
+        - sh
+        - -c
+        - |
+          sysctl -w fs.inotify.max_user_watches=524288
+          sysctl -w fs.inotify.max_user_instances=512
+          sysctl -w net.ipv4.tcp_keepalive_time=60
+          sysctl -w net.ipv4.tcp_keepalive_intvl=10
+          sysctl -w net.ipv4.tcp_keepalive_probes=6
       containers:
         - name: sabnzbd
           image: lscr.io/linuxserver/sabnzbd:latest

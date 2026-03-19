@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  no-ipv6.override: |
+    template IN AAAA {
+        rcode NOERROR
+    }
