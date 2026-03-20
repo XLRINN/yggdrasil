@@ -93,7 +93,7 @@ data:
             widget:
               type: overseerr
               url: http://seer.knarr.svc.cluster.local
-              key: YOUR_SEER_API_KEY
+              key: MTc3Mzk2NDU4NTMzMTc5MThhOGU5LTk1MmQtNDFjZi05MjIxLWI5Mzk1MjZiNmVmMQ==
 
     - Infrastructure:
         - Longhorn:
