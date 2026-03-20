@@ -94,7 +94,7 @@ metadata:
   namespace: knarr
 spec:
   rules:
-  - host: sonarr-anime.drip.heimdal.rip
+  - host: crunchy.drip.heimdal.rip
     http:
       paths:
       - path: /
