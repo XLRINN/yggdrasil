@@ -173,7 +173,7 @@ metadata:
   namespace: admin
 spec:
   rules:
-    - host: home.drip.heimdal.rip
+    - host: drip.heimdal.rip
       http:
         paths:
           - path: /
