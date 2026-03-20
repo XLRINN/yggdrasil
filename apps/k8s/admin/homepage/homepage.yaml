@@ -133,6 +133,18 @@ spec:
         options:
           - name: ndots
             value: "1"
+      initContainers:
+        - name: copy-config
+          image: busybox
+          command:
+            - sh
+            - -c
+            - cp /config-source/* /app/config/
+          volumeMounts:
+            - name: config-source
+              mountPath: /config-source
+            - name: config-writable
+              mountPath: /app/config
       containers:
         - name: homepage
           image: ghcr.io/gethomepage/homepage:latest
@@ -143,13 +155,17 @@ spec:
           env:
             - name: TZ
               value: "America/New_York"
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: "drip.heimdal.rip"
           volumeMounts:
-            - name: config
+            - name: config-writable
               mountPath: /app/config
       volumes:
-        - name: config
+        - name: config-source
           configMap:
             name: homepage-config
+        - name: config-writable
+          emptyDir: {}
 
 ---
 apiVersion: v1
