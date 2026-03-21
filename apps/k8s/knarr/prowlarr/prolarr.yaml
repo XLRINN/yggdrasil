@@ -43,6 +43,10 @@ spec:
         env:
         - name: DOTNET_SYSTEM_NET_DISABLEIPV6
           value: "1"
+        - name: HTTPS_PROXY
+          value: "http://10.42.0.1:3128"
+        - name: NO_PROXY
+          value: "localhost,127.0.0.1,10.42.0.0/16,10.43.0.0/16,.cluster.local"
         - name: DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP3SUPPORT
           value: "0"
         - name: PUID

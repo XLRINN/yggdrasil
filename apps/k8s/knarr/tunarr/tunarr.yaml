@@ -12,7 +12,7 @@ items:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 1Gi
+          storage: 10Gi
       # storageClassName: local-path # Uncomment if you use a specific class
 
   # --- Deployment ---
@@ -36,6 +36,7 @@ items:
             app: tunarr
         spec:
           # --- Disable IPv6 (Just like Prowlarr, to prevent timeouts) ---
+          hostNetwork: true
           dnsConfig:
             options:
               - name: ndots
@@ -59,7 +60,7 @@ items:
               volumeMounts:
                 # Mount for Tunarr's internal database/settings
                 - name: config
-                  mountPath: /app/tunarr/config
+                  mountPath: /root/.local/share/tunarr
                 # Mount for your Media (Movies/TV) so Tunarr can stream files directly
                 - name: media
                   mountPath: /mnt/njord

@@ -6,7 +6,7 @@ spec:
   acme:
     # You must replace this email address with your own.
     # Let's Encrypt uses this to warn you if your cert is expiring.
-    email: your-email@example.com
+    email: xlrin.morgan@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-prod

@@ -30,6 +30,10 @@ spec:
       labels:
         app: radarr
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       initContainers:
       - name: inotify-sysctl
         image: busybox
@@ -41,6 +45,8 @@ spec:
         - |
           sysctl -w fs.inotify.max_user_watches=524288
           sysctl -w fs.inotify.max_user_instances=512
+          sysctl -w net.ipv6.conf.all.disable_ipv6=1
+          sysctl -w net.ipv6.conf.default.disable_ipv6=1
       containers:
       - name: radarr
         image: lscr.io/linuxserver/radarr:latest
@@ -51,6 +57,12 @@ spec:
           value: "1000"
         - name: TZ
           value: "America/New_York"
+        - name: DOTNET_SYSTEM_NET_DISABLEIPV6
+          value: "true"
+        - name: HTTPS_PROXY
+          value: "http://10.42.0.1:3128"
+        - name: NO_PROXY
+          value: "localhost,127.0.0.1,10.42.0.0/16,10.43.0.0/16,.cluster.local"
         ports:
         - containerPort: 7878
         volumeMounts:

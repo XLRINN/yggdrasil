@@ -38,13 +38,13 @@ data:
   services.yaml: |
     - Media:
         - Jellyfin:
-            href: http://100.92.37.94:8096
+            href: https://heimdal.rip/jelly
             icon: jellyfin.png
             description: Media Server
             widget:
               type: jellyfin
-              url: http://100.92.37.94:8096
-              key: YOUR_JELLYFIN_API_KEY
+              url: http://jellyfin.knarr.svc.cluster.local/jelly
+              key: 3994e23ed5a847309e88a7bf8a160bd5
               enableBlocks: true
         - Tunarr:
             href: http://tunarr.drip.heimdal.rip
@@ -53,7 +53,7 @@ data:
 
     - Downloads:
         - SABnzbd:
-            href: http://sabnzb.drip.heimdal.rip
+            href: https://heimdal.rip/sabnzbd
             icon: sabnzbd.png
             description: Usenet Downloader
             widget:
@@ -61,7 +61,7 @@ data:
               url: http://sabnzbd.knarr.svc.cluster.local
               key: bd92a4d3915349479bf69e57a0de5849
         - Sonarr:
-            href: http://sonarr.drip.heimdal.rip
+            href: https://heimdal.rip/sonarr
             icon: sonarr.png
             description: TV Shows
             widget:
@@ -69,7 +69,7 @@ data:
               url: http://sonarr.knarr.svc.cluster.local
               key: d6384c35ad1744bfb4456ce5ca7ce051
         - Radarr:
-            href: http://radarr.drip.heimdal.rip
+            href: https://heimdal.rip/radarr
             icon: radarr.png
             description: Movies
             widget:
@@ -77,17 +77,25 @@ data:
               url: http://radarr.knarr.svc.cluster.local
               key: 5b243c724ced48489b8fe9456267ef32
         - Prowlarr:
-            href: http://prowlarr.drip.heimdal.rip
+            href: https://heimdal.rip/prowlarr
             icon: prowlarr.png
             description: Indexers
             widget:
               type: prowlarr
               url: http://prowlarr.knarr.svc.cluster.local
               key: c4cf026aab2d407db18fc50b5b57f004
+        - Crunchy:
+            href: https://crunchy.drip.heimdal.rip
+            icon: sonarr.png
+            description: Anime
+            widget:
+              type: sonarr
+              url: http://sonarr-anime.knarr.svc.cluster.local
+              key: abab8117d6e94ecb972f707c47eecd57
 
     - Requests:
         - Seer:
-            href: http://seer.drip.heimdal.rip
+            href: https://heimdal.rip/seer
             icon: overseerr.png
             description: Media Requests
             widget:
@@ -97,7 +105,7 @@ data:
 
     - Infrastructure:
         - Longhorn:
-            href: http://longhorn.drip.heimdal.rip
+            href: https://heimdal.rip/longhorn
             icon: longhorn.png
             description: Storage
         - Rancher:
@@ -105,7 +113,7 @@ data:
             icon: rancher.png
             description: Kubernetes
         - n8n:
-            href: http://n8n.drip.heimdal.rip
+            href: https://heimdal.rip/n8n
             icon: n8n.png
             description: Automation
 
@@ -156,7 +164,7 @@ spec:
             - name: TZ
               value: "America/New_York"
             - name: HOMEPAGE_ALLOWED_HOSTS
-              value: "drip.heimdal.rip"
+              value: "drip.heimdal.rip,heimdal.rip"
           volumeMounts:
             - name: config-writable
               mountPath: /app/config
@@ -187,9 +195,25 @@ kind: Ingress
 metadata:
   name: homepage-ingress
   namespace: admin
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  tls:
+  - hosts:
+    - heimdal.rip
+    secretName: heimdal-rip-tls
   rules:
     - host: drip.heimdal.rip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: homepage
+                port:
+                  number: 80
+    - host: heimdal.rip
       http:
         paths:
           - path: /

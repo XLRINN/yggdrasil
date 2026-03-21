@@ -60,6 +60,17 @@ spec:
           value: "America/New_York"
         - name: DOTNET_SYSTEM_NET_DISABLEIPV6
           value: "true"
+        - name: HTTPS_PROXY
+          value: "http://10.42.0.1:3128"
+        - name: NO_PROXY
+          value: "localhost,127.0.0.1,10.42.0.0/16,10.43.0.0/16,.cluster.local"
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - ln -sf /app/sonarr/bin/UI/sonarr /app/sonarr/bin/UI/crunchy
         ports:
         - containerPort: 8989
         volumeMounts:

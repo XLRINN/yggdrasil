@@ -1,3 +1,33 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-n8n
+  namespace: auto
+spec:
+  stripPrefix:
+    prefixes:
+      - /n8n
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n-heimdal-ingress
+  namespace: auto
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: auto-strip-n8n@kubernetescrd
+spec:
+  rules:
+  - host: heimdal.rip
+    http:
+      paths:
+      - path: /n8n
+        pathType: Prefix
+        backend:
+          service:
+            name: n8n-svc
+            port:
+              number: 80
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
