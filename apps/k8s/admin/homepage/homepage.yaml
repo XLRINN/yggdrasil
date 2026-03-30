@@ -112,10 +112,6 @@ data:
             href: https://rancher.drip.lan
             icon: rancher.png
             description: Kubernetes
-        - n8n:
-            href: https://heimdal.rip/n8n
-            icon: n8n.png
-            description: Automation
 
 ---
 apiVersion: apps/v1
