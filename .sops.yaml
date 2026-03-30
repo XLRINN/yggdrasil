@@ -1,0 +1,8 @@
+# SOPS configuration for secret encryption with age
+# Generate a key: age-keygen -o age.key
+# Add the public key below, keep age.key out of git (.gitignore it)
+creation_rules:
+  - path_regex: .*/secrets/.*\.yaml$
+    encrypted_regex: ^(data|stringData)$
+    age: >-
+      age1nv2kd8a0ev2cny9mg507nz73jsk8n2j7708afatughslnz5pduzqgj0mq7
