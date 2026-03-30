@@ -1,0 +1,52 @@
+---
+# Requires GITHUB_TOKEN env var set on the control machine:
+#   GITHUB_TOKEN=ghp_... ansible-playbook site.yml --tags flux
+
+- name: Check if flux CLI is installed
+  command: which flux
+  register: flux_which
+  changed_when: false
+  failed_when: false
+
+- name: Install flux CLI
+  shell: curl -s https://fluxcd.io/install.sh | bash
+  when: flux_which.rc != 0
+
+- name: Create flux-system namespace
+  command: k3s kubectl create namespace flux-system --dry-run=client -o yaml | k3s kubectl apply -f -
+  changed_when: false
+
+- name: Read local age key file
+  set_fact:
+    sops_age_key_content: "{{ lookup('file', sops_age_key_path | expanduser) }}"
+  delegate_to: localhost
+  become: false
+
+- name: Create SOPS age secret in flux-system
+  shell: |
+    k3s kubectl create secret generic sops-age \
+      --namespace=flux-system \
+      --from-literal=age.agekey="{{ sops_age_key_content }}" \
+      --dry-run=client -o yaml | k3s kubectl apply -f -
+  no_log: true
+  changed_when: false
+
+- name: Check if Flux is already bootstrapped
+  command: k3s kubectl get kustomization flux-system -n flux-system
+  register: flux_bootstrapped
+  changed_when: false
+  failed_when: false
+
+- name: Bootstrap Flux
+  shell: |
+    flux bootstrap github \
+      --owner={{ flux_github_owner }} \
+      --repository={{ flux_github_repo }} \
+      --branch={{ flux_github_branch }} \
+      --path={{ flux_cluster_path }} \
+      --personal \
+      --kubeconfig=/etc/rancher/k3s/k3s.yaml
+  environment:
+    GITHUB_TOKEN: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  when: flux_bootstrapped.rc != 0

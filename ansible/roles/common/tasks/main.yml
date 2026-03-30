@@ -1,0 +1,137 @@
+---
+- name: Update apt cache and upgrade packages
+  apt:
+    update_cache: true
+    upgrade: dist
+    cache_valid_time: 3600
+
+- name: Install essential packages
+  apt:
+    name:
+      - curl
+      - wget
+      - git
+      - vim
+      - htop
+      - ufw
+      - ca-certificates
+      - gnupg
+      - open-iscsi
+      - nfs-common
+      - apparmor
+      - apparmor-utils
+    state: present
+
+- name: Create user {{ server_user }}
+  user:
+    name: "{{ server_user }}"
+    uid: "{{ server_user_uid }}"
+    groups: sudo
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Authorize SSH key for {{ server_user }}
+  authorized_key:
+    user: "{{ server_user }}"
+    key: "{{ server_user_ssh_pubkey }}"
+    state: present
+  when: server_user_ssh_pubkey | length > 0
+
+- name: Allow sudo without password for {{ server_user }}
+  lineinfile:
+    path: /etc/sudoers.d/{{ server_user }}
+    line: "{{ server_user }} ALL=(ALL) NOPASSWD:ALL"
+    create: true
+    mode: "0440"
+    validate: visudo -cf %s
+
+- name: Disable swap (required for Kubernetes)
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: Remove swap from fstab
+  lineinfile:
+    path: /etc/fstab
+    regexp: '\sswap\s'
+    state: absent
+
+- name: Load required kernel modules
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - overlay
+    - br_netfilter
+
+- name: Persist kernel modules across reboots
+  copy:
+    dest: /etc/modules-load.d/k3s.conf
+    content: |
+      overlay
+      br_netfilter
+
+- name: Set sysctl values
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/99-k3s.conf
+    reload: true
+  loop:
+    - { key: net.ipv4.ip_forward,              value: "1" }
+    - { key: net.bridge.bridge-nf-call-iptables, value: "1" }
+    - { key: net.bridge.bridge-nf-call-ip6tables, value: "1" }
+    - { key: fs.inotify.max_user_watches,      value: "524288" }
+    - { key: fs.inotify.max_user_instances,    value: "512" }
+    - { key: net.ipv4.tcp_keepalive_time,      value: "600" }
+    - { key: net.ipv4.tcp_keepalive_intvl,     value: "60" }
+    - { key: net.ipv4.tcp_keepalive_probes,    value: "3" }
+
+- name: Configure UFW defaults
+  ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  loop:
+    - { direction: incoming, policy: deny }
+    - { direction: outgoing, policy: allow }
+
+- name: Allow SSH
+  ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+
+- name: Allow K3s API
+  ufw:
+    rule: allow
+    port: "6443"
+    proto: tcp
+
+- name: Allow HTTP and HTTPS
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - "80"
+    - "443"
+
+- name: Allow pod and service CIDRs (Flannel)
+  ufw:
+    rule: allow
+    src: "{{ item }}"
+  loop:
+    - 10.42.0.0/16   # pod CIDR
+    - 10.43.0.0/16   # service CIDR
+
+- name: Enable UFW
+  ufw:
+    state: enabled
+
+- name: Create media mount point
+  file:
+    path: /mnt/njord
+    state: directory
+    owner: "{{ server_user }}"
+    group: "{{ server_user }}"
+    mode: "0755"

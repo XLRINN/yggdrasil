@@ -1,0 +1,21 @@
+# --- User ---
+server_user: david
+server_user_uid: 1000
+# Public key to authorize for server_user (leave empty to skip)
+server_user_ssh_pubkey: ""
+
+# --- K3s ---
+k3s_version: ""          # leave empty for latest stable
+k3s_config:
+  write-kubeconfig-mode: "0644"
+  disable:
+    - servicelb           # using Cloudflare tunnel, no need for LB
+  tls-san: []             # populated automatically from ansible_host
+
+# --- Flux ---
+flux_github_owner: XLRINN
+flux_github_repo: yggdrasil
+flux_github_branch: master
+flux_cluster_path: clusters/home
+# Path to your age private key file on the CONTROL machine (where you run ansible)
+sops_age_key_path: "~/.config/sops/age/keys.txt"

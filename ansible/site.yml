@@ -1,0 +1,19 @@
+---
+# Run: GITHUB_TOKEN=<token> ansible-playbook site.yml
+# Or skip specific stages with tags:
+#   ansible-playbook site.yml --tags common
+#   ansible-playbook site.yml --tags k3s,longhorn
+#   ansible-playbook site.yml --tags flux
+
+- name: Provision K3s single-node server
+  hosts: all
+  become: true
+  roles:
+    - role: common
+      tags: common
+    - role: longhorn
+      tags: longhorn
+    - role: k3s
+      tags: k3s
+    - role: flux
+      tags: flux

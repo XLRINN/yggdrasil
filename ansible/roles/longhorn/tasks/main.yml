@@ -1,0 +1,47 @@
+---
+# Longhorn requires open-iscsi, nfs-common, and a few other dependencies.
+# See: https://longhorn.io/docs/latest/deploy/install/#installation-requirements
+
+- name: Install Longhorn dependencies
+  apt:
+    name:
+      - open-iscsi
+      - nfs-common
+      - util-linux
+      - bash
+      - curl
+      - grep
+      - gawk
+      - cryptsetup
+      - dmsetup
+    state: present
+
+- name: Enable and start iscsid
+  systemd:
+    name: iscsid
+    enabled: true
+    state: started
+
+- name: Load iscsi_tcp kernel module
+  modprobe:
+    name: iscsi_tcp
+    state: present
+
+- name: Persist iscsi_tcp module
+  lineinfile:
+    path: /etc/modules-load.d/k3s.conf
+    line: iscsi_tcp
+    state: present
+
+# Prevent multipath from interfering with Longhorn volumes
+# See: https://longhorn.io/docs/latest/kb/troubleshooting-volume-with-multipath/
+- name: Configure multipath to blacklist Longhorn devices
+  copy:
+    dest: /etc/multipath.conf
+    content: |
+      blacklist {
+          devnode "^sd[a-z0-9]+"
+      }
+    mode: "0644"
+  notify: Restart multipathd
+  when: ansible_facts.services['multipathd.service'] is defined
