@@ -1,0 +1,106 @@
+---
+# Install k3s on control-plane and worker nodes.
+# Run after k8s-prereqs.yml.
+
+- name: Install k3s on control-plane (first node is the init server)
+  hosts: control_plane[0]
+  become: true
+  gather_facts: true
+
+  vars:
+    k3s_init_args: "{{ k3s_server_extra_args }}"
+
+  tasks:
+    - name: Download k3s install script
+      ansible.builtin.get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s-install.sh
+        mode: "0755"
+
+    - name: Install k3s server (init)
+      ansible.builtin.shell: |
+        INSTALL_K3S_VERSION="{{ k3s_version }}" \
+        K3S_CLUSTER_INIT=true \
+        sh /tmp/k3s-install.sh server {{ k3s_init_args }}
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Wait for k3s to be ready
+      ansible.builtin.wait_for:
+        path: /var/lib/rancher/k3s/server/node-token
+        timeout: 120
+
+    - name: Fetch node token
+      ansible.builtin.slurp:
+        path: /var/lib/rancher/k3s/server/node-token
+      register: k3s_token_raw
+
+    - name: Set token fact
+      ansible.builtin.set_fact:
+        k3s_token: "{{ k3s_token_raw['content'] | b64decode | trim }}"
+
+    - name: Fetch kubeconfig
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "{{ playbook_dir }}/../kubeconfig.yml"
+        flat: true
+
+    - name: Replace localhost with control plane IP in kubeconfig
+      ansible.builtin.replace:
+        path: "{{ playbook_dir }}/../kubeconfig.yml"
+        regexp: 'https://127\.0\.0\.1:6443'
+        replace: "https://{{ ansible_host }}:6443"
+      delegate_to: localhost
+      become: false
+
+
+- name: Install k3s on additional control-plane nodes (HA)
+  hosts: control_plane[1:]
+  become: true
+  gather_facts: true
+
+  vars:
+    first_cp_ip: "{{ hostvars[groups['control_plane'][0]]['ansible_host'] }}"
+    k3s_token: "{{ hostvars[groups['control_plane'][0]]['k3s_token'] }}"
+
+  tasks:
+    - name: Download k3s install script
+      ansible.builtin.get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s-install.sh
+        mode: "0755"
+
+    - name: Install k3s server (join)
+      ansible.builtin.shell: |
+        INSTALL_K3S_VERSION="{{ k3s_version }}" \
+        K3S_TOKEN="{{ k3s_token }}" \
+        K3S_URL="https://{{ first_cp_ip }}:6443" \
+        sh /tmp/k3s-install.sh server {{ k3s_server_extra_args }}
+      args:
+        creates: /usr/local/bin/k3s
+
+
+- name: Join worker nodes to the cluster
+  hosts: workers
+  become: true
+  gather_facts: true
+
+  vars:
+    first_cp_ip: "{{ hostvars[groups['control_plane'][0]]['ansible_host'] }}"
+    k3s_token: "{{ hostvars[groups['control_plane'][0]]['k3s_token'] }}"
+
+  tasks:
+    - name: Download k3s install script
+      ansible.builtin.get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s-install.sh
+        mode: "0755"
+
+    - name: Install k3s agent
+      ansible.builtin.shell: |
+        INSTALL_K3S_VERSION="{{ k3s_version }}" \
+        K3S_TOKEN="{{ k3s_token }}" \
+        K3S_URL="https://{{ first_cp_ip }}:6443" \
+        sh /tmp/k3s-install.sh agent
+      args:
+        creates: /usr/local/bin/k3s

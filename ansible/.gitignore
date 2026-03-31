@@ -1,0 +1,12 @@
+# Generated inventory (contains IPs)
+inventory/hosts.yml
+
+# Kubeconfig written by k3s-install playbook
+kubeconfig.yml
+*.kubeconfig
+
+# Ansible retry files
+*.retry
+
+# Vault password file
+.vault_pass

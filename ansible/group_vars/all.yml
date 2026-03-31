@@ -1,0 +1,29 @@
+# Variables shared across all hosts
+
+# ---------------------------------------------------------------------------
+# k3s
+# ---------------------------------------------------------------------------
+k3s_version: "v1.32.3+k3s1"   # https://github.com/k3s-io/k3s/releases
+
+# k3s install options — disable local-storage in favour of Longhorn
+k3s_server_extra_args: >-
+  --disable local-storage
+  --disable servicelb
+  --flannel-backend=none
+  --disable-network-policy
+
+# CNI — Cilium is installed separately via Flux; flannel is disabled above
+cni: cilium
+
+# ---------------------------------------------------------------------------
+# Flux
+# ---------------------------------------------------------------------------
+flux_version: "v2.4.0"   # https://github.com/fluxcd/flux2/releases
+flux_git_url: "https://github.com/xlrinn/yggdrasil"
+flux_git_branch: "master"
+flux_path: "./apps/k8s"
+
+# ---------------------------------------------------------------------------
+# Misc
+# ---------------------------------------------------------------------------
+timezone: "UTC"

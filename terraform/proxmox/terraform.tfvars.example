@@ -1,0 +1,65 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# NEVER commit terraform.tfvars — it contains secrets.
+
+# ---------------------------------------------------------------------------
+# Proxmox connection
+# ---------------------------------------------------------------------------
+proxmox_endpoint = "https://192.168.1.100:8006/"
+proxmox_username = "root@pam"
+proxmox_password = "changeme"
+proxmox_insecure = true   # set false if you have a valid TLS cert
+
+proxmox_node   = "pve"
+vm_template_id = 9000     # ID of your Ubuntu 24.04 cloud-image template
+
+# ---------------------------------------------------------------------------
+# Networking
+# ---------------------------------------------------------------------------
+storage        = "local-lvm"
+network_bridge = "vmbr0"
+gateway        = "192.168.1.1"
+dns_servers    = ["192.168.1.1", "1.1.1.1"]
+
+# ---------------------------------------------------------------------------
+# Access
+# ---------------------------------------------------------------------------
+vm_user = "ubuntu"
+ssh_public_keys = [
+  "ssh-ed25519 AAAA... you@host",
+]
+
+# ---------------------------------------------------------------------------
+# Cluster
+# ---------------------------------------------------------------------------
+cluster_name = "yggdrasil"
+
+# Single control-plane (change to 3 nodes for HA)
+control_plane_nodes = [
+  {
+    name    = "k8s-cp-01"
+    vm_id   = 200
+    ip_cidr = "192.168.1.10/24"
+    cores   = 2
+    memory  = 4096
+    disk    = 40
+  },
+]
+
+worker_nodes = [
+  {
+    name    = "k8s-worker-01"
+    vm_id   = 211
+    ip_cidr = "192.168.1.21/24"
+    cores   = 4
+    memory  = 8192
+    disk    = 80
+  },
+  {
+    name    = "k8s-worker-02"
+    vm_id   = 212
+    ip_cidr = "192.168.1.22/24"
+    cores   = 4
+    memory  = 8192
+    disk    = 80
+  },
+]

@@ -1,0 +1,18 @@
+---
+# Master playbook — runs all phases in order.
+# Usage:
+#   ansible-playbook site.yml -i inventory/hosts.yml
+#
+# Or run phases individually:
+#   ansible-playbook playbooks/k8s-prereqs.yml -i inventory/hosts.yml
+#   ansible-playbook playbooks/k3s-install.yml -i inventory/hosts.yml
+#   ansible-playbook playbooks/flux-bootstrap.yml -i inventory/hosts.yml
+
+- name: Phase 1 — Kubernetes prerequisites
+  ansible.builtin.import_playbook: playbooks/k8s-prereqs.yml
+
+- name: Phase 2 — Install k3s
+  ansible.builtin.import_playbook: playbooks/k3s-install.yml
+
+- name: Phase 3 — Bootstrap Flux
+  ansible.builtin.import_playbook: playbooks/flux-bootstrap.yml

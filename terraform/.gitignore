@@ -1,0 +1,14 @@
+# Secret vars
+terraform.tfvars
+*.tfvars
+!*.tfvars.example
+
+# Terraform state — store remotely (e.g. Terraform Cloud, S3, local backend)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Crash logs
+crash.log
+crash.*.log
