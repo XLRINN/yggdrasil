@@ -38,7 +38,7 @@ variable "proxmox_node" {
 variable "vm_template_id" {
   description = "Proxmox VM template ID (Ubuntu cloud image, see README)"
   type        = number
-  default     = 9000
+  default     = 999
 }
 
 variable "storage" {

@@ -10,7 +10,7 @@ proxmox_password = "changeme"
 proxmox_insecure = true   # set false if you have a valid TLS cert
 
 proxmox_node   = "pve"
-vm_template_id = 9000     # ID of your Ubuntu 24.04 cloud-image template
+vm_template_id = 999      # ID of your Ubuntu cloud-image template
 
 # ---------------------------------------------------------------------------
 # Networking
