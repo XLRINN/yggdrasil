@@ -17,7 +17,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.middlewares: longhorn-system-strip-longhorn@kubernetescrd
 spec:
   rules:
-  - host: heimdal.rip
+  - host: yggdrasil.rip
     http:
       paths:
       - path: /longhorn
@@ -38,7 +38,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
-  - host: "longhorn.drip.heimdal.rip"  # Ensure this matches your DNS
+  - host: "longhorn.yggdrasil.rip"  # Ensure this matches your DNS
     http:
       paths:
       - path: /

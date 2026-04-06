@@ -5,7 +5,7 @@ metadata:
   namespace: knarr
 spec:
   rules:
-  - host: heimdal.rip
+  - host: yggdrasil.rip
     http:
       paths:
       - path: /sonarr

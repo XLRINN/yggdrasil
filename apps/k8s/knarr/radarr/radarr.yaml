@@ -97,7 +97,7 @@ metadata:
   namespace: knarr
 spec:
   rules:
-  - host: radarr.drip.heimdal.rip
+  - host: radarr.yggdrasil.rip
     http:
       paths:
       - path: /

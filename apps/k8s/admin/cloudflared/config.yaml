@@ -8,15 +8,11 @@ data:
     tunnel: <TUNNEL_ID>
     credentials-file: /etc/cloudflared/creds/credentials.json
     ingress:
-      - hostname: "*.drip.heimdal.rip"
+      - hostname: "*.yggdrasil.rip"
         service: https://traefik.kube-system.svc.cluster.local:443
         originRequest:
           noTLSVerify: true
-      - hostname: "*.heimdal.rip"
-        service: https://traefik.kube-system.svc.cluster.local:443
-        originRequest:
-          noTLSVerify: true
-      - hostname: heimdal.rip
+      - hostname: yggdrasil.rip
         service: https://traefik.kube-system.svc.cluster.local:443
         originRequest:
           noTLSVerify: true

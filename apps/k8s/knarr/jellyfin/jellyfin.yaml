@@ -92,7 +92,7 @@ metadata:
   namespace: knarr
 spec:
   rules:
-  - host: fin.drip.heimdal.rip
+  - host: fin.yggdrasil.rip
     http:
       paths:
       - path: /

@@ -35,11 +35,11 @@ spec:
         - name: GENERIC_TIMEZONE
           value: "America/New_York"
         - name: N8N_HOST
-          value: "heimdal.rip"
+          value: "yggdrasil.rip"
         - name: N8N_PATH
           value: "/n8n/"
         - name: WEBHOOK_URL
-          value: "https://heimdal.rip/n8n/"
+          value: "https://yggdrasil.rip/n8n/"
         volumeMounts:
         - name: n8n-storage
           mountPath: /home/node/.n8n

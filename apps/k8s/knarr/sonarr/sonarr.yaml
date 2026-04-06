@@ -97,7 +97,7 @@ metadata:
   namespace: knarr
 spec:
   rules:
-  - host: sonarr.drip.heimdal.rip
+  - host: sonarr.yggdrasil.rip
     http:
       paths:
       - path: /

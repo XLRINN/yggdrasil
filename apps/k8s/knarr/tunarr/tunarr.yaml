@@ -105,7 +105,7 @@ items:
     spec:
       rules:
         # CHANGE THIS to your actual domain
-        - host: tunarr.drip.heimdal.rip
+        - host: tunarr.yggdrasil.rip
           http:
             paths:
               - path: /

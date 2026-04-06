@@ -84,7 +84,7 @@ metadata:
   namespace: knarr
 spec:
   rules:
-  - host: prowlarr.drip.heimdal.rip
+  - host: prowlarr.yggdrasil.rip
     http:
       paths:
       - path: /

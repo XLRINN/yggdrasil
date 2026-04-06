@@ -105,7 +105,7 @@ metadata:
   namespace: knarr
 spec:
   rules:
-  - host: crunchy.drip.heimdal.rip
+  - host: crunchy.yggdrasil.rip
     http:
       paths:
       - path: /

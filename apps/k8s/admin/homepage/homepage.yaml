@@ -38,7 +38,7 @@ data:
   services.yaml: |
     - Media:
         - Jellyfin:
-            href: https://heimdal.rip/jelly
+            href: https://yggdrasil.rip/jelly
             icon: jellyfin.png
             description: Media Server
             widget:
@@ -47,13 +47,13 @@ data:
               key: 3994e23ed5a847309e88a7bf8a160bd5
               enableBlocks: true
         - Tunarr:
-            href: http://tunarr.drip.heimdal.rip
+            href: http://tunarr.yggdrasil.rip
             icon: tunarr.png
             description: Live TV Channels
 
     - Downloads:
         - SABnzbd:
-            href: https://heimdal.rip/sabnzbd
+            href: https://yggdrasil.rip/sabnzbd
             icon: sabnzbd.png
             description: Usenet Downloader
             widget:
@@ -61,7 +61,7 @@ data:
               url: http://sabnzbd.knarr.svc.cluster.local
               key: bd92a4d3915349479bf69e57a0de5849
         - Sonarr:
-            href: https://heimdal.rip/sonarr
+            href: https://yggdrasil.rip/sonarr
             icon: sonarr.png
             description: TV Shows
             widget:
@@ -69,7 +69,7 @@ data:
               url: http://sonarr.knarr.svc.cluster.local
               key: d6384c35ad1744bfb4456ce5ca7ce051
         - Radarr:
-            href: https://heimdal.rip/radarr
+            href: https://yggdrasil.rip/radarr
             icon: radarr.png
             description: Movies
             widget:
@@ -77,7 +77,7 @@ data:
               url: http://radarr.knarr.svc.cluster.local
               key: 5b243c724ced48489b8fe9456267ef32
         - Prowlarr:
-            href: https://heimdal.rip/prowlarr
+            href: https://yggdrasil.rip/prowlarr
             icon: prowlarr.png
             description: Indexers
             widget:
@@ -85,7 +85,7 @@ data:
               url: http://prowlarr.knarr.svc.cluster.local
               key: c4cf026aab2d407db18fc50b5b57f004
         - Crunchy:
-            href: https://crunchy.drip.heimdal.rip
+            href: https://crunchy.yggdrasil.rip
             icon: sonarr.png
             description: Anime
             widget:
@@ -95,7 +95,7 @@ data:
 
     - Requests:
         - Seer:
-            href: https://heimdal.rip/seer
+            href: https://yggdrasil.rip/seer
             icon: overseerr.png
             description: Media Requests
             widget:
@@ -105,7 +105,7 @@ data:
 
     - Infrastructure:
         - Longhorn:
-            href: https://heimdal.rip/longhorn
+            href: https://yggdrasil.rip/longhorn
             icon: longhorn.png
             description: Storage
         - Rancher:
@@ -113,7 +113,7 @@ data:
             icon: rancher.png
             description: Kubernetes
         - n8n:
-            href: https://heimdal.rip/n8n
+            href: https://yggdrasil.rip/n8n
             icon: n8n.png
             description: Automation
 
@@ -164,7 +164,7 @@ spec:
             - name: TZ
               value: "America/New_York"
             - name: HOMEPAGE_ALLOWED_HOSTS
-              value: "drip.heimdal.rip,heimdal.rip"
+              value: "yggdrasil.rip"
           volumeMounts:
             - name: config-writable
               mountPath: /app/config
@@ -200,20 +200,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - heimdal.rip
-    secretName: heimdal-rip-tls
+    - yggdrasil.rip
+    secretName: yggdrasil-rip-tls
   rules:
-    - host: drip.heimdal.rip
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: homepage
-                port:
-                  number: 80
-    - host: heimdal.rip
+    - host: yggdrasil.rip
       http:
         paths:
           - path: /
