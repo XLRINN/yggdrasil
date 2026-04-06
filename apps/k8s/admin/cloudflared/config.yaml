@@ -5,6 +5,8 @@ metadata:
   namespace: admin
 data:
   config.yaml: |
+    tunnel: <TUNNEL_ID>
+    credentials-file: /etc/cloudflared/creds/credentials.json
     ingress:
       - hostname: "*.drip.heimdal.rip"
         service: https://traefik.kube-system.svc.cluster.local:443

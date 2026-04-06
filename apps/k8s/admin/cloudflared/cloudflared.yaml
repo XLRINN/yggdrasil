@@ -24,15 +24,13 @@ spec:
         - --config
         - /etc/cloudflared/config.yaml
         - run
-        env:
-        - name: TUNNEL_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: tunnel-credentials
-              key: TUNNEL_TOKEN
         volumeMounts:
         - name: config
-          mountPath: /etc/cloudflared
+          mountPath: /etc/cloudflared/config.yaml
+          subPath: config.yaml
+          readOnly: true
+        - name: creds
+          mountPath: /etc/cloudflared/creds
           readOnly: true
         resources:
           requests:
@@ -45,3 +43,6 @@ spec:
       - name: config
         configMap:
           name: cloudflared-config
+      - name: creds
+        secret:
+          secretName: tunnel-credentials
