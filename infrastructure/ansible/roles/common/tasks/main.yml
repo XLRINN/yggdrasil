@@ -1,0 +1,61 @@
+---
+- name: Install disk utilities
+  apt:
+    name:
+      - cloud-guest-utils  # provides growpart
+      - parted
+    state: present
+
+- name: Grow root partition to fill disk
+  command: growpart /dev/vda 3
+  register: growpart_result
+  changed_when: "'CHANGED' in growpart_result.stdout"
+  failed_when: growpart_result.rc != 0 and 'NOCHANGE' not in growpart_result.stdout
+
+- name: Resize LVM physical volume
+  command: pvresize /dev/vda3
+  when: growpart_result.changed
+
+- name: Extend logical volume to use all free space
+  command: lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+  register: lvextend_result
+  changed_when: "'successfully resized' in lvextend_result.stdout"
+  failed_when: lvextend_result.rc != 0 and 'already' not in lvextend_result.stderr
+  when: growpart_result.changed
+
+- name: Resize root filesystem
+  command: resize2fs /dev/ubuntu-vg/ubuntu-lv
+  when: lvextend_result.changed | default(false)
+
+- name: Update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install base packages
+  apt:
+    name:
+      - curl
+      - git
+      - wget
+      - unzip
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - qemu-guest-agent
+      - rclone
+      - aria2
+      - neovim
+      - tmux
+    state: present
+
+- name: Enable and start qemu-guest-agent
+  systemd:
+    name: qemu-guest-agent
+    enabled: true
+    state: started
+
+- name: Set hostname
+  hostname:
+    name: draupnir

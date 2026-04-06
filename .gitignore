@@ -1,0 +1,17 @@
+# Terraform
+**/.terraform/
+*.tfvars
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform.lock.hcl
+
+# Ansible secrets (use ansible-vault)
+infrastructure/ansible/vars/secrets.yml
+
+# age key
+age.key
+*.key
+
+# misc
+.DS_Store

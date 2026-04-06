@@ -1,0 +1,21 @@
+---
+- name: Configure draupnir
+  hosts: draupnir
+  become: true
+  vars_files:
+    - vars/secrets.yml  # ansible-vault encrypted; see vars/secrets.yml.example
+  roles:
+    - common
+    - tailscale
+    - k8s_tools
+    - flux_bootstrap
+    - claude_cli
+
+- name: Configure alexandria
+  hosts: alexandria
+  become: true
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - fileshare
+    - claude_cli

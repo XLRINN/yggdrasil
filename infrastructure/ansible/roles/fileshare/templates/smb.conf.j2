@@ -1,0 +1,22 @@
+[global]
+   workgroup = WORKGROUP
+   server string = alexandria
+   server role = standalone server
+   log file = /var/log/samba/log.%m
+   max log size = 1000
+   logging = file
+   panic action = /usr/share/samba/panic-action %d
+   obey pam restrictions = yes
+   unix password sync = no
+   passwd program = /usr/bin/passwd %u
+   pam password change = yes
+   map to guest = never
+
+[alexandria]
+   path = /alexandria
+   browseable = yes
+   read only = no
+   valid users = {{ samba_user }}
+   create mask = 0664
+   directory mask = 0775
+   force group = nogroup

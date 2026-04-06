@@ -1,0 +1,69 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install NFS, Samba, and base utilities
+  apt:
+    name:
+      - nfs-kernel-server
+      - samba
+      - acl
+      - rclone
+      - aria2
+    state: present
+
+- name: Ensure /alexandria is owned by nobody/nogroup
+  file:
+    path: /alexandria
+    owner: nobody
+    group: nogroup
+    mode: "0775"
+    state: directory
+
+- name: Configure NFS exports
+  template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload nfs exports
+
+- name: Enable and start nfs-kernel-server
+  systemd:
+    name: nfs-kernel-server
+    enabled: true
+    state: started
+
+- name: Configure Samba
+  template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart samba
+
+- name: Create samba system user
+  user:
+    name: "{{ samba_user }}"
+    shell: /usr/sbin/nologin
+    create_home: false
+    state: present
+
+- name: Set Samba password for user
+  shell: >
+    (echo {{ samba_password }}; echo {{ samba_password }}) | smbpasswd -a -s {{ samba_user }}
+  no_log: true
+  changed_when: false
+
+- name: Enable and start Samba services
+  systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - smbd
+    - nmbd

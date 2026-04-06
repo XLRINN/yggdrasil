@@ -1,0 +1,43 @@
+---
+- name: Add kubectl signing key
+  get_url:
+    url: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
+    dest: /tmp/k8s-release.key
+
+- name: Dearmor kubectl key
+  command: gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg /tmp/k8s-release.key
+  args:
+    creates: /usr/share/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Add kubectl apt repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /"
+    filename: kubernetes
+    state: present
+
+- name: Install kubectl
+  apt:
+    name: kubectl
+    state: present
+    update_cache: true
+
+# --- k9s ---
+- name: Get latest k9s release
+  uri:
+    url: https://api.github.com/repos/derailed/k9s/releases/latest
+    return_content: true
+  register: k9s_release
+
+- name: Install k9s
+  unarchive:
+    src: "https://github.com/derailed/k9s/releases/download/{{ k9s_release.json.tag_name }}/k9s_Linux_amd64.tar.gz"
+    dest: /usr/local/bin
+    include: k9s
+    remote_src: true
+    mode: "0755"
+
+# --- flux CLI ---
+- name: Install flux CLI
+  shell: curl -s https://fluxcd.io/install.sh | bash
+  args:
+    creates: /usr/local/bin/flux

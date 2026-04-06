@@ -1,0 +1,23 @@
+---
+- name: Download NodeSource setup script
+  get_url:
+    url: https://deb.nodesource.com/setup_22.x
+    dest: /tmp/nodesource_setup.sh
+    mode: "0755"
+
+- name: Run NodeSource setup script
+  command: bash /tmp/nodesource_setup.sh
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: present
+    update_cache: true
+
+- name: Install Claude CLI
+  npm:
+    name: "@anthropic-ai/claude-code"
+    global: true
+    state: present

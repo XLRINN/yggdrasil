@@ -1,0 +1,30 @@
+---
+- name: Create flux-system namespace
+  command: kubectl create namespace flux-system --dry-run=client -o yaml | kubectl apply -f -
+  environment:
+    KUBECONFIG: /home/ubuntu/.kube/config
+
+- name: Create SOPS age secret
+  shell: |
+    kubectl create secret generic sops-age \
+      --namespace=flux-system \
+      --from-literal=age.agekey="{{ sops_age_key }}" \
+      --dry-run=client -o yaml | kubectl apply -f -
+  environment:
+    KUBECONFIG: /home/ubuntu/.kube/config
+  no_log: true
+
+- name: Bootstrap Flux against yggdrasil repo
+  command: >
+    flux bootstrap github
+    --owner=XLRINN
+    --repository=yggdrasil
+    --branch=main
+    --path=clusters/home
+    --personal
+    --token-auth
+  environment:
+    KUBECONFIG: /home/ubuntu/.kube/config
+    GITHUB_TOKEN: "{{ github_token }}"
+  become: false
+  become_user: ubuntu

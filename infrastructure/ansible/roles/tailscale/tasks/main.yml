@@ -1,0 +1,29 @@
+---
+- name: Add Tailscale signing key
+  get_url:
+    url: https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg
+    dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    mode: "0644"
+
+- name: Add Tailscale apt repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu noble main"
+    filename: tailscale
+    state: present
+
+- name: Install Tailscale
+  apt:
+    name: tailscale
+    state: present
+    update_cache: true
+
+- name: Enable tailscaled
+  systemd:
+    name: tailscaled
+    enabled: true
+    state: started
+
+- name: Bring up Tailscale
+  command: tailscale up --authkey {{ tailscale_auth_key }} --hostname draupnir
+  args:
+    creates: /var/lib/tailscale/tailscaled.state
