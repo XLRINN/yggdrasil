@@ -12,6 +12,15 @@
     - flux_bootstrap
     - claude_cli
 
+- name: Bootstrap Flux on drip
+  hosts: drip
+  become: true
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - k8s_tools
+    - flux_bootstrap
+
 - name: Configure alexandria
   hosts: alexandria
   become: true
