@@ -12,7 +12,7 @@ provider "tailscale" {
 
 resource "tailscale_tailnet_key" "draupnir" {
   reusable      = false
-  ephemeral     = false
+  ephemeral     = true
   preauthorized = true
   description   = "draupnir provisioned by terraform"
 }
