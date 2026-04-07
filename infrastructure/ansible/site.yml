@@ -6,7 +6,6 @@
     - vars/secrets.yml  # ansible-vault encrypted; see vars/secrets.yml.example
   roles:
     - common
-    - tailscale
     - k3s
     - k8s_tools
     - flux_bootstrap

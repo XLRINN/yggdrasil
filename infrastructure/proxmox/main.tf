@@ -5,6 +5,34 @@ provider "proxmox" {
   insecure = true # self-signed cert
 }
 
+provider "tailscale" {
+  api_key = var.tailscale_api_key
+  tailnet  = var.tailscale_tailnet
+}
+
+resource "tailscale_tailnet_key" "draupnir" {
+  reusable      = false
+  ephemeral     = false
+  preauthorized = true
+  description   = "draupnir provisioned by terraform"
+}
+
+resource "proxmox_virtual_environment_file" "draupnir_cloudinit" {
+  content_type = "snippets"
+  datastore_id = "local"
+  node_name    = "asgard"
+
+  source_raw {
+    file_name = "draupnir-cloudinit.yaml"
+    data      = <<-EOF
+      #cloud-config
+      runcmd:
+        - curl -fsSL https://tailscale.com/install.sh | sh
+        - tailscale up --authkey=${tailscale_tailnet_key.draupnir.key} --hostname=draupnir
+      EOF
+  }
+}
+
 resource "proxmox_virtual_environment_vm" "draupnir" {
   name      = var.vm_name
   node_name = "asgard"
@@ -40,6 +68,8 @@ resource "proxmox_virtual_environment_vm" "draupnir" {
   }
 
   initialization {
+    user_data_file_id = proxmox_virtual_environment_file.draupnir_cloudinit.id
+
     ip_config {
       ipv4 {
         address = "${var.vm_ip}/24"

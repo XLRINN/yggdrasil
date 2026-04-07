@@ -46,6 +46,17 @@ variable "ssh_public_key" {
   default     = ""
 }
 
+variable "tailscale_api_key" {
+  description = "Tailscale API key for generating auth keys"
+  type        = string
+  sensitive   = true
+}
+
+variable "tailscale_tailnet" {
+  description = "Tailscale tailnet (e.g. example.com or the org name)"
+  type        = string
+}
+
 variable "ubuntu_lxc_template" {
   description = "Proxmox template file ID for Ubuntu 24.04 LXC"
   type        = string
