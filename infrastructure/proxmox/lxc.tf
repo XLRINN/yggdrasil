@@ -13,6 +13,10 @@ resource "proxmox_virtual_environment_container" "alexandria" {
       }
     }
 
+    dns {
+      servers = ["1.1.1.1", "8.8.8.8"]
+    }
+
     user_account {
       password = var.proxmox_password
       keys     = var.ssh_public_key != "" ? [var.ssh_public_key] : []
