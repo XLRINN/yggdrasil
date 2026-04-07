@@ -8,7 +8,8 @@ resource "proxmox_virtual_environment_container" "alexandria" {
 
     ip_config {
       ipv4 {
-        address = "dhcp"
+        address = "192.168.69.5/24"
+        gateway = "192.168.69.1"
       }
     }
 
