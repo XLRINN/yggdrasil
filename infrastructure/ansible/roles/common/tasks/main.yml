@@ -1,11 +1,6 @@
 ---
-- name: Install disk utilities
-  apt:
-    name:
-      - cloud-guest-utils  # provides growpart
-      - parted
-    state: present
-
+# Expand disk FIRST before any apt calls — ubuntu cloud images ship
+# cloud-guest-utils pre-installed, so growpart is available immediately.
 - name: Grow root partition to fill disk
   command: growpart /dev/vda 3
   register: growpart_result
@@ -35,6 +30,8 @@
 - name: Install base packages
   apt:
     name:
+      - cloud-guest-utils
+      - parted
       - curl
       - git
       - wget
