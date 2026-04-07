@@ -1,4 +1,19 @@
 ---
+- name: Fix resolv.conf symlink (broken in Ubuntu LXC containers)
+  file:
+    path: /etc/resolv.conf
+    state: absent
+
+- name: Write static resolv.conf
+  copy:
+    dest: /etc/resolv.conf
+    content: |
+      nameserver 1.1.1.1
+      nameserver 8.8.8.8
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: Update apt cache
   apt:
     update_cache: true
