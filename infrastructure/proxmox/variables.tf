@@ -55,6 +55,6 @@ variable "ssh_public_key" {
 variable "ubuntu_lxc_template" {
   description = "Proxmox template file ID for Ubuntu 24.04 LXC"
   type        = string
-  default     = "local:vztmpl/ubuntu-24.04-standard_24.04-1_amd64.tar.zst"
+  default     = "local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
 }
 
