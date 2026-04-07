@@ -19,3 +19,11 @@
   roles:
     - fileshare
     - claude_cli
+
+- name: Configure pihole
+  hosts: pihole
+  become: true
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - pihole

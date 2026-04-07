@@ -8,3 +8,7 @@ all:
       ansible_host: FILL_IN_AFTER_BOOT  # DHCP — check Proxmox or router for assigned IP
       ansible_user: root
       ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+    pihole:
+      ansible_host: 192.168.69.2
+      ansible_user: root
+      ansible_ssh_private_key_file: ~/.ssh/id_ed25519

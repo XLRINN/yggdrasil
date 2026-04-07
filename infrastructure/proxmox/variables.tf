@@ -58,3 +58,9 @@ variable "ubuntu_lxc_template" {
   default     = "local:vztmpl/ubuntu-24.04-standard_24.04-1_amd64.tar.zst"
 }
 
+variable "pihole_password" {
+  description = "Pi-hole web UI admin password"
+  type        = string
+  sensitive   = true
+}
+

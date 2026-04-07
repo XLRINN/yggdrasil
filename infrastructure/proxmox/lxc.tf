@@ -1,3 +1,59 @@
+resource "proxmox_virtual_environment_container" "pihole" {
+  node_name    = "asgard"
+  vm_id        = 100
+  unprivileged = true
+
+  initialization {
+    hostname = "pihole"
+
+    ip_config {
+      ipv4 {
+        address = "192.168.69.2/24"
+        gateway = "192.168.69.1"
+      }
+    }
+
+    dns {
+      servers = ["1.1.1.1"] # bootstrap — point to itself after provisioning
+    }
+
+    user_account {
+      password = var.vm_password
+      keys     = var.ssh_public_key != "" ? [var.ssh_public_key] : []
+    }
+  }
+
+  cpu {
+    cores = 1
+  }
+
+  memory {
+    dedicated = 512
+    swap      = 0
+  }
+
+  disk {
+    datastore_id = "disks-fast"
+    size         = 4
+  }
+
+  network_interface {
+    name   = "eth0"
+    bridge = "vmbr0"
+  }
+
+  operating_system {
+    template_file_id = var.ubuntu_lxc_template
+    type             = "ubuntu"
+  }
+
+  features {
+    nesting = true # required for Pi-hole's dnsmasq inside LXC
+  }
+
+  on_boot = true
+}
+
 resource "proxmox_virtual_environment_container" "alexandria" {
   node_name    = "asgard"
   vm_id        = 111

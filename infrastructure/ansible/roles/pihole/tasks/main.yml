@@ -1,0 +1,47 @@
+---
+- name: Install dependencies
+  apt:
+    name: [curl, dns-root-data]
+    state: present
+    update_cache: true
+
+- name: Create Pi-hole config directory
+  file:
+    path: /etc/pihole
+    state: directory
+    mode: "0755"
+
+- name: Deploy unattended install config
+  template:
+    src: setupVars.conf.j2
+    dest: /etc/pihole/setupVars.conf
+    mode: "0644"
+
+- name: Install Pi-hole (unattended)
+  shell: curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
+  args:
+    creates: /usr/local/bin/pihole
+
+- name: Set Pi-hole web UI password
+  command: pihole -a -p {{ pihole_password }}
+  no_log: true
+  changed_when: true
+
+- name: Deploy wildcard DNS config for yggdrasil.rip
+  template:
+    src: 02-yggdrasil.conf.j2
+    dest: /etc/dnsmasq.d/02-yggdrasil.conf
+    mode: "0644"
+  notify: restart pihole-FTL
+
+- name: Enable and start pihole-FTL
+  systemd:
+    name: pihole-FTL
+    enabled: true
+    state: started
+
+handlers:
+  - name: restart pihole-FTL
+    systemd:
+      name: pihole-FTL
+      state: restarted

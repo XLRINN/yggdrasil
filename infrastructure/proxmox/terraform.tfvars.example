@@ -1,5 +1,6 @@
 proxmox_password = "your-proxmox-root-password"
 ssh_public_key   = "ssh-ed25519 AAAA..."
+pihole_password  = "changeme"
 
 # Optional overrides
 # vm_name    = "sleipnir"
