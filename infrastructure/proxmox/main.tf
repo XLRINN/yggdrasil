@@ -49,7 +49,7 @@ resource "proxmox_virtual_environment_vm" "draupnir" {
 
     user_account {
       username = "david"
-      password = var.vm_password
+      password = var.proxmox_password
       keys     = var.ssh_public_key != "" ? [var.ssh_public_key] : []
     }
 

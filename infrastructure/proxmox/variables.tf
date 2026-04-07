@@ -40,12 +40,6 @@ variable "gateway" {
   default     = "192.168.69.1"
 }
 
-variable "vm_password" {
-  description = "Password for console access (emergency use)"
-  type        = string
-  sensitive   = true
-}
-
 variable "ssh_public_key" {
   description = "SSH public key to authorize on the VM"
   type        = string

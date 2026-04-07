@@ -13,7 +13,7 @@ resource "proxmox_virtual_environment_container" "alexandria" {
     }
 
     user_account {
-      password = var.vm_password
+      password = var.proxmox_password
       keys     = var.ssh_public_key != "" ? [var.ssh_public_key] : []
     }
   }
@@ -49,8 +49,10 @@ resource "proxmox_virtual_environment_container" "alexandria" {
 
   features {
     nesting = true
-    mount   = "nfs;cifs" # allow NFS and SMB server inside container
+    mount   = ["nfs", "cifs"] # allow NFS and SMB server inside container
   }
 
-  on_boot = true
+  startup {
+    order = 1
+  }
 }
