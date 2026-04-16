@@ -95,7 +95,13 @@ kind: Ingress
 metadata:
   name: radarr-ingress
   namespace: knarr
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  tls:
+  - hosts:
+    - radarr.drip.heimdal.rip
+    secretName: radarr-tls
   rules:
   - host: radarr.drip.heimdal.rip
     http:

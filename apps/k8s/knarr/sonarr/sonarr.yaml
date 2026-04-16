@@ -95,7 +95,13 @@ kind: Ingress
 metadata:
   name: sonarr-ingress
   namespace: knarr
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  tls:
+  - hosts:
+    - sonarr.drip.heimdal.rip
+    secretName: sonarr-tls
   rules:
   - host: sonarr.drip.heimdal.rip
     http:

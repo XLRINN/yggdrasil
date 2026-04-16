@@ -100,11 +100,14 @@ items:
       name: tunarr-ingress
       namespace: knarr
       annotations:
-        # Standard Nginx ingress annotations
         nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        cert-manager.io/cluster-issuer: letsencrypt-prod
     spec:
+      tls:
+      - hosts:
+        - tunarr.drip.heimdal.rip
+        secretName: tunarr-tls
       rules:
-        # CHANGE THIS to your actual domain
         - host: tunarr.drip.heimdal.rip
           http:
             paths:

@@ -4,14 +4,15 @@ metadata:
   name: sabnzbd-ingress
   namespace: knarr
   annotations:
-    # Use your Traefik/Nginx class here. usually 'traefik' or 'nginx'
     kubernetes.io/ingress.class: traefik
-    
-    # Optional: If you use Cert-Manager for SSL
-    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  tls:
+  - hosts:
+    - sabnzb.drip.heimdal.rip
+    secretName: sabnzb-tls
   rules:
-  - host: sabnzb.drip.heimdal.rip   # <--- UPDATE: Your actual domain
+  - host: sabnzb.drip.heimdal.rip
     http:
       paths:
       - path: /
