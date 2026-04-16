@@ -2,30 +2,23 @@
 # Expand disk FIRST before any apt calls — ubuntu cloud images ship
 # cloud-guest-utils pre-installed, so growpart is available immediately.
 - name: Grow root partition to fill disk
-  command: growpart /dev/vda 3
+  command: growpart /dev/sda 1
   register: growpart_result
   changed_when: "'CHANGED' in growpart_result.stdout"
   failed_when: growpart_result.rc != 0 and 'NOCHANGE' not in growpart_result.stdout
 
-- name: Resize LVM physical volume
-  command: pvresize /dev/vda3
-  when: growpart_result.changed
-
-- name: Extend logical volume to use all free space
-  command: lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
-  register: lvextend_result
-  changed_when: "'successfully resized' in lvextend_result.stdout"
-  failed_when: lvextend_result.rc != 0 and 'already' not in lvextend_result.stderr
-  when: growpart_result.changed
-
 - name: Resize root filesystem
-  command: resize2fs /dev/ubuntu-vg/ubuntu-lv
-  when: lvextend_result.changed | default(false)
+  command: resize2fs /dev/sda1
+  when: growpart_result.changed
 
 - name: Update apt cache
   apt:
     update_cache: true
     cache_valid_time: 3600
+
+- name: Fix broken packages
+  command: apt-get -y --fix-broken install
+  changed_when: false
 
 - name: Install base packages
   apt:
@@ -52,7 +45,8 @@
     name: qemu-guest-agent
     enabled: true
     state: started
+  ignore_errors: true
 
 - name: Set hostname
   hostname:
-    name: draupnir
+    name: "{{ inventory_hostname }}"

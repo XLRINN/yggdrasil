@@ -1,6 +1,6 @@
 ---
 - name: Create flux-system namespace
-  command: kubectl create namespace flux-system --dry-run=client -o yaml | kubectl apply -f -
+  shell: kubectl create namespace flux-system --dry-run=client -o yaml | kubectl apply -f -
   environment:
     KUBECONFIG: /home/david/.kube/config
 

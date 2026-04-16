@@ -1,12 +1,2 @@
-proxmox_username  = "root@pam"
-proxmox_password  = "your-proxmox-root-password"
-ssh_public_key    = "ssh-ed25519 AAAA..."
-tailscale_api_key = "tskey-api-..."
-tailscale_tailnet = "example.com"
-
-# Optional overrides
-# vm_name    = "sleipnir"
-# vm_id      = 100
-# cpu_cores  = 8
-# vm_ip      = "192.168.69.77"
-# gateway    = "192.168.69.1"
+proxmox_password = "your-proxmox-root-password"
+ssh_public_key   = "ssh-ed25519 AAAA..."

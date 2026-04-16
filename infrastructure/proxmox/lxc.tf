@@ -9,7 +9,7 @@ resource "proxmox_virtual_environment_container" "alexandria" {
     ip_config {
       ipv4 {
         address = "192.168.69.5/24"
-        gateway = "192.168.69.1"
+        gateway = var.gateway
       }
     }
 
@@ -59,5 +59,35 @@ resource "proxmox_virtual_environment_container" "alexandria" {
 
   startup {
     order = 1
+  }
+
+  provisioner "local-exec" {
+    when    = create
+    command = "ssh-keygen -R 192.168.69.5 || true"
+  }
+}
+
+resource "null_resource" "alexandria_post_create" {
+  depends_on = [proxmox_virtual_environment_container.alexandria]
+
+  connection {
+    type     = "ssh"
+    host     = "asgard"
+    user     = "root"
+    password = var.proxmox_password
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      # Inject SSH key directly into container filesystem
+      "pct exec 111 -- mkdir -p /root/.ssh",
+      "pct exec 111 -- chmod 700 /root/.ssh",
+      "echo '${var.ssh_public_key}' | pct exec 111 -- tee /root/.ssh/authorized_keys",
+      "pct exec 111 -- chmod 600 /root/.ssh/authorized_keys",
+      # Add TUN device for Tailscale
+      "grep -q 'dev/net/tun' /etc/pve/lxc/111.conf || echo 'lxc.cgroup2.devices.allow: c 10:200 rwm' >> /etc/pve/lxc/111.conf",
+      "grep -q 'dev/net/tun' /etc/pve/lxc/111.conf || echo 'lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file 0 0' >> /etc/pve/lxc/111.conf",
+      "pct reboot 111"
+    ]
   }
 }

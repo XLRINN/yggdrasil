@@ -23,7 +23,12 @@
     enabled: true
     state: started
 
+- name: Check Tailscale status
+  command: tailscale status
+  register: tailscale_status
+  changed_when: false
+  failed_when: false
+
 - name: Bring up Tailscale
-  command: tailscale up --authkey {{ tailscale_auth_key }} --hostname draupnir
-  args:
-    creates: /var/lib/tailscale/tailscaled.state
+  command: tailscale up --authkey {{ tailscale_auth_key }} --hostname {{ inventory_hostname }}
+  when: tailscale_status.rc != 0 or 'Logged out' in tailscale_status.stderr

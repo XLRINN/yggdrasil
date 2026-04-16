@@ -1,9 +1,3 @@
-variable "proxmox_username" {
-  description = "Proxmox user"
-  type        = string
-  default     = "root@pam"
-}
-
 variable "proxmox_password" {
   description = "Proxmox password"
   type        = string
@@ -44,17 +38,6 @@ variable "ssh_public_key" {
   description = "SSH public key to authorize on the VM"
   type        = string
   default     = ""
-}
-
-variable "tailscale_api_key" {
-  description = "Tailscale API key for generating auth keys"
-  type        = string
-  sensitive   = true
-}
-
-variable "tailscale_tailnet" {
-  description = "Tailscale tailnet (e.g. example.com or the org name)"
-  type        = string
 }
 
 variable "ubuntu_lxc_template" {
