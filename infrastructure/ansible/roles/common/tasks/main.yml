@@ -11,6 +11,13 @@
   command: resize2fs /dev/sda1
   when: growpart_result.changed
 
+- name: Stop and disable unattended-upgrades
+  systemd:
+    name: unattended-upgrades
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
 - name: Wait for apt lock to be released
   wait_for:
     path: /var/lib/dpkg/lock-frontend
