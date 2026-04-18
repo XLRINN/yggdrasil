@@ -1,0 +1,6 @@
+---
+- name: restart multipathd
+  systemd:
+    name: multipathd
+    state: restarted
+  ignore_errors: true

@@ -13,6 +13,25 @@
     enabled: true
     state: started
 
+- name: Blacklist Longhorn devices from multipathd
+  copy:
+    dest: /etc/multipath/conf.d/longhorn.conf
+    content: |
+      blacklist {
+        devnode "^sd[a-z0-9]+"
+      }
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart multipathd
+
+- name: Ensure multipathd is running (needed to pick up blacklist)
+  systemd:
+    name: multipathd
+    state: started
+    enabled: true
+  ignore_errors: true
+
 - name: Add Longhorn Helm repository
   command: helm repo add longhorn https://charts.longhorn.io
   environment:
