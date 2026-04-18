@@ -21,10 +21,26 @@
     mode: "0775"
   delegate_to: alexandria
 
+- name: Create njord media mount point
+  file:
+    path: /mnt/njord
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: Mount NFS backup share
   mount:
     path: /mnt/longhorn-backup
     src: "192.168.69.5:/alexandria/longhorn-backups"
+    fstype: nfs
+    opts: defaults,_netdev,soft,timeo=30
+    state: mounted
+
+- name: Mount njord media share
+  mount:
+    path: /mnt/njord
+    src: "njord:/mnt/user/njord"
     fstype: nfs
     opts: defaults,_netdev,soft,timeo=30
     state: mounted
