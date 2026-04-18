@@ -1,5 +1,5 @@
 ---
-- name: Install Longhorn prerequisites
+- name: Install Longhorn node prerequisites
   apt:
     name:
       - open-iscsi
@@ -31,25 +31,3 @@
     state: started
     enabled: true
   ignore_errors: true
-
-- name: Add Longhorn Helm repository
-  command: helm repo add longhorn https://charts.longhorn.io
-  environment:
-    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  changed_when: false
-
-- name: Update Helm repositories
-  command: helm repo update
-  environment:
-    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  changed_when: false
-
-- name: Install Longhorn
-  command: >
-    helm upgrade --install longhorn longhorn/longhorn
-    --namespace longhorn-system
-    --create-namespace
-    --set defaultSettings.backupTarget="nfs://192.168.69.5:/alexandria/longhorn-backups"
-  environment:
-    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  changed_when: false

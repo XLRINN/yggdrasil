@@ -11,9 +11,10 @@ spec:
     kind: GitRepository
     name: flux-system
   healthChecks:
-    - apiVersion: storage.k8s.io/v1
-      kind: StorageClass
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
       name: longhorn
+      namespace: longhorn-system
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: cert-manager
