@@ -11,6 +11,12 @@
   command: resize2fs /dev/sda1
   when: growpart_result.changed
 
+- name: Wait for apt lock to be released
+  wait_for:
+    path: /var/lib/dpkg/lock-frontend
+    state: absent
+    timeout: 120
+
 - name: Update apt cache
   apt:
     update_cache: true
