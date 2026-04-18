@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: admin
+data:
+  config.yaml: |
+    ingress:
+      - hostname: "*.yggdrasil.rip"
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: yggdrasil.rip
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - service: http_status:404
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,6 +35,8 @@ spec:
         args:
         - tunnel
         - --no-autoupdate
+        - --config
+        - /etc/cloudflared/config.yaml
         - run
         env:
         - name: TUNNEL_TOKEN
@@ -28,6 +44,10 @@ spec:
             secretKeyRef:
               name: tunnel-credentials
               key: TUNNEL_TOKEN
+        volumeMounts:
+        - name: config
+          mountPath: /etc/cloudflared
+          readOnly: true
         resources:
           requests:
             cpu: 10m
@@ -35,4 +55,8 @@ spec:
           limits:
             cpu: 50m
             memory: 128Mi
+      volumes:
+      - name: config
+        configMap:
+          name: cloudflared-config
 
