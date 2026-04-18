@@ -17,7 +17,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.middlewares: auto-strip-n8n@kubernetescrd
 spec:
   rules:
-  - host: heimdal.rip
+  - host: yggdrasil.rip
     http:
       paths:
       - path: /n8n
@@ -41,10 +41,10 @@ spec:
   # This section tells Kubernetes "This domain uses this secret for SSL"
   tls:
   - hosts:
-    - n8n.drip.heimdal.rip
+    - n8n.drip.yggdrasil.rip
     secretName: n8n-tls-secret
   rules:
-  - host: "n8n.drip.heimdal.rip"
+  - host: "n8n.drip.yggdrasil.rip"
     http:
       paths:
       - path: /

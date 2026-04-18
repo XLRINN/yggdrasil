@@ -108,10 +108,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - crunchy.drip.heimdal.rip
+    - crunchy.drip.yggdrasil.rip
     secretName: sonarr-anime-tls
   rules:
-  - host: crunchy.drip.heimdal.rip
+  - host: crunchy.drip.yggdrasil.rip
     http:
       paths:
       - path: /

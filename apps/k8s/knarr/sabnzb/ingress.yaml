@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - sabnzb.drip.heimdal.rip
+    - sabnzb.drip.yggdrasil.rip
     secretName: sabnzb-tls
   rules:
-  - host: sabnzb.drip.heimdal.rip
+  - host: sabnzb.drip.yggdrasil.rip
     http:
       paths:
       - path: /

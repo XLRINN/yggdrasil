@@ -87,10 +87,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - prowlarr.drip.heimdal.rip
+    - prowlarr.drip.yggdrasil.rip
     secretName: prowlarr-tls
   rules:
-  - host: prowlarr.drip.heimdal.rip
+  - host: prowlarr.drip.yggdrasil.rip
     http:
       paths:
       - path: /

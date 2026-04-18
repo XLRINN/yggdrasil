@@ -100,10 +100,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - sonarr.drip.heimdal.rip
+    - sonarr.drip.yggdrasil.rip
     secretName: sonarr-tls
   rules:
-  - host: sonarr.drip.heimdal.rip
+  - host: sonarr.drip.yggdrasil.rip
     http:
       paths:
       - path: /

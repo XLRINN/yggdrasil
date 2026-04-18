@@ -100,10 +100,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - seer.drip.heimdal.rip
+    - seer.drip.yggdrasil.rip
     secretName: seer-tls
   rules:
-    - host: seer.drip.heimdal.rip
+    - host: seer.drip.yggdrasil.rip
       http:
         paths:
           - path: /

@@ -100,10 +100,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - radarr.drip.heimdal.rip
+    - radarr.drip.yggdrasil.rip
     secretName: radarr-tls
   rules:
-  - host: radarr.drip.heimdal.rip
+  - host: radarr.drip.yggdrasil.rip
     http:
       paths:
       - path: /

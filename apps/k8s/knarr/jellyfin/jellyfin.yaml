@@ -95,10 +95,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - fin.drip.heimdal.rip
+    - fin.drip.yggdrasil.rip
     secretName: jellyfin-tls
   rules:
-  - host: fin.drip.heimdal.rip
+  - host: fin.drip.yggdrasil.rip
     http:
       paths:
       - path: /

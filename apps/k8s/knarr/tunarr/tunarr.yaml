@@ -105,10 +105,10 @@ items:
     spec:
       tls:
       - hosts:
-        - tunarr.drip.heimdal.rip
+        - tunarr.drip.yggdrasil.rip
         secretName: tunarr-tls
       rules:
-        - host: tunarr.drip.heimdal.rip
+        - host: tunarr.drip.yggdrasil.rip
           http:
             paths:
               - path: /
