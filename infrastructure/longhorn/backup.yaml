@@ -1,4 +1,12 @@
 apiVersion: longhorn.io/v1beta2
+kind: Setting
+metadata:
+  name: backup-target
+  namespace: longhorn-system
+spec:
+  value: "nfs://192.168.69.5:/alexandria/longhorn-backups"
+---
+apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:
   name: daily-backup

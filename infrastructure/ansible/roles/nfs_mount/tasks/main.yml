@@ -1,0 +1,30 @@
+---
+- name: Install NFS client
+  apt:
+    name: nfs-common
+    state: present
+
+- name: Create Longhorn backup mount point
+  file:
+    path: /mnt/longhorn-backup
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create longhorn-backups directory on NFS server
+  file:
+    path: /alexandria/longhorn-backups
+    state: directory
+    owner: nobody
+    group: nogroup
+    mode: "0775"
+  delegate_to: alexandria
+
+- name: Mount NFS backup share
+  mount:
+    path: /mnt/longhorn-backup
+    src: "192.168.69.5:/alexandria/longhorn-backups"
+    fstype: nfs
+    opts: defaults,_netdev,soft,timeo=30
+    state: mounted

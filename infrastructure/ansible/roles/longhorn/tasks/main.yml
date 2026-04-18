@@ -1,0 +1,36 @@
+---
+- name: Install Longhorn prerequisites
+  apt:
+    name:
+      - open-iscsi
+      - nfs-common
+      - util-linux
+    state: present
+
+- name: Enable and start iscsid
+  systemd:
+    name: iscsid
+    enabled: true
+    state: started
+
+- name: Add Longhorn Helm repository
+  command: helm repo add longhorn https://charts.longhorn.io
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  changed_when: false
+
+- name: Update Helm repositories
+  command: helm repo update
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  changed_when: false
+
+- name: Install Longhorn
+  command: >
+    helm upgrade --install longhorn longhorn/longhorn
+    --namespace longhorn-system
+    --create-namespace
+    --set defaultSettings.backupTarget="nfs://192.168.69.5:/alexandria/longhorn-backups"
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  changed_when: false

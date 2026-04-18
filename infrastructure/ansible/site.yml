@@ -9,6 +9,8 @@
     - tailscale
     - k3s
     - k8s_tools
+    - nfs_mount
+    - longhorn
     - flux_bootstrap
     - claude_cli
 

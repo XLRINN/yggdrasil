@@ -21,6 +21,12 @@
     state: present
     update_cache: true
 
+# --- Helm ---
+- name: Install Helm
+  shell: curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  args:
+    creates: /usr/local/bin/helm
+
 # --- k9s ---
 - name: Get latest k9s release
   uri:
