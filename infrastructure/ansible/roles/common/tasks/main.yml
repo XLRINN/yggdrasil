@@ -23,11 +23,14 @@
   ignore_errors: true
   changed_when: false
 
-- name: Wait for apt lock to be released
-  wait_for:
-    path: /var/lib/dpkg/lock-frontend
+- name: Remove stale apt lock files
+  file:
+    path: "{{ item }}"
     state: absent
-    timeout: 120
+  loop:
+    - /var/lib/dpkg/lock-frontend
+    - /var/lib/dpkg/lock
+    - /var/cache/apt/archives/lock
 
 - name: Update apt cache
   apt:
