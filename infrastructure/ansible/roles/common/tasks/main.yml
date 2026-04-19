@@ -18,6 +18,11 @@
     enabled: false
   ignore_errors: true
 
+- name: Kill any running apt or dpkg processes
+  command: killall apt apt-get dpkg
+  ignore_errors: true
+  changed_when: false
+
 - name: Wait for apt lock to be released
   wait_for:
     path: /var/lib/dpkg/lock-frontend
