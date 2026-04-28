@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: syncthing-ingress
+  namespace: admin
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/hostname: syncthing.yggdrasil.rip
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Syncthing (draupnir)"
+    gethomepage.dev/group: "Storage"
+    gethomepage.dev/icon: "syncthing.png"
+    gethomepage.dev/description: "File sync — draupnir node"
+spec:
+  rules:
+  - host: syncthing.yggdrasil.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: syncthing
+            port:
+              number: 8384
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: syncthing-alex-ingress
+  namespace: admin
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/hostname: syncthing-alex.yggdrasil.rip
+spec:
+  rules:
+  - host: syncthing-alex.yggdrasil.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: syncthing-alexandria
+            port:
+              number: 8384

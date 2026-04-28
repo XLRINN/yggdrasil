@@ -6,13 +6,19 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: sabnzbd.yggdrasil.rip
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "SABnzbd"
+    gethomepage.dev/group: "Downloads"
+    gethomepage.dev/icon: "sabnzbd.png"
+    gethomepage.dev/description: "Usenet downloader"
 spec:
   tls:
   - hosts:
-    - sabnzb.drip.heimdal.rip
-    secretName: sabnzb-tls
+    - sabnzbd.yggdrasil.rip
+    secretName: sabnzbd-tls
   rules:
-  - host: sabnzb.drip.heimdal.rip
+  - host: sabnzbd.yggdrasil.rip
     http:
       paths:
       - path: /

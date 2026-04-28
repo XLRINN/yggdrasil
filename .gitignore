@@ -15,3 +15,6 @@ age.key
 
 # misc
 .DS_Store
+*.log
+{changed:*
+{censored:*

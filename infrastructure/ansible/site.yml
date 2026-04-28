@@ -1,18 +1,47 @@
 ---
-- name: Configure draupnir
-  hosts: draupnir
+# =============================================================================
+# YGGDRASIL — ANSIBLE SITE PLAYBOOK
+# =============================================================================
+#
+# USAGE:
+#   All hosts:          ansible-playbook site.yml
+#   Core only:          ansible-playbook site.yml --limit core
+#   Network only:       ansible-playbook site.yml --limit network
+#   Single host:        ansible-playbook site.yml --limit draupnir
+#
+# GROUPS:
+#   core     — draupnir (k8s) + alexandria (NAS) — frequently rebuilt
+#   network  — pihole + cloudflared — stable, survive core rebuilds
+#
+# SECRETS:
+#   vars/secrets.yml — ansible-vault encrypted, see vars/secrets.yml.example
+#   vars/services.yml — plain text, source of truth for non-k8s services
+
+# -----------------------------------------------------------------------------
+# NETWORK — Run first so DNS and tunnel are up before core services need them
+# -----------------------------------------------------------------------------
+
+- name: Configure pihole
+  hosts: pihole
   become: true
   vars_files:
-    - vars/secrets.yml  # ansible-vault encrypted; see vars/secrets.yml.example
+    - vars/secrets.yml
+    - vars/services.yml
   roles:
-    - common
-    - tailscale
-    - k3s
-    - k8s_tools
-    - nfs_mount
-    - longhorn
-    - flux_bootstrap
-    - claude_cli
+    - pihole
+
+- name: Configure cloudflared and homepage
+  hosts: cloudflared
+  become: true
+  vars_files:
+    - vars/secrets.yml
+    - vars/services.yml
+  roles:
+    - cloudflared
+
+# -----------------------------------------------------------------------------
+# CORE — Alexandria first so NFS is ready before draupnir mounts it
+# -----------------------------------------------------------------------------
 
 - name: Configure alexandria
   hosts: alexandria
@@ -22,4 +51,20 @@
   roles:
     - tailscale
     - fileshare
+    - claude_cli
+
+- name: Configure draupnir
+  hosts: draupnir
+  become: true
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - common
+    - tailscale
+    - k3s
+    - k8s_tools
+    - nfs_mount
+    - rclone_mount
+    - longhorn
+    - flux_bootstrap
     - claude_cli

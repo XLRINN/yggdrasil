@@ -21,3 +21,47 @@
     name: "@anthropic-ai/claude-code"
     global: true
     state: present
+
+- name: Auto-start tmux on SSH login for david
+  blockinfile:
+    path: /home/david/.bashrc
+    marker: "# {mark} ANSIBLE MANAGED — tmux auto-start"
+    block: |
+      if [ -z "$TMUX" ] && [ "$TERM" != "screen" ]; then
+        tmux attach 2>/dev/null || tmux new-session
+      fi
+    create: true
+    owner: david
+    group: david
+    mode: "0644"
+
+- name: Get latest yazi release
+  uri:
+    url: https://api.github.com/repos/sxyazi/yazi/releases/latest
+    return_content: true
+  register: yazi_release
+
+- name: Download yazi
+  get_url:
+    url: "{{ yazi_release.json.assets | selectattr('name', 'equalto', 'yazi-x86_64-unknown-linux-gnu.zip') | map(attribute='browser_download_url') | first }}"
+    dest: /tmp/yazi.zip
+    mode: "0644"
+  when: not ansible_check_mode
+
+- name: Install unzip
+  apt:
+    name: unzip
+    state: present
+
+- name: Extract yazi
+  unarchive:
+    src: /tmp/yazi.zip
+    dest: /tmp/
+    remote_src: true
+
+- name: Install yazi binary
+  copy:
+    src: /tmp/yazi-x86_64-unknown-linux-gnu/yazi
+    dest: /usr/local/bin/yazi
+    mode: "0755"
+    remote_src: true

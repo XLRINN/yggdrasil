@@ -1,0 +1,101 @@
+# =============================================================================
+# YGGDRASIL — SERVICE REGISTRY
+# =============================================================================
+#
+# This is the single source of truth for all NON-KUBERNETES services.
+#
+# When you add or change an entry here, three things update automatically
+# when you run the playbook:
+#
+#   1. Pi-hole   → local DNS entry added (hostname resolves to ip on your LAN)
+#   2. Cloudflared → ingress rule added (hostname routed to ip:port via tunnel)
+#   3. Homepage  → service card appears in the dashboard under the group
+#
+# To apply changes to network services:
+#   ansible-playbook site.yml --limit network
+#
+# -----------------------------------------------------------------------------
+# KUBERNETES SERVICES (running on draupnir via Flux)
+# -----------------------------------------------------------------------------
+# Do NOT add k8s services here. They are handled automatically:
+#   - Cloudflared: routes all unknown hostnames to Traefik (catch-all rule)
+#   - Pi-hole DNS: managed by ExternalDNS running in k8s
+#   - Homepage:    reads Ingress annotations automatically via k8s API
+#
+# To add a new k8s service:
+#   1. Create manifests in apps/k8s/<namespace>/<app>/
+#   2. Add these annotations to the Ingress:
+#        gethomepage.dev/enabled: "true"
+#        gethomepage.dev/name: "My App"
+#        gethomepage.dev/group: "Media"        # or whatever group fits
+#        gethomepage.dev/icon: "myapp.png"
+#        gethomepage.dev/description: "My app description"
+#   3. Push to git — Flux deploys, ExternalDNS creates DNS, Homepage discovers
+#
+# -----------------------------------------------------------------------------
+# FIELD REFERENCE
+# -----------------------------------------------------------------------------
+#
+#   name          Display name shown in Homepage
+#   description   Short description shown in Homepage
+#   hostname      Full public hostname (must match Cloudflare DNS record)
+#   ip            Local IP of the host running this service
+#   port          Port the service listens on
+#   protocol      http or https
+#   tls_verify    Set to false for self-signed certs (e.g. Proxmox)
+#   homepage_group  Which group/section to show this in on Homepage
+#   homepage_icon   Icon filename from https://github.com/walkxcode/dashboard-icons
+#
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # NETWORK INFRASTRUCTURE
+  # Services running on stable LXCs — never rebuilt with draupnir/alexandria
+  # ---------------------------------------------------------------------------
+
+  - name: Proxmox
+    description: Hypervisor running asgard
+    hostname: proxmox.yggdrasil.rip
+    ip: 192.168.69.69
+    port: 8006
+    protocol: https
+    tls_verify: false           # Proxmox uses a self-signed cert
+    homepage_group: Network
+    homepage_icon: proxmox.png
+
+  - name: Pi-hole
+    description: Local DNS resolver and ad blocker
+    hostname: pihole.yggdrasil.rip
+    ip: 192.168.69.2
+    port: 80
+    protocol: http
+    tls_verify: true
+    homepage_group: Network
+    homepage_icon: pi-hole.png
+
+  # ---------------------------------------------------------------------------
+  # ALEXANDRIA — File storage (mimmisbrunnr, 60TB)
+  # Services running on the alexandria LXC at 192.168.69.5
+  # ---------------------------------------------------------------------------
+
+  - name: Filebrowser
+    description: Web file manager for mimmisbrunnr
+    hostname: files.yggdrasil.rip
+    ip: 192.168.69.5
+    port: 8080
+    protocol: http
+    tls_verify: true
+    homepage_group: Storage
+    homepage_icon: filebrowser.png
+
+  - name: Syncthing
+    description: File sync — alexandria node
+    hostname: syncthing-alex.yggdrasil.rip
+    ip: 192.168.69.5
+    port: 8384
+    protocol: http
+    tls_verify: true
+    homepage_group: Storage
+    homepage_icon: syncthing.png

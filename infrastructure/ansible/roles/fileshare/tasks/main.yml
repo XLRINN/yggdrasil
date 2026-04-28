@@ -1,18 +1,42 @@
 ---
-- name: Fix resolv.conf symlink (broken in Ubuntu LXC containers)
-  file:
-    path: /etc/resolv.conf
-    state: absent
+- name: Create david user
+  user:
+    name: david
+    shell: /bin/bash
+    groups:
+      - sudo
+      - nogroup
+    append: true
+    create_home: true
+    state: present
 
-- name: Write static resolv.conf
+- name: Add SSH key for david
+  authorized_key:
+    user: david
+    key: "{{ ssh_public_key }}"
+    state: present
+
+- name: Allow david passwordless sudo
   copy:
-    dest: /etc/resolv.conf
-    content: |
-      nameserver 1.1.1.1
-      nameserver 8.8.8.8
+    dest: /etc/sudoers.d/david
+    content: "david ALL=(ALL) NOPASSWD:ALL\n"
     owner: root
     group: root
-    mode: "0644"
+    mode: "0440"
+
+- name: Stop and disable systemd-resolved
+  systemd:
+    name: systemd-resolved
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+- name: Write static resolv.conf
+  shell: |
+    rm -f /etc/resolv.conf
+    echo "nameserver 1.1.1.1" > /etc/resolv.conf
+    echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+  changed_when: true
 
 - name: Update apt cache
   apt:
@@ -27,15 +51,25 @@
       - acl
       - rclone
       - aria2
+      - curl
+      - git
+      - wget
+      - unzip
+      - neovim
+      - tmux
     state: present
 
-- name: Ensure /alexandria is owned by nobody/nogroup
+- name: Ensure /mnt/mimmis is writable by david
   file:
-    path: /alexandria
-    owner: nobody
-    group: nogroup
+    path: /mnt/mimmis
+    owner: david
+    group: david
     mode: "0775"
     state: directory
+
+- name: Set ownership of /mnt/mimmis contents to david
+  command: chown -R david:david /mnt/mimmis
+  changed_when: false
 
 - name: Configure NFS exports
   template:
@@ -46,11 +80,21 @@
     mode: "0644"
   notify: reload nfs exports
 
+- name: Enable and start rpcbind
+  systemd:
+    name: rpcbind
+    enabled: true
+    state: started
+
 - name: Enable and start nfs-kernel-server
   systemd:
     name: nfs-kernel-server
     enabled: true
     state: started
+
+- name: Reload NFS exports
+  command: exportfs -ra
+  changed_when: false
 
 - name: Configure Samba
   template:
@@ -61,16 +105,9 @@
     mode: "0644"
   notify: restart samba
 
-- name: Create samba system user
-  user:
-    name: "{{ samba_user }}"
-    shell: /usr/sbin/nologin
-    create_home: false
-    state: present
-
-- name: Set Samba password for user
+- name: Set Samba password for david
   shell: >
-    (echo {{ samba_password }}; echo {{ samba_password }}) | smbpasswd -a -s {{ samba_user }}
+    (echo {{ proxmox_password }}; echo {{ proxmox_password }}) | smbpasswd -a -s david
   no_log: true
   changed_when: false
 
@@ -82,3 +119,174 @@
   loop:
     - smbd
     - nmbd
+
+- name: Ensure rclone config directory exists
+  file:
+    path: /root/.config/rclone
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Obscure rclone SFTP password
+  command: rclone obscure "{{ proxmox_password }}"
+  register: rclone_obscured_pass
+  changed_when: false
+  no_log: true
+
+- name: Write rclone config
+  copy:
+    dest: /root/.config/rclone/rclone.conf
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      [njord]
+      type = sftp
+      host = vana
+      user = root
+      pass = {{ rclone_obscured_pass.stdout }}
+      shell_type = unix
+      md5sum_command = md5sum
+      sha1sum_command = sha1sum
+
+- name: Install fuse3
+  apt:
+    name: fuse3
+    state: present
+
+- name: Allow fuse mounts by non-root
+  lineinfile:
+    path: /etc/fuse.conf
+    line: "user_allow_other"
+    state: present
+
+- name: Install rclone systemd service for njord
+  template:
+    src: rclone-njord.service.j2
+    dest: /etc/systemd/system/rclone-njord.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload systemd
+
+- name: Enable rclone njord mount
+  systemd:
+    name: rclone-njord
+    enabled: true
+    daemon_reload: true
+
+- name: Start rclone njord mount
+  systemd:
+    name: rclone-njord
+    state: started
+  ignore_errors: true
+
+- name: Download Filebrowser install script
+  get_url:
+    url: https://raw.githubusercontent.com/filebrowser/get/master/get.sh
+    dest: /tmp/filebrowser-get.sh
+    mode: "0755"
+
+- name: Install Filebrowser
+  command: bash /tmp/filebrowser-get.sh
+  args:
+    creates: /usr/local/bin/filebrowser
+
+- name: Create Filebrowser config directory
+  file:
+    path: /etc/filebrowser
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure Filebrowser
+  copy:
+    dest: /etc/filebrowser/filebrowser.json
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      {
+        "port": 8080,
+        "baseURL": "",
+        "address": "0.0.0.0",
+        "log": "stdout",
+        "database": "/etc/filebrowser/filebrowser.db",
+        "root": "/mnt/mimmis"
+      }
+
+- name: Install Filebrowser systemd service
+  copy:
+    dest: /etc/systemd/system/filebrowser.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Filebrowser
+      After=network.target
+
+      [Service]
+      Type=simple
+      ExecStart=/usr/local/bin/filebrowser -c /etc/filebrowser/filebrowser.json
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: reload systemd
+
+- name: Remove existing Filebrowser database
+  file:
+    path: /etc/filebrowser/filebrowser.db
+    state: absent
+
+- name: Initialise Filebrowser config
+  command: filebrowser -c /etc/filebrowser/filebrowser.json config init
+
+- name: Create Filebrowser admin user
+  command: >
+    filebrowser -c /etc/filebrowser/filebrowser.json
+    users add david {{ filebrowser_password }} --perm.admin
+  no_log: true
+
+- name: Enable and start Filebrowser
+  systemd:
+    name: filebrowser
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Install Syncthing
+  apt:
+    name: syncthing
+    state: present
+
+- name: Ensure Syncthing config directory exists
+  file:
+    path: /home/david/.local/share/syncthing
+    state: directory
+    owner: david
+    group: david
+    mode: "0700"
+
+- name: Enable and start Syncthing for david
+  systemd:
+    name: syncthing@david
+    enabled: true
+    state: started
+
+- name: Wait for Syncthing to generate config
+  wait_for:
+    path: /home/david/.local/share/syncthing/config.xml
+    state: present
+    timeout: 30
+
+- name: Set Syncthing GUI to listen on all interfaces
+  replace:
+    path: /home/david/.local/share/syncthing/config.xml
+    regexp: '<address>127\.0\.0\.1:8384</address>'
+    replace: '<address>0.0.0.0:8384</address>'
+  notify: restart syncthing

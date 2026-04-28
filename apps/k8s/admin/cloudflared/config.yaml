@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: admin
+data:
+  config.yaml: |
+    tunnel: TUNNEL_ID_PLACEHOLDER
+    credentials-file: /etc/cloudflared/credentials.json
+    ingress:
+      # Non-k8s services
+      - hostname: files.yggdrasil.rip
+        service: http://192.168.69.5:8080
+      - hostname: proxmox.yggdrasil.rip
+        service: https://192.168.69.69:8006
+        originRequest:
+          noTLSVerify: true
+      - hostname: pihole.yggdrasil.rip
+        service: http://PIHOLE_IP:80
+      - hostname: syncthing-alex.yggdrasil.rip
+        service: http://192.168.69.5:8384
+
+      # Catch-all — all k8s services go through Traefik
+      - service: http://traefik.kube-system.svc.cluster.local:80

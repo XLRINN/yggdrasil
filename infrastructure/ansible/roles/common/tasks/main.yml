@@ -11,12 +11,18 @@
   command: resize2fs /dev/sda1
   when: growpart_result.changed
 
-- name: Stop and disable unattended-upgrades
+- name: Stop and disable unattended-upgrades and apt timers
   systemd:
-    name: unattended-upgrades
+    name: "{{ item }}"
     state: stopped
     enabled: false
   ignore_errors: true
+  loop:
+    - unattended-upgrades
+    - apt-daily.timer
+    - apt-daily-upgrade.timer
+    - apt-daily.service
+    - apt-daily-upgrade.service
 
 - name: Kill any running apt or dpkg processes
   command: killall apt apt-get dpkg
@@ -59,6 +65,7 @@
       - aria2
       - neovim
       - tmux
+      - nfs-common
     state: present
 
 - name: Enable and start qemu-guest-agent

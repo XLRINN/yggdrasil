@@ -6,3 +6,12 @@
   systemd:
     name: smbd
     state: restarted
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: restart syncthing
+  systemd:
+    name: syncthing@david
+    state: restarted

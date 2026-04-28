@@ -96,14 +96,21 @@ metadata:
   name: radarr-ingress
   namespace: knarr
   annotations:
+    kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: radarr.yggdrasil.rip
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Radarr"
+    gethomepage.dev/group: "Downloads"
+    gethomepage.dev/icon: "radarr.png"
+    gethomepage.dev/description: "Movie manager"
 spec:
   tls:
   - hosts:
-    - radarr.drip.heimdal.rip
+    - radarr.yggdrasil.rip
     secretName: radarr-tls
   rules:
-  - host: radarr.drip.heimdal.rip
+  - host: radarr.yggdrasil.rip
     http:
       paths:
       - path: /

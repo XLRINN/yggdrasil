@@ -1,0 +1,75 @@
+---
+- name: Install rclone and fuse
+  apt:
+    name:
+      - rclone
+      - fuse3
+    state: present
+
+- name: Ensure rclone config directory exists
+  file:
+    path: /root/.config/rclone
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Obscure rclone SFTP password
+  command: rclone obscure "{{ proxmox_password }}"
+  register: rclone_obscured_pass
+  changed_when: false
+  no_log: true
+
+- name: Write rclone config
+  copy:
+    dest: /root/.config/rclone/rclone.conf
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      [njord]
+      type = sftp
+      host = vana
+      user = root
+      pass = {{ rclone_obscured_pass.stdout }}
+      shell_type = unix
+      md5sum_command = md5sum
+      sha1sum_command = sha1sum
+
+- name: Allow fuse mounts by non-root (required for --allow-other)
+  lineinfile:
+    path: /etc/fuse.conf
+    line: "user_allow_other"
+    state: present
+
+- name: Install rclone systemd service for njord
+  template:
+    src: rclone-njord.service.j2
+    dest: /etc/systemd/system/rclone-njord.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload systemd
+
+- name: Enable and start rclone njord mount
+  systemd:
+    name: rclone-njord
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Install rclone systemd service for longhorn backups
+  template:
+    src: rclone-longhorn.service.j2
+    dest: /etc/systemd/system/rclone-longhorn.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload systemd
+
+- name: Enable and start rclone longhorn mount
+  systemd:
+    name: rclone-longhorn
+    enabled: true
+    state: started
+    daemon_reload: true

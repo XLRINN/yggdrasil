@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syncthing
+  namespace: admin
+  labels:
+    app: syncthing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: syncthing
+  template:
+    metadata:
+      labels:
+        app: syncthing
+    spec:
+      initContainers:
+      - name: volume-permissions
+        image: busybox:latest
+        command: ["sh", "-c", "chown -R 1000:1000 /var/syncthing"]
+        volumeMounts:
+        - name: syncthing-storage
+          mountPath: /var/syncthing
+      containers:
+      - name: syncthing
+        image: syncthing/syncthing:latest
+        ports:
+        - containerPort: 8384
+          name: web-ui
+        - containerPort: 22000
+          name: sync-tcp
+          protocol: TCP
+        - containerPort: 22000
+          name: sync-udp
+          protocol: UDP
+        - containerPort: 21027
+          name: discovery
+          protocol: UDP
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        volumeMounts:
+        - name: syncthing-storage
+          mountPath: /var/syncthing
+      volumes:
+      - name: syncthing-storage
+        persistentVolumeClaim:
+          claimName: syncthing-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: syncthing-pvc
+  namespace: admin
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: syncthing
+  namespace: admin
+spec:
+  selector:
+    app: syncthing
+  ports:
+  - name: web-ui
+    port: 8384
+    targetPort: 8384
+  - name: sync-tcp
+    port: 22000
+    targetPort: 22000
+    protocol: TCP
+  - name: sync-udp
+    port: 22000
+    targetPort: 22000
+    protocol: UDP
+  - name: discovery
+    port: 21027
+    targetPort: 21027
+    protocol: UDP
+  type: ClusterIP

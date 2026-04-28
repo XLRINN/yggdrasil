@@ -1,0 +1,21 @@
+# Homepage services configuration
+# Managed by Ansible — do not edit manually
+# Source: infrastructure/ansible/vars/services.yml
+#
+# Kubernetes services (on draupnir) are NOT listed here.
+# Homepage discovers them automatically via Ingress annotations.
+# See SERVICES.md for how to add annotations to k8s apps.
+
+{% set seen_groups = [] %}
+{% for service in services %}
+{% if service.homepage_group not in seen_groups %}
+{% set _ = seen_groups.append(service.homepage_group) %}
+- {{ service.homepage_group }}:
+{% for s in services if s.homepage_group == service.homepage_group %}
+    - {{ s.name }}:
+        href: "{{ s.protocol }}://{{ s.hostname }}"
+        description: "{{ s.description | default('') }}"
+        icon: "{{ s.homepage_icon | default('default.png') }}"
+{% endfor %}
+{% endif %}
+{% endfor %}

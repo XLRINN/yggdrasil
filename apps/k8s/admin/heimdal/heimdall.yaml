@@ -73,4 +73,4 @@ spec:
   - port: 80
     targetPort: 80
 
-# Ingress removed — drip.heimdal.rip is now served by Homepage
+# Ingress removed — drip.yggdrasil.rip is now served by Homepage

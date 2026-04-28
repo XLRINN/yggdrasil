@@ -1,0 +1,16 @@
+# Pi-hole custom DNS records
+# Managed by Ansible — do not edit manually
+# Source: infrastructure/ansible/vars/services.yml
+#
+# Format: <ip>  <hostname>
+#
+# These entries allow local DNS resolution for all services
+# when connected to the home network (via Pi-hole as DNS server).
+# External access uses Cloudflare tunnel regardless of this file.
+
+{% for service in services %}
+{{ "%-18s" | format(service.ip) }} {{ service.hostname }}
+{% endfor %}
+
+# Note: Kubernetes services on draupnir (192.168.69.77) are managed
+# automatically by ExternalDNS and do not need to be listed here.

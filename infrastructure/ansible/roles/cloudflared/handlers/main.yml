@@ -1,0 +1,10 @@
+---
+- name: restart cloudflared
+  systemd:
+    name: cloudflared
+    state: restarted
+
+- name: restart homepage
+  systemd:
+    name: homepage
+    state: restarted

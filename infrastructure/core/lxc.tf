@@ -49,7 +49,7 @@ resource "proxmox_virtual_environment_container" "alexandria" {
 
   mount_point {
     volume = "/mnt/pve/mimmisbrunnr"
-    path   = "/alexandria"
+    path   = "/mnt/mimmis"
   }
 
   features {

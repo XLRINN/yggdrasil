@@ -104,14 +104,21 @@ metadata:
   name: sonarr-anime-ingress
   namespace: knarr
   annotations:
+    kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: anime.yggdrasil.rip
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Sonarr Anime"
+    gethomepage.dev/group: "Downloads"
+    gethomepage.dev/icon: "sonarr.png"
+    gethomepage.dev/description: "Anime series manager"
 spec:
   tls:
   - hosts:
-    - crunchy.drip.heimdal.rip
+    - anime.yggdrasil.rip
     secretName: sonarr-anime-tls
   rules:
-  - host: crunchy.drip.heimdal.rip
+  - host: anime.yggdrasil.rip
     http:
       paths:
       - path: /

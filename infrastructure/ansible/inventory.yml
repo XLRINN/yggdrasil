@@ -1,10 +1,33 @@
 all:
-  hosts:
-    draupnir:
-      ansible_host: 192.168.69.77
-      ansible_user: david
-      ansible_ssh_private_key_file: ~/.ssh/id_ed25519
-    alexandria:
-      ansible_host: 192.168.69.5
-      ansible_user: root
-      ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+  children:
+
+    # -------------------------------------------------------------------------
+    # CORE — Ephemeral, frequently rebuilt
+    # Managed by: infrastructure/core/
+    # -------------------------------------------------------------------------
+    core:
+      hosts:
+        draupnir:
+          ansible_host: 192.168.69.77
+          ansible_user: david
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+        alexandria:
+          ansible_host: 192.168.69.5
+          ansible_user: root
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+    # -------------------------------------------------------------------------
+    # NETWORK — Stable, never rebuilt unless intentional
+    # Managed by: infrastructure/network/
+    # These must stay up during draupnir/alexandria rebuilds
+    # -------------------------------------------------------------------------
+    network:
+      hosts:
+        pihole:
+          ansible_host: 192.168.69.2
+          ansible_user: root
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+        cloudflared:
+          ansible_host: 192.168.69.3
+          ansible_user: root
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519

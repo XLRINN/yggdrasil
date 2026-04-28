@@ -100,15 +100,21 @@ items:
       name: tunarr-ingress
       namespace: knarr
       annotations:
-        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-prod
+        external-dns.alpha.kubernetes.io/hostname: tunarr.yggdrasil.rip
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: "Tunarr"
+        gethomepage.dev/group: "Media"
+        gethomepage.dev/icon: "tunarr.png"
+        gethomepage.dev/description: "Virtual channel DVR"
     spec:
       tls:
       - hosts:
-        - tunarr.drip.heimdal.rip
+        - tunarr.yggdrasil.rip
         secretName: tunarr-tls
       rules:
-        - host: tunarr.drip.heimdal.rip
+        - host: tunarr.yggdrasil.rip
           http:
             paths:
               - path: /

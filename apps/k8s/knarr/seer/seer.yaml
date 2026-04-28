@@ -96,14 +96,21 @@ metadata:
   name: seer
   namespace: knarr
   annotations:
+    kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: seer.yggdrasil.rip
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Seer"
+    gethomepage.dev/group: "Requests"
+    gethomepage.dev/icon: "overseerr.png"
+    gethomepage.dev/description: "Media request manager"
 spec:
   tls:
   - hosts:
-    - seer.drip.heimdal.rip
+    - seer.yggdrasil.rip
     secretName: seer-tls
   rules:
-    - host: seer.drip.heimdal.rip
+    - host: seer.yggdrasil.rip
       http:
         paths:
           - path: /

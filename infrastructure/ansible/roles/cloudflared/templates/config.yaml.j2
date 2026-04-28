@@ -1,0 +1,38 @@
+# Cloudflare Tunnel configuration
+# Managed by Ansible — do not edit manually
+# Source: infrastructure/ansible/vars/services.yml
+#
+# HOW THIS WORKS:
+#   - Each service in vars/services.yml gets an explicit ingress rule
+#   - The catch-all at the bottom routes everything else to Traefik on draupnir
+#   - Traefik handles routing for all Kubernetes services automatically
+#   - Zero Trust access policies are configured in the Cloudflare dashboard
+
+tunnel: {{ cloudflare_tunnel_id }}
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  # ---------------------------------------------------------------------------
+  # Non-Kubernetes services
+  # Defined in infrastructure/ansible/vars/services.yml
+  # ---------------------------------------------------------------------------
+{% for service in services %}
+  - hostname: {{ service.hostname }}
+    service: {{ service.protocol }}://{{ service.ip }}:{{ service.port }}
+{% if not service.tls_verify | default(true) %}
+    originRequest:
+      noTLSVerify: true  # Self-signed certificate — skip verification
+{% endif %}
+
+{% endfor %}
+  # ---------------------------------------------------------------------------
+  # Homepage dashboard (running on this LXC)
+  # ---------------------------------------------------------------------------
+  - hostname: homepage.yggdrasil.rip
+    service: http://localhost:3000
+
+  # ---------------------------------------------------------------------------
+  # Catch-all: routes all Kubernetes services through Traefik on draupnir
+  # New k8s apps added via Flux are automatically routed here — no changes needed
+  # ---------------------------------------------------------------------------
+  - service: http://192.168.69.77:80

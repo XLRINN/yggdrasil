@@ -13,6 +13,14 @@
     enabled: true
     state: started
 
+- name: Ensure multipath conf directory exists
+  file:
+    path: /etc/multipath/conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: Blacklist Longhorn devices from multipathd
   copy:
     dest: /etc/multipath/conf.d/longhorn.conf

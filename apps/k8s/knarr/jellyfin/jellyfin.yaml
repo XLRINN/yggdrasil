@@ -91,14 +91,21 @@ metadata:
   name: jellyfin-ingress
   namespace: knarr
   annotations:
+    kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: jellyfin.yggdrasil.rip
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Jellyfin"
+    gethomepage.dev/group: "Media"
+    gethomepage.dev/icon: "jellyfin.png"
+    gethomepage.dev/description: "Media server"
 spec:
   tls:
   - hosts:
-    - fin.drip.heimdal.rip
+    - jellyfin.yggdrasil.rip
     secretName: jellyfin-tls
   rules:
-  - host: fin.drip.heimdal.rip
+  - host: jellyfin.yggdrasil.rip
     http:
       paths:
       - path: /

@@ -1,0 +1,2 @@
+proxmox_password = "changeme"
+ssh_public_key   = "ssh-rsa ..."

@@ -83,14 +83,21 @@ metadata:
   name: prowlarr-ingress
   namespace: knarr
   annotations:
+    kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: prowlarr.yggdrasil.rip
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Prowlarr"
+    gethomepage.dev/group: "Downloads"
+    gethomepage.dev/icon: "prowlarr.png"
+    gethomepage.dev/description: "Indexer manager"
 spec:
   tls:
   - hosts:
-    - prowlarr.drip.heimdal.rip
+    - prowlarr.yggdrasil.rip
     secretName: prowlarr-tls
   rules:
-  - host: prowlarr.drip.heimdal.rip
+  - host: prowlarr.yggdrasil.rip
     http:
       paths:
       - path: /
