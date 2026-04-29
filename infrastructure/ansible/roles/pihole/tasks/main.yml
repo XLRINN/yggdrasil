@@ -63,6 +63,15 @@
   no_log: true
   changed_when: false
 
+- name: Write wildcard DNS for k8s services
+  template:
+    src: k8s-wildcard.conf.j2
+    dest: /etc/dnsmasq.d/99-k8s-wildcard.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart pihole dns
+
 - name: Write custom DNS entries from services registry
   template:
     src: custom.list.j2
