@@ -72,6 +72,19 @@
     mode: "0644"
   notify: restart pihole dns
 
+- name: Write wildcard DNS for k8s services
+  copy:
+    dest: /etc/dnsmasq.d/yggdrasil-k8s.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Wildcard DNS for k8s services on draupnir
+      # Routes *.yggdrasil.rip to Traefik locally, bypassing Cloudflare tunnel
+      # Specific non-k8s entries in custom.list take priority over this wildcard
+      address=/yggdrasil.rip/192.168.69.77
+  notify: restart pihole dns
+
 - name: Enable and start Pi-hole FTL
   systemd:
     name: pihole-FTL
