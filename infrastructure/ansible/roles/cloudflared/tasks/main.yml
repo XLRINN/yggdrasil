@@ -219,6 +219,7 @@
   pip:
     name: cloudflare
     state: present
+    extra_args: --break-system-packages
 
 - name: Create Cloudflare DNS CNAME records for non-k8s services
   community.general.cloudflare_dns:
