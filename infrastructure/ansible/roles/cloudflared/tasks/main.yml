@@ -183,3 +183,27 @@
     enabled: true
     state: started
     daemon_reload: true
+
+# --- Cloudflare DNS (non-k8s services from services.yml) ---
+
+- name: Install python3-pip for Cloudflare DNS module
+  apt:
+    name: python3-pip
+    state: present
+
+- name: Install cloudflare python library
+  pip:
+    name: cloudflare
+    state: present
+
+- name: Create Cloudflare DNS CNAME records for non-k8s services
+  community.general.cloudflare_dns:
+    zone: yggdrasil.rip
+    record: "{{ item.hostname | regex_replace('\\.yggdrasil\\.rip$', '') }}"
+    type: CNAME
+    value: "{{ cloudflare_tunnel_id }}.cfargotunnel.com"
+    proxied: true
+    api_token: "{{ cloudflare_api_token }}"
+    state: present
+  loop: "{{ services }}"
+  no_log: true
