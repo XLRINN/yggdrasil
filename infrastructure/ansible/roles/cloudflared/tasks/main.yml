@@ -55,11 +55,35 @@
     group: root
     mode: "0700"
 
-- name: Install cloudflared systemd service via token
-  command: cloudflared service install {{ cloudflare_tunnel_token }}
+- name: Write tunnel credentials file
+  copy:
+    dest: /etc/cloudflared/credentials.json
+    content: "{{ cloudflare_credentials_json }}"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+
+- name: Generate cloudflared config from services registry
+  template:
+    src: config.yaml.j2
+    dest: /etc/cloudflared/config.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart cloudflared
+
+- name: Remove token-mode cloudflared service if present
+  shell: |
+    if grep -q "TUNNEL_TOKEN\|tunnel-token" /etc/systemd/system/cloudflared.service 2>/dev/null; then
+      cloudflared service uninstall || true
+    fi
+  changed_when: false
+
+- name: Install cloudflared systemd service
+  command: cloudflared service install
   args:
     creates: /etc/systemd/system/cloudflared.service
-  no_log: true
 
 - name: Enable and start cloudflared
   systemd:
