@@ -200,6 +200,7 @@
       ExecStartPre=-/usr/bin/docker rm -f homepage
       ExecStart=/usr/bin/docker run --rm \
         --name homepage \
+        --security-opt apparmor=unconfined \
         -p 3000:3000 \
         -v /etc/homepage:/app/config \
         ghcr.io/gethomepage/homepage:latest
