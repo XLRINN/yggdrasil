@@ -67,7 +67,7 @@ services:
 
   - name: Proxmox
     description: Hypervisor running asgard
-    hostname: proxmox.yggdrasil.rip
+    hostname: asgard.yggdrasil.rip
     ip: 192.168.69.69
     port: 8006
     protocol: https
