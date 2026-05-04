@@ -59,12 +59,13 @@
   command: cloudflared service install {{ cloudflare_tunnel_token }}
   args:
     creates: /etc/systemd/system/cloudflared.service
-  no_log: true
+  ignore_errors: true
 
 - name: Stop cloudflared to reconfigure it
   systemd:
     name: cloudflared
     state: stopped
+    daemon_reload: true
   ignore_errors: true
 
 - name: Find generated credentials file
