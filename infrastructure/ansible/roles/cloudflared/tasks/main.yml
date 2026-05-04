@@ -55,37 +55,14 @@
     group: root
     mode: "0700"
 
-- name: Install cloudflared service via token to generate credentials
-  command: cloudflared service install {{ cloudflare_tunnel_token }}
-  args:
-    creates: /etc/systemd/system/cloudflared.service
-  ignore_errors: true
-
-- name: Stop cloudflared to reconfigure it
-  systemd:
-    name: cloudflared
-    state: stopped
-    daemon_reload: true
-  ignore_errors: true
-
-- name: Find generated credentials file
-  find:
-    paths:
-      - /etc/cloudflared
-      - /root/.cloudflared
-    patterns: "*.json"
-    excludes: "credentials.json"
-  register: cred_files
-
-- name: Copy generated credentials to standard location
+- name: Write tunnel credentials file
   copy:
-    src: "{{ cred_files.files[0].path }}"
     dest: /etc/cloudflared/credentials.json
+    content: "{{ cloudflare_credentials_json }}"
     owner: root
     group: root
     mode: "0600"
-    remote_src: true
-  when: cred_files.files | length > 0
+  no_log: true
 
 - name: Generate cloudflared config from services registry
   template:
@@ -95,7 +72,7 @@
     group: root
     mode: "0644"
 
-- name: Update cloudflared service to use config file
+- name: Install cloudflared systemd service
   copy:
     dest: /etc/systemd/system/cloudflared.service
     owner: root
@@ -107,15 +84,13 @@
       After=network.target
 
       [Service]
-      TimeoutStartSec=0
-      Type=notify
+      Type=simple
       ExecStart=/usr/bin/cloudflared --no-autoupdate --config /etc/cloudflared/config.yaml tunnel run
       Restart=on-failure
       RestartSec=5s
 
       [Install]
       WantedBy=multi-user.target
-  notify: restart cloudflared
 
 - name: Enable and start cloudflared
   systemd:
