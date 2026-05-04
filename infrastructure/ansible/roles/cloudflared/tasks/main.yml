@@ -55,10 +55,10 @@
     group: root
     mode: "0700"
 
-- name: Write tunnel token file
+- name: Write tunnel token env file
   copy:
-    dest: /etc/cloudflared/tunnel-token
-    content: "{{ cloudflare_tunnel_token }}"
+    dest: /etc/cloudflared/tunnel-env
+    content: "TUNNEL_TOKEN={{ cloudflare_tunnel_token }}"
     owner: root
     group: root
     mode: "0600"
@@ -72,6 +72,7 @@
     owner: root
     group: root
     mode: "0644"
+  notify: restart cloudflared
 
 - name: Install cloudflared systemd service
   copy:
@@ -86,7 +87,8 @@
 
       [Service]
       Type=simple
-      ExecStart=/usr/bin/cloudflared --no-autoupdate --config /etc/cloudflared/config.yaml tunnel run --token-file /etc/cloudflared/tunnel-token
+      EnvironmentFile=/etc/cloudflared/tunnel-env
+      ExecStart=/usr/bin/cloudflared --no-autoupdate --config /etc/cloudflared/config.yaml tunnel run
       Restart=on-failure
       RestartSec=5s
 
