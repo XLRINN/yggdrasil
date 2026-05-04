@@ -8,9 +8,6 @@
 #   - Traefik handles routing for all Kubernetes services automatically
 #   - Zero Trust access policies are configured in the Cloudflare dashboard
 
-tunnel: {{ cloudflare_tunnel_id }}
-credentials-file: /etc/cloudflared/credentials.json
-
 ingress:
   # ---------------------------------------------------------------------------
   # Non-Kubernetes services

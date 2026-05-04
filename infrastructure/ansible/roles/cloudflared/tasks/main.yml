@@ -55,14 +55,15 @@
     group: root
     mode: "0700"
 
-- name: Write tunnel credentials file
+- name: Write tunnel token file
   copy:
-    dest: /etc/cloudflared/credentials.json
-    content: "{{ cloudflare_credentials_json }}"
+    dest: /etc/cloudflared/tunnel-token
+    content: "{{ cloudflare_tunnel_token }}"
     owner: root
     group: root
     mode: "0600"
   no_log: true
+  notify: restart cloudflared
 
 - name: Generate cloudflared config from services registry
   template:
@@ -85,12 +86,13 @@
 
       [Service]
       Type=simple
-      ExecStart=/usr/bin/cloudflared --no-autoupdate --config /etc/cloudflared/config.yaml tunnel run
+      ExecStart=/usr/bin/cloudflared --no-autoupdate --config /etc/cloudflared/config.yaml tunnel run --token-file /etc/cloudflared/tunnel-token
       Restart=on-failure
       RestartSec=5s
 
       [Install]
       WantedBy=multi-user.target
+  notify: restart cloudflared
 
 - name: Enable and start cloudflared
   systemd:
