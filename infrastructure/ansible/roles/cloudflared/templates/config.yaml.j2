@@ -26,12 +26,6 @@ ingress:
 
 {% endfor %}
   # ---------------------------------------------------------------------------
-  # Homepage dashboard (running on this LXC)
-  # ---------------------------------------------------------------------------
-  - hostname: homepage.yggdrasil.rip
-    service: http://localhost:3000
-
-  # ---------------------------------------------------------------------------
   # Catch-all: routes all Kubernetes services through Traefik on draupnir
   # New k8s apps added via Flux are automatically routed here — no changes needed
   # ---------------------------------------------------------------------------
