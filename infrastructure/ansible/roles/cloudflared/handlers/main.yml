@@ -4,8 +4,3 @@
     name: cloudflared
     state: restarted
     daemon_reload: true
-
-- name: restart homepage
-  systemd:
-    name: homepage
-    state: restarted

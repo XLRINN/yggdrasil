@@ -6,11 +6,18 @@ metadata:
   namespace: admin
 data:
   settings.yaml: |
-    title: drip
+    title: Yggdrasil
     theme: dark
     color: slate
     headerStyle: clean
+    allowedHosts: homepage.yggdrasil.rip
     layout:
+      Network:
+        style: row
+        columns: 4
+      Storage:
+        style: row
+        columns: 4
       Media:
         style: row
         columns: 2
@@ -36,6 +43,30 @@ data:
     []
 
   services.yaml: |
+    - Network:
+        - Proxmox:
+            href: https://asgard.yggdrasil.rip
+            icon: proxmox.png
+            description: Hypervisor
+        - Pi-hole:
+            href: https://pihole.yggdrasil.rip
+            icon: pi-hole.png
+            description: DNS & Ad Blocker
+        - Cloudflared:
+            href: https://one.dash.cloudflare.com
+            icon: cloudflare.png
+            description: Tunnel
+
+    - Storage:
+        - Filebrowser:
+            href: https://files.yggdrasil.rip
+            icon: filebrowser.png
+            description: Web File Manager
+        - Syncthing:
+            href: https://syncthing-alex.yggdrasil.rip
+            icon: syncthing.png
+            description: File Sync — Alexandria
+
     - Media:
         - Jellyfin:
             href: https://yggdrasil.rip/jelly
@@ -164,7 +195,7 @@ spec:
             - name: TZ
               value: "America/New_York"
             - name: HOMEPAGE_ALLOWED_HOSTS
-              value: "drip.yggdrasil.rip,yggdrasil.rip"
+              value: "homepage.yggdrasil.rip"
           volumeMounts:
             - name: config-writable
               mountPath: /app/config
@@ -198,22 +229,8 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
-  tls:
-  - hosts:
-    - yggdrasil.rip
-    secretName: yggdrasil-rip-tls
   rules:
-    - host: drip.yggdrasil.rip
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: homepage
-                port:
-                  number: 80
-    - host: yggdrasil.rip
+    - host: homepage.yggdrasil.rip
       http:
         paths:
           - path: /

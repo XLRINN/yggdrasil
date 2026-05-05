@@ -5,3 +5,4 @@ resources:
   - cloudflared/
   - externaldns/
   - syncthing/
+  - homepage/
