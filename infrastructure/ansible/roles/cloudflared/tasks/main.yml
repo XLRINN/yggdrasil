@@ -201,6 +201,7 @@
       ExecStart=/usr/bin/docker run --rm \
         --name homepage \
         --security-opt apparmor=unconfined \
+        -e HOMEPAGE_ALLOWED_HOSTS=homepage.yggdrasil.rip \
         -p 3000:3000 \
         -v /etc/homepage:/app/config \
         ghcr.io/gethomepage/homepage:latest
