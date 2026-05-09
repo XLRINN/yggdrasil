@@ -59,6 +59,7 @@ spec:
             - --provider=cloudflare
             - --cloudflare-proxied
             - --txt-owner-id=yggdrasil
+            - --ignore-ingress-tls-spec
           env:
             - name: CF_API_TOKEN
               valueFrom:
