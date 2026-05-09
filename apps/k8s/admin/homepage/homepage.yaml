@@ -10,7 +10,7 @@ data:
     theme: dark
     color: slate
     headerStyle: clean
-    allowedHosts: homepage.yggdrasil.rip
+    allowedHosts: homepage.yggdrasil.rip,yggdrasil.rip
     layout:
       Network:
         style: row
@@ -195,7 +195,7 @@ spec:
             - name: TZ
               value: "America/New_York"
             - name: HOMEPAGE_ALLOWED_HOSTS
-              value: "homepage.yggdrasil.rip"
+              value: "homepage.yggdrasil.rip,yggdrasil.rip"
           volumeMounts:
             - name: config-writable
               mountPath: /app/config
@@ -231,6 +231,16 @@ metadata:
     external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
 spec:
   rules:
+    - host: yggdrasil.rip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: homepage
+                port:
+                  number: 80
     - host: homepage.yggdrasil.rip
       http:
         paths:
