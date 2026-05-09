@@ -6,4 +6,4 @@ metadata:
     name: media
     part-of: home-lab
     
-    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce: privileged
