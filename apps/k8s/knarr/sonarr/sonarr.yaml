@@ -104,8 +104,6 @@ metadata:
     gethomepage.dev/icon: "sonarr.png"
     gethomepage.dev/description: "TV series manager"
 spec:
-  tls:
-  - hosts:
     - sonarr.yggdrasil.rip
     secretName: sonarr-tls
   rules:

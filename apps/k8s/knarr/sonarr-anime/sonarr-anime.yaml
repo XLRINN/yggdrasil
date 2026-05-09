@@ -112,8 +112,6 @@ metadata:
     gethomepage.dev/icon: "sonarr.png"
     gethomepage.dev/description: "Anime series manager"
 spec:
-  tls:
-  - hosts:
     - anime.yggdrasil.rip
     secretName: sonarr-anime-tls
   rules:

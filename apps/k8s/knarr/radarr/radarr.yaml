@@ -104,8 +104,6 @@ metadata:
     gethomepage.dev/icon: "radarr.png"
     gethomepage.dev/description: "Movie manager"
 spec:
-  tls:
-  - hosts:
     - radarr.yggdrasil.rip
     secretName: radarr-tls
   rules:

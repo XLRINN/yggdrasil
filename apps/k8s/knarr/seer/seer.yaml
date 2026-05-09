@@ -104,8 +104,6 @@ metadata:
     gethomepage.dev/icon: "overseerr.png"
     gethomepage.dev/description: "Media request manager"
 spec:
-  tls:
-  - hosts:
     - seer.yggdrasil.rip
     secretName: seer-tls
   rules:

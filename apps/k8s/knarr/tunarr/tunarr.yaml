@@ -108,10 +108,6 @@ items:
         gethomepage.dev/icon: "tunarr.png"
         gethomepage.dev/description: "Virtual channel DVR"
     spec:
-      tls:
-      - hosts:
-        - tunarr.yggdrasil.rip
-        secretName: tunarr-tls
       rules:
         - host: tunarr.yggdrasil.rip
           http:
