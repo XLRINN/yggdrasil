@@ -35,7 +35,6 @@ metadata:
   namespace: auto
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
-    external-dns.alpha.kubernetes.io/hostname: n8n.drip.yggdrasil.rip
     external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
 spec:
   # This section tells Kubernetes "This domain uses this secret for SSL"
