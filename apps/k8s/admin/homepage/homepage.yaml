@@ -69,12 +69,12 @@ data:
 
     - Media:
         - Jellyfin:
-            href: https://jellyfin.yggdrasil.rip
+            href: https://yggdrasil.rip/jelly
             icon: jellyfin.png
             description: Media Server
             widget:
               type: jellyfin
-              url: http://jellyfin.knarr.svc.cluster.local
+              url: http://jellyfin.knarr.svc.cluster.local/jelly
               key: 3994e23ed5a847309e88a7bf8a160bd5
               enableBlocks: true
         - Tunarr:
@@ -84,7 +84,7 @@ data:
 
     - Downloads:
         - SABnzbd:
-            href: https://sabnzbd.yggdrasil.rip
+            href: https://yggdrasil.rip/sabnzbd
             icon: sabnzbd.png
             description: Usenet Downloader
             widget:
@@ -92,7 +92,7 @@ data:
               url: http://sabnzbd.knarr.svc.cluster.local
               key: bd92a4d3915349479bf69e57a0de5849
         - Sonarr:
-            href: https://sonarr.yggdrasil.rip
+            href: https://yggdrasil.rip/sonarr
             icon: sonarr.png
             description: TV Shows
             widget:
@@ -100,7 +100,7 @@ data:
               url: http://sonarr.knarr.svc.cluster.local
               key: d6384c35ad1744bfb4456ce5ca7ce051
         - Radarr:
-            href: https://radarr.yggdrasil.rip
+            href: https://yggdrasil.rip/radarr
             icon: radarr.png
             description: Movies
             widget:
@@ -108,7 +108,7 @@ data:
               url: http://radarr.knarr.svc.cluster.local
               key: 5b243c724ced48489b8fe9456267ef32
         - Prowlarr:
-            href: https://prowlarr.yggdrasil.rip
+            href: https://yggdrasil.rip/prowlarr
             icon: prowlarr.png
             description: Indexers
             widget:
@@ -116,7 +116,7 @@ data:
               url: http://prowlarr.knarr.svc.cluster.local
               key: c4cf026aab2d407db18fc50b5b57f004
         - Anime:
-            href: https://anime.yggdrasil.rip
+            href: https://yggdrasil.rip/crunchy
             icon: sonarr.png
             description: Anime
             widget:
@@ -126,7 +126,7 @@ data:
 
     - Requests:
         - Seer:
-            href: https://seer.yggdrasil.rip
+            href: https://yggdrasil.rip/seer
             icon: overseerr.png
             description: Media Requests
             widget:

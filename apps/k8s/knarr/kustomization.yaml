@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - storage.yaml
+  - paths-ingress.yaml
   - jellyfin/
   - prowlarr/
   - radarr/
