@@ -63,7 +63,7 @@ items:
                   mountPath: /root/.local/share/tunarr
                 # Mount for your Media (Movies/TV) so Tunarr can stream files directly
                 - name: media
-                  mountPath: /mnt/njord
+                  mountPath: /media
               # --- Hardware Acceleration (Optional) ---
               # Uncomment below if you want to use VAAPI/QuickSync for transcoding
               # securityContext:
