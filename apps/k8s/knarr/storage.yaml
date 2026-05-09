@@ -15,7 +15,7 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/mnt/njord/"
+    path: "/mnt/alexandria/poeticEdda/"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
