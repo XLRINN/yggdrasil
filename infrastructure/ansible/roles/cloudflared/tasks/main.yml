@@ -1,17 +1,14 @@
 ---
-# Cloudflared + Homepage role
-# Manages the Cloudflare tunnel and Homepage dashboard on the cloudflared LXC
+# Cloudflared role
+# Manages the Cloudflare tunnel on the cloudflared LXC.
+# Homepage is deployed via Flux on k8s (apps/k8s/admin/homepage/).
 #
 # SECRETS REQUIRED in vars/secrets.yml:
-#   cloudflare_tunnel_token — token from Cloudflare Zero Trust → Tunnels → your tunnel → Overview
-#   cloudflare_tunnel_id    — tunnel ID from the same page
-#
-# HOW TO GET THESE:
-#   1. Go to Cloudflare Zero Trust → Networks → Tunnels
-#   2. Click your tunnel → Overview tab
-#   3. Copy the Tunnel ID
-#   4. Copy the token from the install command (the long base64 string after 'service install')
-#   5. Add both to secrets.yml via: ansible-vault edit vars/secrets.yml
+#   cloudflare_tunnel_token        — token from Zero Trust → Tunnels → your tunnel → Overview
+#   cloudflare_tunnel_id           — tunnel ID from the same page
+#   cloudflare_credentials_json    — credentials.json content (AccountTag, TunnelSecret, TunnelID)
+#   cloudflare_tunnel_manager_token — account token with Cloudflare Tunnel Write permission
+#   cloudflare_api_token           — zone token for DNS record management
 
 - name: Update apt cache
   apt:
@@ -125,4 +122,37 @@
     api_token: "{{ cloudflare_api_token }}"
     state: present
   loop: "{{ services }}"
+  no_log: true
+
+# --- Cloudflare Tunnel remote config sync ---
+# The dashboard pushes remote ingress config to cloudflared, overriding local config.yaml.
+# This task keeps the remote config in sync with services.yml so they always match.
+
+- name: Build tunnel ingress rules from services registry
+  set_fact:
+    _tunnel_ingress: >-
+      {%- set rules = [] -%}
+      {%- for s in services -%}
+        {%- set rule = {'hostname': s.hostname, 'service': s.protocol + '://' + s.ip + ':' + (s.port | string)} -%}
+        {%- if not (s.tls_verify | default(true)) -%}
+          {%- set rule = rule | combine({'originRequest': {'noTLSVerify': true}}) -%}
+        {%- endif -%}
+        {%- set _ = rules.append(rule) -%}
+      {%- endfor -%}
+      {%- set _ = rules.append({'service': 'http://192.168.69.77:80'}) -%}
+      {{ rules }}
+
+- name: Push tunnel ingress config to Cloudflare API
+  uri:
+    url: "https://api.cloudflare.com/client/v4/accounts/aef72cd455cdee622a7ac143537e23e8/cfd_tunnel/{{ cloudflare_tunnel_id }}/configurations"
+    method: PUT
+    headers:
+      Authorization: "Bearer {{ cloudflare_tunnel_manager_token }}"
+    body_format: json
+    body:
+      config:
+        ingress: "{{ _tunnel_ingress }}"
+        warp-routing:
+          enabled: true
+    status_code: 200
   no_log: true
