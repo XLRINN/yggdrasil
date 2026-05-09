@@ -101,7 +101,6 @@ items:
       namespace: knarr
       annotations:
         kubernetes.io/ingress.class: traefik
-        cert-manager.io/cluster-issuer: letsencrypt-prod
         external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
         gethomepage.dev/enabled: "true"
         gethomepage.dev/name: "Tunarr"
