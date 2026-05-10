@@ -60,6 +60,8 @@ spec:
           value: "America/New_York"
         - name: DOTNET_SYSTEM_NET_DISABLEIPV6
           value: "true"
+        - name: SONARR__SERVER__URLBASE
+          value: "/crunchy"
         - name: HTTPS_PROXY
           value: "http://10.42.0.1:3128"
         - name: NO_PROXY
