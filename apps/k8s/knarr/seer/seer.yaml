@@ -56,17 +56,20 @@ spec:
             runAsNonRoot: true
             runAsUser: 1000
             runAsGroup: 1000
+          env:
+            - name: OVERSEERR_URLBASE
+              value: /seer
           ports:
             - name: http
               containerPort: 5055
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /seer
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /seer
               port: http
           volumeMounts:
             - name: config

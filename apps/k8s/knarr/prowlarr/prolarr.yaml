@@ -46,8 +46,9 @@ spec:
         - |
           CONFIG=/config/config.xml
           if [ -f "$CONFIG" ]; then
-            if grep -q '<UrlBase>' "$CONFIG"; then
-              sed -i 's|<UrlBase>[^<]*</UrlBase>|<UrlBase>/prowlarr</UrlBase>|' "$CONFIG"
+            if grep -q '<UrlBase' "$CONFIG"; then
+              sed -i 's|<UrlBase/>|<UrlBase>/prowlarr</UrlBase>|g' "$CONFIG"
+              sed -i 's|<UrlBase>[^<]*</UrlBase>|<UrlBase>/prowlarr</UrlBase>|g' "$CONFIG"
             else
               sed -i 's|</Config>|  <UrlBase>/prowlarr</UrlBase>\n</Config>|' "$CONFIG"
             fi
