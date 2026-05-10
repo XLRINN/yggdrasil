@@ -119,7 +119,7 @@ data:
             widget:
               type: prowlarr
               url: http://prowlarr.knarr.svc.cluster.local/prowlarr
-              key: c4cf026aab2d407db18fc50b5b57f004
+              key: 25adfdac16e14a95a8623771d0e5c524
         - Anime:
             href: https://yggdrasil.rip/crunchy
             icon: sonarr.png
