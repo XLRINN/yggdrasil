@@ -5,7 +5,7 @@ metadata:
   namespace: knarr
   annotations:
     kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/router.priority: "100"
+    traefik.ingress.kubernetes.io/router.priority: "10000"
 spec:
   rules:
   - host: yggdrasil.rip
