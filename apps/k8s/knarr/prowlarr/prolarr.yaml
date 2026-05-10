@@ -37,14 +37,30 @@ spec:
             value: "1"
           - name: single-request-reopen
 
+      initContainers:
+      - name: set-urlbase
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          CONFIG=/config/config.xml
+          if [ -f "$CONFIG" ]; then
+            if grep -q '<UrlBase>' "$CONFIG"; then
+              sed -i 's|<UrlBase>[^<]*</UrlBase>|<UrlBase>/prowlarr</UrlBase>|' "$CONFIG"
+            else
+              sed -i 's|</Config>|  <UrlBase>/prowlarr</UrlBase>\n</Config>|' "$CONFIG"
+            fi
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /config
       containers:
       - name: prowlarr
         image: lscr.io/linuxserver/prowlarr:latest
         env:
         - name: DOTNET_SYSTEM_NET_DISABLEIPV6
           value: "1"
-        - name: PROWLARR__SERVER__URLBASE
-          value: "/prowlarr"
         - name: HTTPS_PROXY
           value: "http://10.42.0.1:3128"
         - name: NO_PROXY
