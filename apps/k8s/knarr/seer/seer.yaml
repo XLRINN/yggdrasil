@@ -67,10 +67,14 @@ spec:
             httpGet:
               path: /seer
               port: http
+            initialDelaySeconds: 60
+            periodSeconds: 15
           readinessProbe:
             httpGet:
               path: /seer
               port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
           volumeMounts:
             - name: config
               mountPath: /app/config

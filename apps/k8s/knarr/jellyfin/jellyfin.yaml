@@ -46,6 +46,23 @@ spec:
         - |
           sysctl -w fs.inotify.max_user_watches=524288
           sysctl -w fs.inotify.max_user_instances=512
+      - name: set-urlbase
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          CONFIG=/config/network.xml
+          if [ -f "$CONFIG" ]; then
+            if grep -q '<BaseUrl' "$CONFIG"; then
+              sed -i 's|<BaseUrl>[^<]*</BaseUrl>|<BaseUrl>/jelly</BaseUrl>|g' "$CONFIG"
+            else
+              sed -i 's|</NetworkConfiguration>|  <BaseUrl>/jelly</BaseUrl>\n</NetworkConfiguration>|' "$CONFIG"
+            fi
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /config
       containers:
       - name: jellyfin
         image: lscr.io/linuxserver/jellyfin:latest
