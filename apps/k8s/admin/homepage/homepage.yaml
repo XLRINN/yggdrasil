@@ -113,7 +113,7 @@ data:
             description: Indexers
             widget:
               type: prowlarr
-              url: http://prowlarr.knarr.svc.cluster.local
+              url: http://prowlarr.knarr.svc.cluster.local/prowlarr
               key: c4cf026aab2d407db18fc50b5b57f004
         - Anime:
             href: https://yggdrasil.rip/crunchy
@@ -121,7 +121,7 @@ data:
             description: Anime
             widget:
               type: sonarr
-              url: http://sonarr-anime.knarr.svc.cluster.local
+              url: http://sonarr-anime.knarr.svc.cluster.local/crunchy
               key: abab8117d6e94ecb972f707c47eecd57
 
     - Requests:
@@ -131,7 +131,7 @@ data:
             description: Media Requests
             widget:
               type: overseerr
-              url: http://seer.knarr.svc.cluster.local
+              url: http://seer.knarr.svc.cluster.local/seer
               key: MTc3Mzk2NDU4NTMzMTc5MThhOGU5LTk1MmQtNDFjZi05MjIxLWI5Mzk1MjZiNmVmMQ==
 
     - Infrastructure:
