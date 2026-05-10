@@ -48,6 +48,23 @@ spec:
           sysctl -w fs.inotify.max_user_instances=512
           sysctl -w net.ipv6.conf.all.disable_ipv6=1
           sysctl -w net.ipv6.conf.default.disable_ipv6=1
+      - name: set-urlbase
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          CONFIG=/config/config.xml
+          if [ -f "$CONFIG" ]; then
+            if grep -q '<UrlBase>' "$CONFIG"; then
+              sed -i 's|<UrlBase>[^<]*</UrlBase>|<UrlBase>/crunchy</UrlBase>|' "$CONFIG"
+            else
+              sed -i 's|</Config>|  <UrlBase>/crunchy</UrlBase>\n</Config>|' "$CONFIG"
+            fi
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /config
       containers:
       - name: sonarr-anime
         image: lscr.io/linuxserver/sonarr:latest
@@ -60,8 +77,6 @@ spec:
           value: "America/New_York"
         - name: DOTNET_SYSTEM_NET_DISABLEIPV6
           value: "true"
-        - name: SONARR__SERVER__URLBASE
-          value: "/crunchy"
         - name: HTTPS_PROXY
           value: "http://10.42.0.1:3128"
         - name: NO_PROXY
