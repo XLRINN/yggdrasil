@@ -48,6 +48,11 @@ data:
             href: https://asgard.yggdrasil.rip
             icon: proxmox.png
             description: Hypervisor
+            widget:
+              type: proxmox
+              url: https://asgard.yggdrasil.rip
+              username: root@pam!homepage
+              password: b2bd8141-99d7-4b62-aff8-eb011dcac9df
         - Pi-hole:
             href: https://pihole.yggdrasil.rip
             icon: pi-hole.png
@@ -98,7 +103,7 @@ data:
             widget:
               type: sonarr
               url: http://sonarr.knarr.svc.cluster.local/sonarr
-              key: d6384c35ad1744bfb4456ce5ca7ce051
+              key: 1a4f7f510a63417f916caa382c3916da
         - Radarr:
             href: https://yggdrasil.rip/radarr
             icon: radarr.png
