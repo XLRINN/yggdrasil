@@ -12,8 +12,6 @@ metadata:
     gethomepage.dev/icon: "sabnzbd.png"
     gethomepage.dev/description: "Usenet downloader"
 spec:
-    - sabnzbd.yggdrasil.rip
-    secretName: sabnzbd-tls
   rules:
   - host: sabnzbd.yggdrasil.rip
     http:

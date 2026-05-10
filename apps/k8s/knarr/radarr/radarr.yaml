@@ -122,8 +122,6 @@ metadata:
     gethomepage.dev/icon: "radarr.png"
     gethomepage.dev/description: "Movie manager"
 spec:
-    - radarr.yggdrasil.rip
-    secretName: radarr-tls
   rules:
   - host: radarr.yggdrasil.rip
     http:

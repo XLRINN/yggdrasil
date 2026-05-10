@@ -110,8 +110,6 @@ metadata:
     gethomepage.dev/icon: "prowlarr.png"
     gethomepage.dev/description: "Indexer manager"
 spec:
-    - prowlarr.yggdrasil.rip
-    secretName: prowlarr-tls
   rules:
   - host: prowlarr.yggdrasil.rip
     http:

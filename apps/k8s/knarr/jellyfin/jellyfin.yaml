@@ -99,8 +99,6 @@ metadata:
     gethomepage.dev/icon: "jellyfin.png"
     gethomepage.dev/description: "Media server"
 spec:
-    - jellyfin.yggdrasil.rip
-    secretName: jellyfin-tls
   rules:
   - host: jellyfin.yggdrasil.rip
     http:
