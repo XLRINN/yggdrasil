@@ -95,7 +95,7 @@ data:
             widget:
               type: sabnzbd
               url: http://sabnzbd.knarr.svc.cluster.local
-              key: bd92a4d3915349479bf69e57a0de5849
+              key: 715f6d93d62d47d69e20a92618981489
         - Sonarr:
             href: https://yggdrasil.rip/sonarr
             icon: sonarr.png
