@@ -111,7 +111,7 @@ data:
             widget:
               type: radarr
               url: http://radarr.knarr.svc.cluster.local/radarr
-              key: 5b243c724ced48489b8fe9456267ef32
+              key: f25d06d73ea64bedaf11952f946cf393
         - Prowlarr:
             href: https://yggdrasil.rip/prowlarr
             icon: prowlarr.png
