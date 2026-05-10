@@ -54,7 +54,7 @@ data:
               username: root@pam!homepage
               password: b2bd8141-99d7-4b62-aff8-eb011dcac9df
         - Pi-hole:
-            href: https://pihole.yggdrasil.rip
+            href: https://yggdrasil.rip/pihole/admin
             icon: pi-hole.png
             description: DNS & Ad Blocker
         - Cloudflared:
