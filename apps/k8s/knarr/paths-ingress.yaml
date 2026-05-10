@@ -6,8 +6,6 @@ metadata:
 spec:
   stripPrefix:
     prefixes:
-      - /sonarr
-      - /radarr
       - /prowlarr
       - /jelly
       - /crunchy
