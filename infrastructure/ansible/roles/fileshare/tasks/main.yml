@@ -264,7 +264,7 @@
 
 - name: Ensure Syncthing config directory exists
   file:
-    path: /home/david/.local/share/syncthing
+    path: /home/david/.local/state/syncthing
     state: directory
     owner: david
     group: david
@@ -278,14 +278,14 @@
 
 - name: Wait for Syncthing to generate config
   wait_for:
-    path: /home/david/.local/share/syncthing/config.xml
+    path: /home/david/.local/state/syncthing/config.xml
     state: present
     timeout: 120
   ignore_errors: true
 
 - name: Set Syncthing GUI to listen on all interfaces
   replace:
-    path: /home/david/.local/share/syncthing/config.xml
+    path: /home/david/.local/state/syncthing/config.xml
     regexp: '<address>127\.0\.0\.1:8384</address>'
     replace: '<address>0.0.0.0:8384</address>'
   notify: restart syncthing
