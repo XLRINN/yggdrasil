@@ -4,6 +4,7 @@ resources:
   - namespace.yaml
   - storage.yaml
   - paths-ingress.yaml
+  - local-ingress.yaml
   - jellyfin/
   - prowlarr/
   - radarr/

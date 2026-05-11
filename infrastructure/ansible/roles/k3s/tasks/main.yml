@@ -1,4 +1,21 @@
 ---
+- name: Create k3s config directory
+  file:
+    path: /etc/rancher/k3s
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Write k3s config
+  copy:
+    dest: /etc/rancher/k3s/config.yaml
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      write-kubeconfig-mode: "0644"
+
 - name: Install k3s
   shell: curl -sfL https://get.k3s.io | sh -
   args:
@@ -16,11 +33,6 @@
     owner: david
     group: david
     mode: "0700"
-
-- name: Ensure k3s kubeconfig is group-readable
-  file:
-    path: /etc/rancher/k3s/k3s.yaml
-    mode: "0644"
 
 - name: Copy kubeconfig for david
   copy:

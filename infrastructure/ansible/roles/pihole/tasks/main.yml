@@ -85,6 +85,18 @@
       address=/yggdrasil.rip/192.168.69.77
   notify: restart pihole dns
 
+- name: Write wildcard DNS for local skadi.rip domain
+  copy:
+    dest: /etc/dnsmasq.d/skadi-k8s.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Wildcard DNS for local-only skadi.rip services on draupnir
+      # Used for LAN access without going through the Cloudflare tunnel
+      address=/skadi.rip/192.168.69.77
+  notify: restart pihole dns
+
 - name: Enable and start Pi-hole FTL
   systemd:
     name: pihole-FTL
