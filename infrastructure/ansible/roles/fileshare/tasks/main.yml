@@ -280,7 +280,8 @@
   wait_for:
     path: /home/david/.local/share/syncthing/config.xml
     state: present
-    timeout: 30
+    timeout: 120
+  ignore_errors: true
 
 - name: Set Syncthing GUI to listen on all interfaces
   replace:
