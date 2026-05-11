@@ -238,19 +238,17 @@
       WantedBy=multi-user.target
   notify: reload systemd
 
-- name: Remove existing Filebrowser database
-  file:
-    path: /etc/filebrowser/filebrowser.db
-    state: absent
-
-- name: Initialise Filebrowser config
+- name: Initialise Filebrowser database if absent
   command: filebrowser -c /etc/filebrowser/filebrowser.json config init
+  args:
+    creates: /etc/filebrowser/filebrowser.db
 
 - name: Create Filebrowser admin user
-  command: >
+  shell: >
     filebrowser -c /etc/filebrowser/filebrowser.json
-    users add david {{ filebrowser_password }} --perm.admin
+    users add david '{{ filebrowser_password }}' --perm.admin
   no_log: true
+  ignore_errors: true
 
 - name: Enable and start Filebrowser
   systemd:
