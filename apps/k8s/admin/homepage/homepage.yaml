@@ -48,8 +48,13 @@ data:
             href: https://asgard.yggdrasil.rip
             icon: proxmox.png
             description: Hypervisor
+            widget:
+              type: proxmox
+              url: https://asgard.yggdrasil.rip
+              username: root@pam!homepage
+              password: b2bd8141-99d7-4b62-aff8-eb011dcac9df
         - Pi-hole:
-            href: https://pihole.yggdrasil.rip
+            href: https://yggdrasil.rip/pihole/admin
             icon: pi-hole.png
             description: DNS & Ad Blocker
         - Cloudflared:
@@ -90,7 +95,7 @@ data:
             widget:
               type: sabnzbd
               url: http://sabnzbd.knarr.svc.cluster.local
-              key: bd92a4d3915349479bf69e57a0de5849
+              key: 715f6d93d62d47d69e20a92618981489
         - Sonarr:
             href: https://yggdrasil.rip/sonarr
             icon: sonarr.png
@@ -98,7 +103,7 @@ data:
             widget:
               type: sonarr
               url: http://sonarr.knarr.svc.cluster.local/sonarr
-              key: d6384c35ad1744bfb4456ce5ca7ce051
+              key: 1a4f7f510a63417f916caa382c3916da
         - Radarr:
             href: https://yggdrasil.rip/radarr
             icon: radarr.png
@@ -106,7 +111,7 @@ data:
             widget:
               type: radarr
               url: http://radarr.knarr.svc.cluster.local/radarr
-              key: 5b243c724ced48489b8fe9456267ef32
+              key: f25d06d73ea64bedaf11952f946cf393
         - Prowlarr:
             href: https://yggdrasil.rip/prowlarr
             icon: prowlarr.png
@@ -114,7 +119,7 @@ data:
             widget:
               type: prowlarr
               url: http://prowlarr.knarr.svc.cluster.local/prowlarr
-              key: c4cf026aab2d407db18fc50b5b57f004
+              key: 25adfdac16e14a95a8623771d0e5c524
         - Anime:
             href: https://yggdrasil.rip/crunchy
             icon: sonarr.png

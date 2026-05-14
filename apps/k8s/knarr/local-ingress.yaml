@@ -1,0 +1,82 @@
+---
+# Local LAN ingresses for skadi.rip — no Cloudflare tunnel, no URL base needed.
+# Pi-hole resolves *.skadi.rip → 192.168.69.77 (draupnir) via dnsmasq wildcard.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: knarr-local-ingress
+  namespace: knarr
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jellyfin
+            port:
+              number: 80
+  - host: sonarr.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sonarr
+            port:
+              number: 80
+  - host: radarr.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: radarr
+            port:
+              number: 80
+  - host: prowlarr.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prowlarr
+            port:
+              number: 80
+  - host: sabnzbd.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sabnzbd
+            port:
+              number: 80
+  - host: anime.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sonarr-anime
+            port:
+              number: 80
+  - host: seer.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: seer
+            port:
+              number: 80
