@@ -50,7 +50,7 @@ data:
             description: Hypervisor
             widget:
               type: proxmox
-              url: https://asgard.yggdrasil.rip
+              url: https://192.168.69.69:8006
               username: root@pam!homepage
               password: b2bd8141-99d7-4b62-aff8-eb011dcac9df
         - Pi-hole:
