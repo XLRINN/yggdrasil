@@ -80,7 +80,7 @@ data:
             widget:
               type: jellyfin
               url: http://jellyfin.knarr.svc.cluster.local/jelly
-              key: 3994e23ed5a847309e88a7bf8a160bd5
+              key: 124616daeb3245d481c253ac0c6ab605
               enableBlocks: true
         - Tunarr:
             href: https://tunarr.yggdrasil.rip
