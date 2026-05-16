@@ -1,7 +1,9 @@
 ---
-- name: Install NFS client
+- name: Install NFS client and server
   apt:
-    name: nfs-common
+    name:
+      - nfs-common
+      - nfs-kernel-server
     state: present
 
 - name: Create njord media mount point
@@ -27,4 +29,27 @@
     fstype: nfs
     opts: rw,sync,hard,intr
     state: mounted
+
+- name: Create longhorn backup mount point
+  file:
+    path: /mnt/longhorn
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Export /mnt/longhorn via NFS for Longhorn backups
+  copy:
+    dest: /etc/exports.d/longhorn.exports
+    content: "/mnt/longhorn 192.168.69.0/24(rw,sync,no_subtree_check,no_root_squash)\n"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload nfs exports
+
+- name: Enable and start nfs-kernel-server
+  systemd:
+    name: nfs-kernel-server
+    enabled: true
+    state: started
 

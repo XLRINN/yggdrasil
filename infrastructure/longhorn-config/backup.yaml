@@ -3,7 +3,7 @@ kind: Setting
 metadata:
   name: backup-target
   namespace: longhorn-system
-value: "nfs://192.168.69.5:/alexandria/longhorn-backups"
+value: "nfs://192.168.69.77:/mnt/longhorn"
 ---
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
