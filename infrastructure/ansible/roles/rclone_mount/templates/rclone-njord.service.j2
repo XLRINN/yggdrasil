@@ -1,11 +1,12 @@
 [Unit]
 Description=rclone SFTP mount for njord
 After=network-online.target tailscaled.service
-Wants=network-online.target
+Wants=network-online.target tailscaled.service
 
 [Service]
 Type=notify
 ExecStartPre=/bin/mkdir -p /mnt/njord
+ExecStartPre=/bin/sh -c 'until tailscale status --peers=false 2>/dev/null | grep -q "^vana"; do sleep 2; done'
 ExecStart=/usr/bin/rclone mount njord:/ /mnt/njord \
   --config /root/.config/rclone/rclone.conf \
   --vfs-cache-mode writes \
