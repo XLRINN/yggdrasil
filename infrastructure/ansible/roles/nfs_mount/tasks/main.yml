@@ -38,6 +38,14 @@
     group: root
     mode: "0755"
 
+- name: Create exports.d directory
+  file:
+    path: /etc/exports.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: Export /mnt/longhorn via NFS for Longhorn backups
   copy:
     dest: /etc/exports.d/longhorn.exports
