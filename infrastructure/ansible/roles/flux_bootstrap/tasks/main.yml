@@ -14,6 +14,11 @@
     KUBECONFIG: /home/david/.kube/config
   no_log: true
 
+- name: Create admin namespace
+  shell: kubectl create namespace admin --dry-run=client -o yaml | kubectl apply -f -
+  environment:
+    KUBECONFIG: /home/david/.kube/config
+
 - name: Create Cloudflare API token secret for ExternalDNS
   shell: |
     kubectl create secret generic cloudflare-api-token \
