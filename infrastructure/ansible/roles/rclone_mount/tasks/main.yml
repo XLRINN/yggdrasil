@@ -57,6 +57,7 @@
     enabled: true
     state: started
     daemon_reload: true
+  ignore_errors: true
 
 - name: Install rclone systemd service for longhorn backups
   template:
