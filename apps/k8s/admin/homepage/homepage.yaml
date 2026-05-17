@@ -153,7 +153,7 @@ data:
             icon: longhorn.png
             description: Storage
         - n8n:
-            href: https://n8n.drip.yggdrasil.rip
+            href: https://n8n.yggdrasil.rip
             icon: n8n.png
             description: Automation
 
