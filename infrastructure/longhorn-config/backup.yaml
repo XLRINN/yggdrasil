@@ -1,3 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: longhorn-default-setting
+  namespace: longhorn-system
+data:
+  default-setting.yaml: |-
+    backup-target: nfs://192.168.69.77:/mnt/longhorn
+---
 apiVersion: longhorn.io/v1beta2
 kind: Setting
 metadata:
