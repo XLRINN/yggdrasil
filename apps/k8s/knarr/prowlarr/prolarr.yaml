@@ -70,6 +70,8 @@ spec:
           value: "0"
         - name: PUID
           value: "1000"
+        - name: PROWLARR__SERVER__URLBASE
+          value: "/prowlarr"
         - name: PGID
           value: "1000"
         - name: TZ

@@ -71,6 +71,8 @@ spec:
         env:
         - name: PUID
           value: "1000"
+        - name: SONARR__SERVER__URLBASE
+          value: "/sonarr"
         - name: PGID
           value: "1000"
         - name: TZ

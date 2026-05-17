@@ -71,6 +71,8 @@ spec:
         env:
         - name: PUID
           value: "1000"
+        - name: RADARR__SERVER__URLBASE
+          value: "/radarr"
         - name: PGID
           value: "1000"
         - name: TZ

@@ -72,6 +72,8 @@ spec:
         env:
         - name: PUID
           value: "1000"
+        - name: SONARR__SERVER__URLBASE
+          value: "/crunchy"
         - name: PGID
           value: "1000"
         - name: TZ
