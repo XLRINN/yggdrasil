@@ -128,6 +128,14 @@ data:
               type: sonarr
               url: http://sonarr-anime.knarr.svc.cluster.local/crunchy
               key: abab8117d6e94ecb972f707c47eecd57
+        - Lidarr:
+            href: https://yggdrasil.rip/lidarr
+            icon: lidarr.png
+            description: Music Manager
+            widget:
+              type: lidarr
+              url: http://lidarr.knarr.svc.cluster.local/lidarr
+              key: placeholder
 
     - Requests:
         - Seer:
