@@ -6,6 +6,7 @@ resources:
   - paths-ingress.yaml
   - local-ingress.yaml
   - jellyfin/
+  - lidarr/
   - prowlarr/
   - radarr/
   - sabnzb/

@@ -1,0 +1,132 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lidarr-config-pvc
+  namespace: knarr
+  labels:
+    recurring-job-group.longhorn.io/default: enabled
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lidarr
+  namespace: knarr
+  labels:
+    app: lidarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lidarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: lidarr
+    spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      initContainers:
+      - name: inotify-sysctl
+        image: busybox
+        securityContext:
+          privileged: true
+        command:
+        - sh
+        - -c
+        - |
+          sysctl -w fs.inotify.max_user_watches=524288
+          sysctl -w fs.inotify.max_user_instances=512
+      - name: set-urlbase
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          CONFIG=/config/config.xml
+          if [ -f "$CONFIG" ]; then
+            if grep -q '<UrlBase' "$CONFIG"; then
+              sed -i 's|<UrlBase/>|<UrlBase>/lidarr</UrlBase>|g' "$CONFIG"
+              sed -i 's|<UrlBase>[^<]*</UrlBase>|<UrlBase>/lidarr</UrlBase>|g' "$CONFIG"
+            else
+              sed -i 's|</Config>|  <UrlBase>/lidarr</UrlBase>\n</Config>|' "$CONFIG"
+            fi
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /config
+      containers:
+      - name: lidarr
+        image: lscr.io/linuxserver/lidarr:latest
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/New_York"
+        ports:
+        - containerPort: 8686
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: media
+          mountPath: /media
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: lidarr-config-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lidarr
+  namespace: knarr
+spec:
+  selector:
+    app: lidarr
+  ports:
+  - port: 80
+    targetPort: 8686
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lidarr-ingress
+  namespace: knarr
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Lidarr"
+    gethomepage.dev/group: "Downloads"
+    gethomepage.dev/icon: "lidarr.png"
+    gethomepage.dev/description: "Music manager"
+spec:
+  rules:
+  - host: lidarr.yggdrasil.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: lidarr
+            port:
+              number: 80

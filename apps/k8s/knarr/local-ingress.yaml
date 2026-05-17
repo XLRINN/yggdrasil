@@ -80,3 +80,13 @@ spec:
             name: seer
             port:
               number: 80
+  - host: lidarr.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: lidarr
+            port:
+              number: 80

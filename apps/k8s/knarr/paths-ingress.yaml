@@ -60,3 +60,10 @@ spec:
             name: seer
             port:
               number: 80
+      - path: /lidarr
+        pathType: Prefix
+        backend:
+          service:
+            name: lidarr
+            port:
+              number: 80
