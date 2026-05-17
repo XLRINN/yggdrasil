@@ -35,11 +35,9 @@ spec:
         - name: GENERIC_TIMEZONE
           value: "America/New_York"
         - name: N8N_HOST
-          value: "yggdrasil.rip"
-        - name: N8N_PATH
-          value: "/n8n/"
+          value: "n8n.drip.yggdrasil.rip"
         - name: WEBHOOK_URL
-          value: "https://yggdrasil.rip/n8n/"
+          value: "https://n8n.drip.yggdrasil.rip/"
         volumeMounts:
         - name: n8n-storage
           mountPath: /home/node/.n8n
