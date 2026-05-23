@@ -94,7 +94,7 @@ data:
             description: Usenet Downloader
             widget:
               type: sabnzbd
-              url: http://sabnzbd.knarr.svc.cluster.local
+              url: http://sabnzbd.knarr.svc.cluster.local/sab
               key: 9f1564baf2ec45f6b0937b2b00e61695
         - Sonarr:
             href: https://yggdrasil.rip/sonarr
@@ -173,7 +173,7 @@ spec:
       labels:
         app: homepage
       annotations:
-        kubectl.kubernetes.io/restartedAt: "2026-05-23"
+        kubectl.kubernetes.io/restartedAt: "2026-05-23T02"
     spec:
       dnsConfig:
         options:
