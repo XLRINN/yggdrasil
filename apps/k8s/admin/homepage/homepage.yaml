@@ -127,7 +127,7 @@ data:
             widget:
               type: sonarr
               url: http://sonarr-anime.knarr.svc.cluster.local/crunchy
-              key: abab8117d6e94ecb972f707c47eecd57
+              key: b1a6fab58ae74b918e566407b5955923
         - Lidarr:
             href: https://yggdrasil.rip/lidarr
             icon: lidarr.png
