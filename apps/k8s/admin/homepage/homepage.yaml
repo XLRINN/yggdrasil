@@ -103,7 +103,7 @@ data:
             widget:
               type: sonarr
               url: http://sonarr.knarr.svc.cluster.local/sonarr
-              key: 1a4f7f510a63417f916caa382c3916da
+              key: 975bcefe8c1e437ca4b27358cdd7cd1f
         - Radarr:
             href: https://yggdrasil.rip/radarr
             icon: radarr.png
