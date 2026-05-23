@@ -25,7 +25,7 @@ spec:
             name: radarr
             port:
               number: 80
-      - path: /sabnzbd
+      - path: /sab
         pathType: Prefix
         backend:
           service:

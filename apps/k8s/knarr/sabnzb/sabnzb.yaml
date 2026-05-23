@@ -48,9 +48,9 @@ spec:
           CONFIG=/config/sabnzbd.ini
           if [ -f "$CONFIG" ]; then
             if grep -q 'url_base' "$CONFIG"; then
-              sed -i 's|url_base = .*|url_base = /sabnzbd|g' "$CONFIG"
+              sed -i 's|url_base = .*|url_base = /sab|g' "$CONFIG"
             else
-              sed -i '/^\[misc\]/a url_base = /sabnzbd' "$CONFIG"
+              sed -i '/^\[misc\]/a url_base = /sab' "$CONFIG"
             fi
           fi
         volumeMounts:
