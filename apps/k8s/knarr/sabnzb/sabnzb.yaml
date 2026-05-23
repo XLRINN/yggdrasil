@@ -41,32 +41,21 @@ spec:
           sysctl -w net.ipv4.tcp_keepalive_probes=6
       - name: set-urlbase
         image: busybox
+        securityContext:
+          runAsUser: 0
         command:
         - sh
         - -c
         - |
           CONFIG=/config/sabnzbd.ini
           if [ -f "$CONFIG" ]; then
-            if grep -q 'url_base' "$CONFIG"; then
-              sed -i 's|url_base = .*|url_base = /sab|g' "$CONFIG"
-            else
-              sed -i '/^\[misc\]/a url_base = /sab' "$CONFIG"
-            fi
-            if grep -q 'host_whitelist' "$CONFIG"; then
-              sed -i 's|host_whitelist = .*|host_whitelist = yggdrasil.rip|g' "$CONFIG"
-            else
-              sed -i '/^\[misc\]/a host_whitelist = yggdrasil.rip' "$CONFIG"
-            fi
-            if grep -q 'complete_dir' "$CONFIG"; then
-              sed -i 's|complete_dir = .*|complete_dir = /media/vikingr|g' "$CONFIG"
-            else
-              sed -i '/^\[misc\]/a complete_dir = /media/vikingr' "$CONFIG"
-            fi
-            if grep -q 'download_dir' "$CONFIG"; then
-              sed -i 's|download_dir = .*|download_dir = /media/vikingr/incomplete|g' "$CONFIG"
-            else
-              sed -i '/^\[misc\]/a download_dir = /media/vikingr/incomplete' "$CONFIG"
-            fi
+            awk '
+              /^url_base = /      { print "url_base = /sab"; next }
+              /^host_whitelist = / { print "host_whitelist = yggdrasil.rip"; next }
+              /^complete_dir = /  { print "complete_dir = /media/vikingr"; next }
+              /^download_dir = /  { print "download_dir = /media/vikingr/incomplete"; next }
+              { print }
+            ' "$CONFIG" > /tmp/sabnzbd.ini.out && cp /tmp/sabnzbd.ini.out "$CONFIG"
           fi
         volumeMounts:
         - name: config
