@@ -61,17 +61,6 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-      - name: fix-permissions
-        image: busybox
-        securityContext:
-          runAsUser: 0
-        command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /media/vikingr/incomplete /media/vikingr/completed
-        volumeMounts:
-        - name: media
-          mountPath: /media
       containers:
         - name: sabnzbd
           image: lscr.io/linuxserver/sabnzbd:latest
