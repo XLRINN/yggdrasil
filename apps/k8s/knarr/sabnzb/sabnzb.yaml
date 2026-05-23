@@ -57,6 +57,16 @@ spec:
             else
               sed -i '/^\[misc\]/a host_whitelist = yggdrasil.rip' "$CONFIG"
             fi
+            if grep -q 'complete_dir' "$CONFIG"; then
+              sed -i 's|complete_dir = .*|complete_dir = /media/vikingr/completed|g' "$CONFIG"
+            else
+              sed -i '/^\[misc\]/a complete_dir = /media/vikingr/completed' "$CONFIG"
+            fi
+            if grep -q 'download_dir' "$CONFIG"; then
+              sed -i 's|download_dir = .*|download_dir = /media/vikingr/incomplete|g' "$CONFIG"
+            else
+              sed -i '/^\[misc\]/a download_dir = /media/vikingr/incomplete' "$CONFIG"
+            fi
           fi
         volumeMounts:
         - name: config
