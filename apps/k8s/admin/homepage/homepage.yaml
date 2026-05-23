@@ -172,25 +172,11 @@ spec:
     metadata:
       labels:
         app: homepage
-      annotations:
-        kubectl.kubernetes.io/restartedAt: "2026-05-23T02"
     spec:
       dnsConfig:
         options:
           - name: ndots
             value: "1"
-      initContainers:
-        - name: copy-config
-          image: busybox
-          command:
-            - sh
-            - -c
-            - cp /config-source/* /app/config/
-          volumeMounts:
-            - name: config-source
-              mountPath: /config-source
-            - name: config-writable
-              mountPath: /app/config
       containers:
         - name: homepage
           image: ghcr.io/gethomepage/homepage:latest
@@ -204,14 +190,22 @@ spec:
             - name: HOMEPAGE_ALLOWED_HOSTS
               value: "homepage.yggdrasil.rip,yggdrasil.rip"
           volumeMounts:
-            - name: config-writable
-              mountPath: /app/config
+            - name: config
+              mountPath: /app/config/settings.yaml
+              subPath: settings.yaml
+            - name: config
+              mountPath: /app/config/services.yaml
+              subPath: services.yaml
+            - name: config
+              mountPath: /app/config/widgets.yaml
+              subPath: widgets.yaml
+            - name: config
+              mountPath: /app/config/bookmarks.yaml
+              subPath: bookmarks.yaml
       volumes:
-        - name: config-source
+        - name: config
           configMap:
             name: homepage-config
-        - name: config-writable
-          emptyDir: {}
 
 ---
 apiVersion: v1
