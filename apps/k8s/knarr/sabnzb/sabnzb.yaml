@@ -68,7 +68,7 @@ spec:
         command:
         - sh
         - -c
-        - chown -R 1000:1000 /media/vikingr/incomplete
+        - chown -R 1000:1000 /media/vikingr/incomplete /media/vikingr/completed
         volumeMounts:
         - name: media
           mountPath: /media
