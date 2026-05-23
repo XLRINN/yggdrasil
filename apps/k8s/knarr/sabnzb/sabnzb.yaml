@@ -52,6 +52,11 @@ spec:
             else
               sed -i '/^\[misc\]/a url_base = /sab' "$CONFIG"
             fi
+            if grep -q 'host_whitelist' "$CONFIG"; then
+              sed -i 's|host_whitelist = .*|host_whitelist = yggdrasil.rip|g' "$CONFIG"
+            else
+              sed -i '/^\[misc\]/a host_whitelist = yggdrasil.rip' "$CONFIG"
+            fi
           fi
         volumeMounts:
         - name: config

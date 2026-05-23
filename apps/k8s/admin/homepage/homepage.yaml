@@ -89,7 +89,7 @@ data:
 
     - Downloads:
         - SABnzbd:
-            href: https://yggdrasil.rip/sabnzbd
+            href: https://yggdrasil.rip/sab
             icon: sabnzbd.png
             description: Usenet Downloader
             widget:
@@ -132,10 +132,6 @@ data:
             href: https://yggdrasil.rip/lidarr
             icon: lidarr.png
             description: Music Manager
-            widget:
-              type: lidarr
-              url: http://lidarr.knarr.svc.cluster.local/lidarr
-              key: placeholder
 
     - Requests:
         - Seer:
@@ -176,6 +172,8 @@ spec:
     metadata:
       labels:
         app: homepage
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-05-23"
     spec:
       dnsConfig:
         options:
