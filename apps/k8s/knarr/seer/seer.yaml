@@ -132,6 +132,16 @@ spec:
                 name: seer
                 port:
                   number: 80
+    - host: seer.xlrin.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: seer
+                port:
+                  number: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

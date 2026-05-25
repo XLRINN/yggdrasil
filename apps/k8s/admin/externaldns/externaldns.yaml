@@ -56,6 +56,7 @@ spec:
           args:
             - --source=ingress
             - --domain-filter=yggdrasil.rip
+            - --domain-filter=xlrin.io
             - --provider=cloudflare
             - --cloudflare-proxied
             - --txt-owner-id=yggdrasil
