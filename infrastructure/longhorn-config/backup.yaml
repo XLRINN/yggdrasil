@@ -5,14 +5,14 @@ metadata:
   namespace: longhorn-system
 data:
   default-setting.yaml: |-
-    backup-target: nfs://192.168.69.77:/mnt/longhorn
+    backup-target: nfs://192.168.69.5:/mnt/mimmis/longhorn-backups
 ---
 apiVersion: longhorn.io/v1beta2
 kind: Setting
 metadata:
   name: backup-target
   namespace: longhorn-system
-value: "nfs://192.168.69.77:/mnt/longhorn"
+value: "nfs://192.168.69.5:/mnt/mimmis/longhorn-backups"
 ---
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
