@@ -1,18 +1,12 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: longhorn-default-setting
-  namespace: longhorn-system
-data:
-  default-setting.yaml: |-
-    backup-target: nfs://192.168.69.5:/mnt/mimmis/longhorn-backups
----
 apiVersion: longhorn.io/v1beta2
-kind: Setting
+kind: BackupTarget
 metadata:
-  name: backup-target
+  name: default
   namespace: longhorn-system
-value: "nfs://192.168.69.5:/mnt/mimmis/longhorn-backups"
+spec:
+  backupTargetURL: "nfs://192.168.69.5:/mnt/mimmis/longhorn-backups"
+  credentialSecret: ""
+  pollInterval: "5m0s"
 ---
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
