@@ -140,7 +140,7 @@ data:
             description: Media Requests
             widget:
               type: overseerr
-              url: http://seer.knarr.svc.cluster.local/seer
+              url: http://seer.knarr.svc.cluster.local
               key: MTc3Mzk2NDU4NTMzMTc5MThhOGU5LTk1MmQtNDFjZi05MjIxLWI5Mzk1MjZiNmVmMQ==
 
     - Infrastructure:
