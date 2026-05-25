@@ -1,4 +1,14 @@
 ---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-seer
+  namespace: knarr
+spec:
+  stripPrefix:
+    prefixes:
+      - /seer
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -58,22 +68,19 @@ spec:
             runAsNonRoot: true
             runAsUser: 1000
             runAsGroup: 1000
-          env:
-            - name: OVERSEERR_URLBASE
-              value: /seer
           ports:
             - name: http
               containerPort: 5055
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /seer
+              path: /
               port: http
             initialDelaySeconds: 60
             periodSeconds: 15
           readinessProbe:
             httpGet:
-              path: /seer
+              path: /
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
@@ -118,6 +125,28 @@ spec:
       http:
         paths:
           - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: seer
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: seer-path-ingress
+  namespace: knarr
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.middlewares: knarr-strip-seer@kubernetescrd
+    traefik.ingress.kubernetes.io/router.priority: "10000"
+spec:
+  rules:
+    - host: yggdrasil.rip
+      http:
+        paths:
+          - path: /seer
             pathType: Prefix
             backend:
               service:

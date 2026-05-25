@@ -53,13 +53,6 @@ spec:
             name: sonarr-anime
             port:
               number: 80
-      - path: /seer
-        pathType: Prefix
-        backend:
-          service:
-            name: seer
-            port:
-              number: 80
       - path: /lidarr
         pathType: Prefix
         backend:
