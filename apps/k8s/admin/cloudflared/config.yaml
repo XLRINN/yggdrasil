@@ -5,8 +5,6 @@ metadata:
   namespace: admin
 data:
   config.yaml: |
-    tunnel: TUNNEL_ID_PLACEHOLDER
-    credentials-file: /etc/cloudflared/credentials.json
     ingress:
       # Non-k8s services
       - hostname: files.yggdrasil.rip
@@ -16,7 +14,7 @@ data:
         originRequest:
           noTLSVerify: true
       - hostname: pihole.yggdrasil.rip
-        service: http://PIHOLE_IP:80
+        service: http://192.168.69.2:80
       - hostname: syncthing-alex.yggdrasil.rip
         service: http://192.168.69.5:8384
 
