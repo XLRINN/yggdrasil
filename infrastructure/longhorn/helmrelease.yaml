@@ -17,3 +17,6 @@ spec:
     defaultSettings:
       backupTarget: "nfs://192.168.69.5:/alexandria/longhorn-backups"
       defaultReplicaCount: 1
+      storageOverProvisioningPercentage: 200
+      storageReservedPercentageForDefaultDisk: 10
+      storageMinimalAvailablePercentage: 10
