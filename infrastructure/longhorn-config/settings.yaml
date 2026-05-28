@@ -1,9 +1,12 @@
 apiVersion: longhorn.io/v1beta2
-kind: Setting
+kind: BackupTarget
 metadata:
-  name: backup-target
+  name: default
   namespace: longhorn-system
-value: "nfs://192.168.69.5:/alexandria/longhorn-backups"
+spec:
+  backupTargetURL: "nfs://192.168.69.5:/alexandria/longhorn-backups"
+  credentialSecret: ""
+  pollInterval: "5m"
 ---
 apiVersion: longhorn.io/v1beta2
 kind: Setting
