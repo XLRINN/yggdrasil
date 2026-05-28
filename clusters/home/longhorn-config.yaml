@@ -13,3 +13,12 @@ spec:
     name: flux-system
   dependsOn:
     - name: infrastructure
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: longhorn-admission-webhook
+      namespace: longhorn-system
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: longhorn-manager
+      namespace: longhorn-system
