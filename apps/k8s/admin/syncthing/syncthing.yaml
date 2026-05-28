@@ -55,6 +55,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: syncthing-pvc
   namespace: admin
+  labels:
+    recurring-job-group.longhorn.io/default: enabled
 spec:
   accessModes:
     - ReadWriteOnce
