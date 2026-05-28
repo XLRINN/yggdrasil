@@ -7,13 +7,15 @@ items:
     metadata:
       name: tunarr-config-pvc
       namespace: knarr
+      labels:
+        recurring-job-group.longhorn.io/default: enabled
     spec:
       accessModes:
         - ReadWriteOnce
+      storageClassName: longhorn
       resources:
         requests:
           storage: 10Gi
-      # storageClassName: local-path # Uncomment if you use a specific class
 
   # --- Deployment ---
   - apiVersion: apps/v1
