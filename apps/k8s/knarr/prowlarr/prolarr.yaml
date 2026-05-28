@@ -9,9 +9,10 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: longhorn
   resources:
     requests:
-      storage: 2Gi
+      storage: 10Gi
 ---
 apiVersion: apps/v1
 kind: Deployment

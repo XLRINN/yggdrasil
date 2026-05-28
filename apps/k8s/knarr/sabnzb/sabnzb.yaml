@@ -39,6 +39,27 @@ spec:
           sysctl -w net.ipv4.tcp_keepalive_time=60
           sysctl -w net.ipv4.tcp_keepalive_intvl=10
           sysctl -w net.ipv4.tcp_keepalive_probes=6
+      - name: set-urlbase
+        image: busybox
+        securityContext:
+          runAsUser: 0
+        command:
+        - sh
+        - -c
+        - |
+          CONFIG=/config/sabnzbd.ini
+          if [ -f "$CONFIG" ]; then
+            awk '
+              /^url_base = /      { print "url_base = /sab"; next }
+              /^host_whitelist = / { print "host_whitelist = yggdrasil.rip"; next }
+              /^complete_dir = /  { print "complete_dir = /media/vikingr"; next }
+              /^download_dir = /  { print "download_dir = /media/vikingr/incomplete"; next }
+              { print }
+            ' "$CONFIG" > /tmp/sabnzbd.ini.out && cp /tmp/sabnzbd.ini.out "$CONFIG"
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /config
       containers:
         - name: sabnzbd
           image: lscr.io/linuxserver/sabnzbd:latest
@@ -97,4 +118,4 @@ spec:
   storageClassName: longhorn
   resources:
     requests:
-      storage: 1Gi
+      storage: 10Gi
