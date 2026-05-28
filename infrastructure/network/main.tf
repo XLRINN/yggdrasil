@@ -74,6 +74,8 @@ resource "proxmox_virtual_environment_container" "pihole" {
     order = 1
   }
 
+  on_boot = true
+
   provisioner "local-exec" {
     when    = create
     command = "ssh-keygen -R 192.168.69.2 || true"
@@ -159,6 +161,8 @@ resource "proxmox_virtual_environment_container" "cloudflared" {
   startup {
     order = 2
   }
+
+  on_boot = true
 
   provisioner "local-exec" {
     when    = create

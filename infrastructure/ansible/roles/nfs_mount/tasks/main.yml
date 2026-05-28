@@ -27,7 +27,7 @@
     path: /mnt/alexandria
     src: 192.168.69.5:/mnt/mimmis
     fstype: nfs
-    opts: rw,sync,hard,intr
+    opts: rw,sync,soft,timeo=30,retrans=3,_netdev,nofail
     state: mounted
 
 - name: Create longhorn backup mount point

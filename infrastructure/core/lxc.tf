@@ -61,6 +61,8 @@ resource "proxmox_virtual_environment_container" "alexandria" {
     order = 1
   }
 
+  on_boot = true
+
   provisioner "local-exec" {
     when    = create
     command = "ssh-keygen -R 192.168.69.5 || true"
