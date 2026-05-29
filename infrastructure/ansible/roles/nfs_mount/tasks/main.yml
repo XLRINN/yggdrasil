@@ -27,7 +27,7 @@
     path: /mnt/alexandria
     src: 192.168.69.5:/mnt/mimmis
     fstype: nfs
-    opts: rw,sync,soft,timeo=30,retrans=3,_netdev,nofail
+    opts: rw,sync,soft,timeo=30,retrans=3,_netdev,nofail,nofsc
     state: mounted
 
 - name: Enable and start nfs-kernel-server
