@@ -76,6 +76,8 @@ spec:
           value: "1000"
         - name: TZ
           value: "America/New_York"
+        - name: LIDARR__AUTH__APIKEY
+          value: "65a7661882674961990ad55a83954e30"
         ports:
         - containerPort: 8686
           name: http

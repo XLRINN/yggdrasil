@@ -132,6 +132,10 @@ data:
             href: https://yggdrasil.rip/lidarr
             icon: lidarr.png
             description: Music Manager
+            widget:
+              type: lidarr
+              url: http://lidarr.knarr.svc.cluster.local/lidarr
+              key: 65a7661882674961990ad55a83954e30
 
     - Requests:
         - Seer:
