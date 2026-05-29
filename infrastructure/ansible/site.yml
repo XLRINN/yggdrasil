@@ -67,4 +67,5 @@
     - rclone_mount
     - longhorn
     - flux_bootstrap
+    - longhorn_restore
     - claude_cli

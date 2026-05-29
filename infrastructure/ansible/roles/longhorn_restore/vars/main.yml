@@ -1,0 +1,38 @@
+---
+longhorn_namespace: longhorn-system
+longhorn_proxy_port: 18980
+
+longhorn_volumes:
+  - pvc_name: jellyfin-config-pvc
+    namespace: knarr
+    size: "50Gi"
+  - pvc_name: sonarr-config-pvc
+    namespace: knarr
+    size: "20Gi"
+  - pvc_name: radarr-config-pvc
+    namespace: knarr
+    size: "20Gi"
+  - pvc_name: sonarr-anime-config-pvc
+    namespace: knarr
+    size: "20Gi"
+  - pvc_name: prowlarr-config-pvc
+    namespace: knarr
+    size: "20Gi"
+  - pvc_name: lidarr-config-pvc
+    namespace: knarr
+    size: "20Gi"
+  - pvc_name: sabnzbd-config-pvc
+    namespace: knarr
+    size: "20Gi"
+  - pvc_name: seer-config
+    namespace: knarr
+    size: "20Gi"
+  - pvc_name: tunarr-config-pvc
+    namespace: knarr
+    size: "20Gi"
+  - pvc_name: syncthing-pvc
+    namespace: admin
+    size: "20Gi"
+  - pvc_name: n8n-pvc
+    namespace: auto
+    size: "20Gi"

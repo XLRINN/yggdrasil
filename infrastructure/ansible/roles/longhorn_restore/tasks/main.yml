@@ -1,0 +1,83 @@
+---
+- name: Wait for Longhorn manager to be ready
+  command: >
+    kubectl -n {{ longhorn_namespace }} wait deployment/longhorn-manager
+    --for=condition=Available --timeout=300s
+  environment:
+    KUBECONFIG: /home/david/.kube/config
+
+- name: Wait for Longhorn admission webhook to be ready
+  command: >
+    kubectl -n {{ longhorn_namespace }} wait deployment/longhorn-admission-webhook
+    --for=condition=Available --timeout=300s
+  environment:
+    KUBECONFIG: /home/david/.kube/config
+
+- name: Wait for backup target to be available
+  command: >
+    kubectl -n {{ longhorn_namespace }} get backuptarget default
+    -o jsonpath='{.status.available}'
+  environment:
+    KUBECONFIG: /home/david/.kube/config
+  register: backup_target_status
+  until: backup_target_status.stdout == "true"
+  retries: 20
+  delay: 15
+
+- name: Start kubectl proxy for Longhorn API
+  shell: |
+    kubectl proxy --port={{ longhorn_proxy_port }} --address=127.0.0.1 &
+    echo $! > /tmp/kubectl-proxy-longhorn.pid
+  environment:
+    KUBECONFIG: /home/david/.kube/config
+
+- name: Wait for proxy to be ready
+  wait_for:
+    host: 127.0.0.1
+    port: "{{ longhorn_proxy_port }}"
+    timeout: 30
+
+- name: Get all backup volumes from Longhorn
+  uri:
+    url: "http://127.0.0.1:{{ longhorn_proxy_port }}/api/v1/namespaces/{{ longhorn_namespace }}/services/longhorn-frontend:80/proxy/v1/backupvolumes"
+    method: GET
+  register: backup_volumes_response
+
+- name: Build pvcName to backup volume mapping
+  set_fact:
+    pvc_to_backup_volume: >-
+      {{
+        pvc_to_backup_volume | default({}) | combine({
+          (item.pvcName + '/' + item.namespace): {
+            'name': item.name,
+            'lastBackupName': item.lastBackupName
+          }
+        })
+      }}
+  loop: "{{ backup_volumes_response.json.data }}"
+  when:
+    - item.pvcName is defined
+    - item.pvcName != ''
+    - item.lastBackupName is defined
+    - item.lastBackupName != ''
+
+- name: Restore each volume from backup
+  include_tasks: restore_volume.yml
+  loop: "{{ longhorn_volumes }}"
+  loop_control:
+    loop_var: volume
+    label: "{{ volume.pvc_name }}"
+
+- name: Stop kubectl proxy
+  shell: "kill $(cat /tmp/kubectl-proxy-longhorn.pid) 2>/dev/null || true"
+
+- name: Add recurring backup label to restored PVCs
+  command: >
+    kubectl -n {{ item.namespace }} label pvc {{ item.pvc_name }}
+    recurring-job-group.longhorn.io/default=enabled --overwrite
+  environment:
+    KUBECONFIG: /home/david/.kube/config
+  loop: "{{ longhorn_volumes }}"
+  loop_control:
+    label: "{{ item.pvc_name }}"
+  ignore_errors: true

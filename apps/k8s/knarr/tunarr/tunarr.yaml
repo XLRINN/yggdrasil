@@ -15,7 +15,7 @@ items:
       storageClassName: longhorn
       resources:
         requests:
-          storage: 10Gi
+          storage: 20Gi
 
   # --- Deployment ---
   - apiVersion: apps/v1

@@ -1,0 +1,84 @@
+---
+- name: Check if backup exists for {{ volume.pvc_name }}
+  set_fact:
+    backup_info: "{{ pvc_to_backup_volume.get(volume.pvc_name + '/' + volume.namespace, {}) }}"
+
+- name: Skip {{ volume.pvc_name }} — no backup found, Flux will create fresh
+  debug:
+    msg: "No backup found for {{ volume.pvc_name }} in {{ volume.namespace }}, skipping restore"
+  when: backup_info == {}
+
+- name: Restore {{ volume.pvc_name }}
+  when: backup_info != {}
+  block:
+    - name: Get latest backup URL for {{ volume.pvc_name }}
+      uri:
+        url: "http://127.0.0.1:{{ longhorn_proxy_port }}/api/v1/namespaces/{{ longhorn_namespace }}/services/longhorn-frontend:80/proxy/v1/backupvolumes/{{ backup_info.name }}/backups/{{ backup_info.lastBackupName }}"
+        method: GET
+      register: backup_detail
+
+    - name: Delete existing PVC {{ volume.pvc_name }} if present
+      command: >
+        kubectl -n {{ volume.namespace }} delete pvc {{ volume.pvc_name }} --ignore-not-found
+      environment:
+        KUBECONFIG: /home/david/.kube/config
+
+    - name: Delete existing Longhorn volume {{ volume.pvc_name }} if present
+      uri:
+        url: "http://127.0.0.1:{{ longhorn_proxy_port }}/api/v1/namespaces/{{ longhorn_namespace }}/services/longhorn-frontend:80/proxy/v1/volumes/{{ volume.pvc_name }}"
+        method: DELETE
+        status_code: [200, 204, 404]
+
+    - name: Create Longhorn volume from backup for {{ volume.pvc_name }}
+      uri:
+        url: "http://127.0.0.1:{{ longhorn_proxy_port }}/api/v1/namespaces/{{ longhorn_namespace }}/services/longhorn-frontend:80/proxy/v1/volumes"
+        method: POST
+        body_format: json
+        body:
+          name: "{{ volume.pvc_name }}"
+          size: "{{ volume.size }}"
+          numberOfReplicas: 1
+          fromBackup: "{{ backup_detail.json.url }}"
+          frontend: "blockdev"
+          accessMode: "rwo"
+        status_code: [200, 201]
+
+    - name: Wait for {{ volume.pvc_name }} restore to complete
+      uri:
+        url: "http://127.0.0.1:{{ longhorn_proxy_port }}/api/v1/namespaces/{{ longhorn_namespace }}/services/longhorn-frontend:80/proxy/v1/volumes/{{ volume.pvc_name }}"
+        method: GET
+      register: volume_status
+      until: volume_status.json.state == "detached"
+      retries: 60
+      delay: 10
+
+    - name: Expand {{ volume.pvc_name }} to {{ volume.size }}
+      uri:
+        url: "http://127.0.0.1:{{ longhorn_proxy_port }}/api/v1/namespaces/{{ longhorn_namespace }}/services/longhorn-frontend:80/proxy/v1/volumes/{{ volume.pvc_name }}?action=expandVolume"
+        method: POST
+        body_format: json
+        body:
+          size: "{{ volume.size }}"
+        status_code: [200, 204]
+
+    - name: Wait for {{ volume.pvc_name }} expansion to complete
+      uri:
+        url: "http://127.0.0.1:{{ longhorn_proxy_port }}/api/v1/namespaces/{{ longhorn_namespace }}/services/longhorn-frontend:80/proxy/v1/volumes/{{ volume.pvc_name }}"
+        method: GET
+      register: volume_expand_status
+      until: volume_expand_status.json.state == "detached"
+      retries: 30
+      delay: 10
+
+    - name: Create PV and PVC for {{ volume.pvc_name }}
+      uri:
+        url: "http://127.0.0.1:{{ longhorn_proxy_port }}/api/v1/namespaces/{{ longhorn_namespace }}/services/longhorn-frontend:80/proxy/v1/volumes/{{ volume.pvc_name }}?action=pvCreate"
+        method: POST
+        body_format: json
+        body:
+          pvName: "longhorn-{{ volume.pvc_name }}"
+          fsType: "ext4"
+          storageClassName: "longhorn"
+          namespace: "{{ volume.namespace }}"
+          pvcName: "{{ volume.pvc_name }}"
+        status_code: [200, 201]
