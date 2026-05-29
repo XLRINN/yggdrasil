@@ -58,20 +58,3 @@
     state: started
     daemon_reload: true
   ignore_errors: true
-
-- name: Install rclone systemd service for longhorn backups
-  template:
-    src: rclone-longhorn.service.j2
-    dest: /etc/systemd/system/rclone-longhorn.service
-    owner: root
-    group: root
-    mode: "0644"
-  notify: reload systemd
-
-- name: Enable and start rclone longhorn mount
-  systemd:
-    name: rclone-longhorn
-    enabled: true
-    state: started
-    daemon_reload: true
-  ignore_errors: true
