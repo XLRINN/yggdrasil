@@ -86,6 +86,14 @@
     enabled: true
     state: started
 
+- name: Set NFS thread count to 32
+  lineinfile:
+    path: /etc/nfs.conf
+    regexp: '^#?\s*threads='
+    line: "threads=32"
+    insertafter: '^\[nfsd\]'
+  notify: restart nfs
+
 - name: Enable and start nfs-kernel-server
   systemd:
     name: nfs-kernel-server
