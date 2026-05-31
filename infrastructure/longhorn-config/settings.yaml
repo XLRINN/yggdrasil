@@ -4,9 +4,9 @@ metadata:
   name: default
   namespace: longhorn-system
 spec:
-  backupTargetURL: ""
+  backupTargetURL: "nfs://192.168.69.5:/mnt/mimmis/longhorn-backups"
   credentialSecret: ""
-  pollInterval: "0"
+  pollInterval: "30m0s"
 ---
 apiVersion: longhorn.io/v1beta2
 kind: Setting
@@ -14,13 +14,6 @@ metadata:
   name: default-replica-count
   namespace: longhorn-system
 value: "1"
----
-apiVersion: longhorn.io/v1beta2
-kind: Setting
-metadata:
-  name: backup-target-poll-interval
-  namespace: longhorn-system
-value: "0"
 ---
 apiVersion: longhorn.io/v1beta2
 kind: Setting
