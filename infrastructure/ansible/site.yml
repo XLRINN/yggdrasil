@@ -69,3 +69,17 @@
     - flux_bootstrap
     - longhorn_restore
     - claude_cli
+
+# -------------------------------------------------------------------------
+# VULN — Docker + Tailscale test container
+# -------------------------------------------------------------------------
+
+- name: Configure vuln
+  hosts: vuln
+  become: true
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - common
+    - docker
+    - tailscale
