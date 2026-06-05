@@ -48,6 +48,7 @@
     name:
       - nfs-kernel-server
       - samba
+      - avahi-daemon
       - acl
       - rclone
       - aria2
@@ -103,6 +104,21 @@
 - name: Reload NFS exports
   command: exportfs -ra
   changed_when: false
+
+- name: Deploy Avahi NFS service advertisement
+  template:
+    src: avahi-nfs.service.j2
+    dest: /etc/avahi/services/nfs.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart avahi
+
+- name: Enable and start avahi-daemon
+  systemd:
+    name: avahi-daemon
+    enabled: true
+    state: started
 
 - name: Configure Samba
   template:

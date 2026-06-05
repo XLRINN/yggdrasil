@@ -20,3 +20,8 @@
   systemd:
     name: syncthing@david
     state: restarted
+
+- name: restart avahi
+  systemd:
+    name: avahi-daemon
+    state: restarted
