@@ -71,15 +71,18 @@
     - claude_cli
 
 # -------------------------------------------------------------------------
-# VULN — Docker + Tailscale test container
+# VULN — Vulhub pentesting practice container
 # -------------------------------------------------------------------------
 
 - name: Configure vuln
   hosts: vuln
   become: true
+  vars:
+    claude_cli_user: root
   vars_files:
     - vars/secrets.yml
   roles:
     - common
     - docker
     - tailscale
+    - claude_cli

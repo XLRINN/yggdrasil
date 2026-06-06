@@ -22,17 +22,17 @@
     global: true
     state: present
 
-- name: Auto-start tmux on SSH login for david
+- name: Auto-start tmux on SSH login
   blockinfile:
-    path: /home/david/.bashrc
+    path: "~{{ claude_cli_user }}/.bashrc"
     marker: "# {mark} ANSIBLE MANAGED — tmux auto-start"
     block: |
       if [ -z "$TMUX" ] && [ "$TERM" != "screen" ]; then
         tmux attach 2>/dev/null || tmux new-session
       fi
     create: true
-    owner: david
-    group: david
+    owner: "{{ claude_cli_user }}"
+    group: "{{ claude_cli_user }}"
     mode: "0644"
 
 - name: Get latest yazi release
