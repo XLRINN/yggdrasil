@@ -99,3 +99,19 @@ services:
     tls_verify: true
     homepage_group: Storage
     homepage_icon: syncthing.png
+
+  # ---------------------------------------------------------------------------
+  # HERMOD — MCP connector host (192.168.69.50)
+  # Caddy on hermod terminates TLS and reverse-proxies each MCP server.
+  # See vars/mcp_servers.yml for the underlying service definitions.
+  # ---------------------------------------------------------------------------
+
+  - name: Sequence MCP
+    description: MCP connector for Sequence personal finance
+    hostname: sequence-mcp.yggdrasil.rip
+    ip: 192.168.69.50
+    port: 443
+    protocol: https
+    tls_verify: true
+    homepage_group: MCP
+    homepage_icon: sequence.png

@@ -1,0 +1,14 @@
+---
+- name: reload systemd and restart mcp services
+  systemd:
+    name: "mcp-{{ item.name }}"
+    state: restarted
+    daemon_reload: true
+  loop: "{{ mcp_servers }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: restart caddy
+  systemd:
+    name: caddy
+    state: restarted

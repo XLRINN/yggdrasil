@@ -71,6 +71,21 @@
     - claude_cli
 
 # -------------------------------------------------------------------------
+# HERMOD — MCP connector host (sequence, budget, mail, ...)
+# -------------------------------------------------------------------------
+
+- name: Configure hermod
+  hosts: hermod
+  become: true
+  vars_files:
+    - vars/secrets.yml
+    - vars/mcp_servers.yml
+  roles:
+    - common
+    - tailscale
+    - mcp
+
+# -------------------------------------------------------------------------
 # VULN — Docker + Tailscale test container
 # -------------------------------------------------------------------------
 

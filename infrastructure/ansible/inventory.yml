@@ -21,6 +21,17 @@ all:
           ansible_ssh_private_key_file: ~/.ssh/id_ed25519
 
     # -------------------------------------------------------------------------
+    # MCP — Hosts MCP connectors for Claude (sequence, budget, mail, ...)
+    # Managed by: infrastructure/hermod/
+    # -------------------------------------------------------------------------
+    mcp:
+      hosts:
+        hermod:
+          ansible_host: 192.168.69.50
+          ansible_user: david
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+    # -------------------------------------------------------------------------
     # NETWORK — Stable, never rebuilt unless intentional
     # Managed by: infrastructure/network/
     # These must stay up during draupnir/alexandria rebuilds

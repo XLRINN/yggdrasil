@@ -1,0 +1,17 @@
+[Unit]
+Description=MCP server — {{ item.name }}
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/mcp/{{ item.name }}
+ExecStart={{ item.command }}
+Restart=on-failure
+RestartSec=5
+Environment=PORT={{ item.port }}
+{% for key, value in item.env.items() %}
+Environment={{ key }}={{ value }}
+{% endfor %}
+
+[Install]
+WantedBy=multi-user.target

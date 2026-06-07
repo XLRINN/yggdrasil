@@ -1,0 +1,41 @@
+# =============================================================================
+# YGGDRASIL — MCP SERVER REGISTRY (hosted on hermod, 192.168.69.50)
+# =============================================================================
+#
+# Each entry runs as its own systemd service (node/npx) behind Caddy, which
+# reverse-proxies the public hostname to the local port over HTTPS.
+#
+# Add a new MCP server by appending an entry here — no role changes needed.
+#
+#   name      Short identifier — used for the systemd unit and local routing
+#   hostname  Public hostname (Cloudflare tunnel must route here)
+#   port      Local port the server listens on (keep these unique)
+#   command   Command used to launch the server (npx, node, docker run, etc.)
+#   env       Map of environment variables (secrets pulled from secrets.yml)
+#
+# =============================================================================
+
+mcp_servers:
+  - name: sequence
+    hostname: sequence-mcp.yggdrasil.rip
+    port: 3001
+    command: "npx -y @sequence/mcp-server"
+    env:
+      SEQUENCE_API_KEY: "{{ sequence_api_key }}"
+
+  # - name: budget
+  #   hostname: budget-mcp.yggdrasil.rip
+  #   port: 3002
+  #   command: "npx -y @actual-budget/mcp-server"
+  #   env:
+  #     ACTUAL_SERVER_URL: "{{ actual_server_url }}"
+  #     ACTUAL_PASSWORD: "{{ actual_password }}"
+
+  # - name: mail
+  #   hostname: mail-mcp.yggdrasil.rip
+  #   port: 3003
+  #   command: "npx -y @some-org/gmail-mcp-server"
+  #   env:
+  #     GMAIL_CLIENT_ID: "{{ gmail_client_id }}"
+  #     GMAIL_CLIENT_SECRET: "{{ gmail_client_secret }}"
+  #     GMAIL_REFRESH_TOKEN: "{{ gmail_refresh_token }}"

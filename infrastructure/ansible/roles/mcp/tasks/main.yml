@@ -1,0 +1,72 @@
+---
+- name: Add NodeSource apt key
+  get_url:
+    url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+    dest: /usr/share/keyrings/nodesource.gpg
+    mode: "0644"
+
+- name: Add NodeSource apt repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main"
+    filename: nodesource
+    state: present
+
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: present
+    update_cache: true
+
+- name: Add Caddy apt key
+  get_url:
+    url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+    dest: /usr/share/keyrings/caddy.gpg
+    mode: "0644"
+
+- name: Add Caddy apt repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/caddy.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main"
+    filename: caddy
+    state: present
+
+- name: Install Caddy
+  apt:
+    name: caddy
+    state: present
+    update_cache: true
+
+- name: Create mcp working directory
+  file:
+    path: "/opt/mcp/{{ item.name }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ mcp_servers }}"
+
+- name: Template systemd unit for each MCP server
+  template:
+    src: mcp.service.j2
+    dest: "/etc/systemd/system/mcp-{{ item.name }}.service"
+    mode: "0644"
+  loop: "{{ mcp_servers }}"
+  notify: reload systemd and restart mcp services
+
+- name: Template Caddyfile
+  template:
+    src: Caddyfile.j2
+    dest: /etc/caddy/Caddyfile
+    mode: "0644"
+  notify: restart caddy
+
+- name: Enable and start MCP services
+  systemd:
+    name: "mcp-{{ item.name }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop: "{{ mcp_servers }}"
+
+- name: Enable and start Caddy
+  systemd:
+    name: caddy
+    enabled: true
+    state: started
