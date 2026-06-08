@@ -55,12 +55,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: syncthing-pvc
   namespace: admin
-  labels:
-    recurring-job-group.longhorn.io/default: enabled
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: local-path
   resources:
     requests:
       storage: 20Gi
