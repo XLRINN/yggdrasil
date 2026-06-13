@@ -29,7 +29,7 @@ mcp_servers:
     command: "npx -y actual-mcp-server --http"
     env:
       ACTUAL_SERVER_URL: "https://ab.yggdrasil.rip"
-      ACTUAL_PASSWORD: "{{ actual_password }}"
+      ACTUAL_PASSWORD: "{{ proxmox_password }}"
       ACTUAL_BUDGET_SYNC_ID: "{{ actual_budget_sync_id }}"
       MCP_BRIDGE_PORT: "3002"
       MCP_SSE_AUTHORIZATION: "{{ actual_mcp_token }}"
