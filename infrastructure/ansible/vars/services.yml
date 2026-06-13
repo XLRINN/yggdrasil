@@ -106,6 +106,16 @@ services:
   # See vars/mcp_servers.yml for the underlying service definitions.
   # ---------------------------------------------------------------------------
 
+  - name: Budget MCP
+    description: MCP connector for Actual Budget
+    hostname: budget-mcp.yggdrasil.rip
+    ip: 192.168.69.50
+    port: 443
+    protocol: https
+    tls_verify: true
+    homepage_group: MCP
+    homepage_icon: actual-budget.png
+
   - name: Sequence MCP
     description: MCP connector for Sequence personal finance
     hostname: sequence-mcp.yggdrasil.rip

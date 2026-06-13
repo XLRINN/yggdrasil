@@ -23,13 +23,16 @@ mcp_servers:
     env:
       SEQUENCE_API_KEY: "{{ sequence_api_key }}"
 
-  # - name: budget
-  #   hostname: budget-mcp.yggdrasil.rip
-  #   port: 3002
-  #   command: "npx -y @actual-budget/mcp-server"
-  #   env:
-  #     ACTUAL_SERVER_URL: "{{ actual_server_url }}"
-  #     ACTUAL_PASSWORD: "{{ actual_password }}"
+  - name: budget
+    hostname: budget-mcp.yggdrasil.rip
+    port: 3002
+    command: "npx -y actual-mcp-server --http"
+    env:
+      ACTUAL_SERVER_URL: "https://ab.yggdrasil.rip"
+      ACTUAL_PASSWORD: "{{ actual_password }}"
+      ACTUAL_BUDGET_SYNC_ID: "{{ actual_budget_sync_id }}"
+      MCP_BRIDGE_PORT: "3002"
+      MCP_SSE_AUTHORIZATION: "{{ actual_mcp_token }}"
 
   # - name: mail
   #   hostname: mail-mcp.yggdrasil.rip
