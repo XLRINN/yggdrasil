@@ -32,6 +32,7 @@ mcp_servers:
       ACTUAL_PASSWORD: "{{ proxmox_password }}"
       ACTUAL_BUDGET_SYNC_ID: "{{ actual_budget_sync_id }}"
       MCP_BRIDGE_PORT: "3002"
+      MCP_BRIDGE_DATA_DIR: "/opt/mcp/budget/actual-data"
       MCP_SSE_AUTHORIZATION: "{{ actual_mcp_token }}"
 
   # - name: mail
