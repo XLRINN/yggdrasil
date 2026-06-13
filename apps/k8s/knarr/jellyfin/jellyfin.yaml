@@ -4,12 +4,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: jellyfin-config-pvc
   namespace: knarr
-  labels:
-    recurring-job-group.longhorn.io/default: enabled
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: local-path
   resources:
     requests:
       storage: 50Gi
@@ -67,7 +65,7 @@ spec:
           mountPath: /config
       containers:
       - name: jellyfin
-        image: lscr.io/linuxserver/jellyfin:latest
+        image: lscr.io/linuxserver/jellyfin@sha256:c123ef2f82195e377d8ca3df275f13f9dfa5c6e61b195958662b42b5e54362ab
         env:
         - name: PUID
           value: "1000"

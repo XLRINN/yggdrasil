@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: n8n-pvc
-  namespace: auto
+  name: actual-budget-pvc
+  namespace: admin
 spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: local-path
   resources:
     requests:
-      storage: 20Gi
+      storage: 5Gi

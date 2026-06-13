@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: actual-budget
+  namespace: admin
+  labels:
+    app: actual-budget
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: actual-budget
+  template:
+    metadata:
+      labels:
+        app: actual-budget
+    spec:
+      containers:
+      - name: actual-budget
+        image: actualbudget/actual-server:latest
+        ports:
+        - containerPort: 5006
+        volumeMounts:
+        - name: actual-budget-storage
+          mountPath: /data
+      volumes:
+      - name: actual-budget-storage
+        persistentVolumeClaim:
+          claimName: actual-budget-pvc
