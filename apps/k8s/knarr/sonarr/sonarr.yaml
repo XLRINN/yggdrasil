@@ -4,6 +4,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: sonarr-config-pvc
   namespace: knarr
+spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: local-path

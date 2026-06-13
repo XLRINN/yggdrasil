@@ -11,6 +11,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: seer-config
   namespace: knarr
+spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: local-path

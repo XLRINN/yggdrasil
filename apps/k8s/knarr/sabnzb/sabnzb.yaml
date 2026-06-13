@@ -111,6 +111,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: sabnzbd-config-pvc
   namespace: knarr
+spec:
   accessModes: ["ReadWriteOnce"]
   storageClassName: local-path
   resources:

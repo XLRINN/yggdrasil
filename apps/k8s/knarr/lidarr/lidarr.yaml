@@ -4,6 +4,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: lidarr-config-pvc
   namespace: knarr
+spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: local-path
