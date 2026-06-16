@@ -38,6 +38,7 @@ spec:
       initContainers:
       - name: inotify-sysctl
         image: busybox
+        imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
         command:
@@ -48,6 +49,7 @@ spec:
           sysctl -w fs.inotify.max_user_instances=512
       - name: set-urlbase
         image: busybox
+        imagePullPolicy: IfNotPresent
         command:
         - sh
         - -c
