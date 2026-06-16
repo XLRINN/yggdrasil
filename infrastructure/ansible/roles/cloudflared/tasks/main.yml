@@ -125,6 +125,17 @@
   loop: "{{ services }}"
   no_log: true
 
+- name: Create Cloudflare DNS CNAME record for root domain (yggdrasil.rip → Traefik via tunnel)
+  community.general.cloudflare_dns:
+    zone: yggdrasil.rip
+    record: "@"
+    type: CNAME
+    value: "{{ cloudflare_tunnel_id }}.cfargotunnel.com"
+    proxied: true
+    api_token: "{{ cloudflare_api_token }}"
+    state: present
+  no_log: true
+
 # --- Cloudflare Tunnel remote config sync ---
 # The dashboard pushes remote ingress config to cloudflared, overriding local config.yaml.
 # This task keeps the remote config in sync with services.yml so they always match.
