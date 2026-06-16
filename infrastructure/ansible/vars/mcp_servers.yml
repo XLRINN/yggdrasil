@@ -35,11 +35,3 @@ mcp_servers:
       MCP_BRIDGE_DATA_DIR: "/opt/mcp/budget/actual-data"
       MCP_SSE_AUTHORIZATION: "{{ actual_mcp_token }}"
 
-  # - name: mail
-  #   hostname: mail-mcp.yggdrasil.rip
-  #   port: 3003
-  #   command: "npx -y @some-org/gmail-mcp-server"
-  #   env:
-  #     GMAIL_CLIENT_ID: "{{ gmail_client_id }}"
-  #     GMAIL_CLIENT_SECRET: "{{ gmail_client_secret }}"
-  #     GMAIL_REFRESH_TOKEN: "{{ gmail_refresh_token }}"
