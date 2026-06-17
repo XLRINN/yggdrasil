@@ -1,39 +1,19 @@
 ---
-- name: Add NodeSource apt key
-  get_url:
-    url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
-    dest: /usr/share/keyrings/nodesource.gpg
-    mode: "0644"
+- name: Set up NodeSource Node.js 22 repository and install Node.js
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+    apt-get install -y nodejs
+  args:
+    creates: /usr/bin/node
 
-- name: Add NodeSource apt repository
-  apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main"
-    filename: nodesource
-    state: present
-
-- name: Install Node.js
-  apt:
-    name: nodejs
-    state: present
-    update_cache: true
-
-- name: Add Caddy apt key
-  get_url:
-    url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
-    dest: /usr/share/keyrings/caddy.gpg
-    mode: "0644"
-
-- name: Add Caddy apt repository
-  apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/caddy.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main"
-    filename: caddy
-    state: present
-
-- name: Install Caddy
-  apt:
-    name: caddy
-    state: present
-    update_cache: true
+- name: Set up Caddy repository and install Caddy
+  shell: |
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+    apt-get update
+    apt-get install -y caddy
+  args:
+    creates: /usr/bin/caddy
 
 - name: Create mcp working directory
   file:

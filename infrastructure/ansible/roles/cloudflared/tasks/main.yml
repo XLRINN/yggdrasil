@@ -120,6 +120,7 @@
     type: CNAME
     value: "{{ cloudflare_tunnel_id }}.cfargotunnel.com"
     proxied: true
+    solo: true
     api_token: "{{ cloudflare_api_token }}"
     state: present
   loop: "{{ services }}"
