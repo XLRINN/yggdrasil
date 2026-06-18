@@ -6,6 +6,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.priority: "10000"
+    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
 spec:
   rules:
   - host: yggdrasil.rip

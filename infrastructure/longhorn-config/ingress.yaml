@@ -15,6 +15,7 @@ metadata:
   namespace: longhorn-system
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: longhorn-system-strip-longhorn@kubernetescrd
+    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
 spec:
   rules:
   - host: yggdrasil.rip
