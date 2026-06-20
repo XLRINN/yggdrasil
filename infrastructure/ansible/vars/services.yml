@@ -125,3 +125,16 @@ services:
     tls_verify: true
     homepage_group: MCP
     homepage_icon: sequence.png
+
+# =============================================================================
+# DNS-ONLY HOSTS
+# =============================================================================
+#
+# Hosts that need a pihole DNS entry but have no web UI.
+# These are NOT added to the Cloudflare tunnel or Homepage.
+#
+# To apply changes: ansible-playbook site.yml --limit network
+#
+dns_hosts:
+  - hostname: vuln.yggdrasil.rip
+    ip: 192.168.69.85

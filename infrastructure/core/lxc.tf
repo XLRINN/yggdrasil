@@ -61,8 +61,6 @@ resource "proxmox_virtual_environment_container" "alexandria" {
     order = 1
   }
 
-  on_boot = true
-
   provisioner "local-exec" {
     when    = create
     command = "ssh-keygen -R 192.168.69.5 || true"
@@ -85,7 +83,7 @@ resource "proxmox_virtual_environment_container" "vuln" {
     }
 
     dns {
-      servers = ["1.1.1.1", "8.8.8.8"]
+      servers = ["192.168.69.2", "1.1.1.1"]
     }
 
     user_account {
@@ -127,8 +125,6 @@ resource "proxmox_virtual_environment_container" "vuln" {
   startup {
     order = 1
   }
-
-  on_boot = true
 
   provisioner "local-exec" {
     when    = create

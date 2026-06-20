@@ -11,6 +11,9 @@
 {% for service in services %}
 {{ "%-18s" | format(service.ip) }} {{ service.hostname }}
 {% endfor %}
+{% for host in dns_hosts | default([]) %}
+{{ "%-18s" | format(host.ip) }} {{ host.hostname }}
+{% endfor %}
 
 # Note: Kubernetes services on draupnir (192.168.69.77) are managed
 # automatically by ExternalDNS and do not need to be listed here.
