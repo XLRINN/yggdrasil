@@ -1,0 +1,36 @@
+---
+- name: Create david user
+  user:
+    name: david
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Add david to sudo group
+  user:
+    name: david
+    groups: sudo
+    append: true
+
+- name: Allow sudo without password for david
+  copy:
+    dest: /etc/sudoers.d/david
+    content: "david ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: visudo -cf %s
+
+- name: Add SSH authorized key for david
+  authorized_key:
+    user: david
+    key: "{{ ssh_public_key }}"
+    state: present
+
+- name: Add david to docker group
+  user:
+    name: david
+    groups: docker
+    append: true
+  when: "'docker' in ansible_facts.packages or ansible_facts.services['docker'] is defined"
+  ignore_errors: true
