@@ -15,6 +15,9 @@ data:
     DisableViaHeader Yes
     LogLevel Critical
     MaxClients 100
+  resolv.conf: |
+    nameserver 127.0.0.53
+    options edns0
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -36,6 +39,7 @@ spec:
       containers:
       - name: tinyproxy
         image: vimagick/tinyproxy:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3128
           hostPort: 3128
@@ -43,6 +47,9 @@ spec:
         - name: config
           mountPath: /etc/tinyproxy/tinyproxy.conf
           subPath: tinyproxy.conf
+        - name: config
+          mountPath: /etc/resolv.conf
+          subPath: resolv.conf
       volumes:
       - name: config
         configMap:
