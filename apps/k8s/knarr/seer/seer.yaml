@@ -11,10 +11,12 @@ kind: PersistentVolumeClaim
 metadata:
   name: seer-config
   namespace: knarr
+  labels:
+    recurring-job-group.longhorn.io/default: "enabled"
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: longhorn
   resources:
     requests:
       storage: 20Gi

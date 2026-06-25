@@ -36,3 +36,6 @@ longhorn_volumes:
   - pvc_name: n8n-pvc
     namespace: auto
     size: "20Gi"
+  - pvc_name: actual-budget-pvc
+    namespace: admin
+    size: "5Gi"
