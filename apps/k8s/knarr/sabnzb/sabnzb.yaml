@@ -107,13 +107,28 @@ spec:
 
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sabnzbd-config-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    server: 192.168.69.5
+    path: /mnt/mimmis/k8s-config/sabnzbd
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: sabnzbd-config-pvc
   namespace: knarr
 spec:
   accessModes: ["ReadWriteOnce"]
-  storageClassName: local-path
+  storageClassName: manual
+  volumeName: sabnzbd-config-pv
   resources:
     requests:
       storage: 20Gi

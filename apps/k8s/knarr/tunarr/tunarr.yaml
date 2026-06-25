@@ -1,17 +1,32 @@
 apiVersion: v1
 kind: List
 items:
+  # --- PV for Tunarr Configuration (NFS on alexandria) ---
+  - apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: tunarr-config-pv
+    spec:
+      storageClassName: manual
+      capacity:
+        storage: 20Gi
+      accessModes:
+        - ReadWriteOnce
+      nfs:
+        server: 192.168.69.5
+        path: /mnt/mimmis/k8s-config/tunarr
+
   # --- PVC for Tunarr Configuration ---
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
       name: tunarr-config-pvc
       namespace: knarr
-      labels:
     spec:
       accessModes:
         - ReadWriteOnce
-      storageClassName: local-path
+      storageClassName: manual
+      volumeName: tunarr-config-pv
       resources:
         requests:
           storage: 20Gi

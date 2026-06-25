@@ -1,5 +1,19 @@
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-config-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    server: 192.168.69.5
+    path: /mnt/mimmis/k8s-config/jellyfin
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: jellyfin-config-pvc
@@ -7,7 +21,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: manual
+  volumeName: jellyfin-config-pv
   resources:
     requests:
       storage: 50Gi

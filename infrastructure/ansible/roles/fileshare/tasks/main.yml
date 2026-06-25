@@ -72,6 +72,27 @@
   command: chown -R david:david /mnt/mimmis
   changed_when: false
 
+- name: Create k8s app config directories
+  file:
+    path: "/mnt/mimmis/k8s-config/{{ item }}"
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: "0775"
+  loop:
+    - sonarr
+    - radarr
+    - lidarr
+    - prowlarr
+    - sonarr-anime
+    - jellyfin
+    - seer
+    - tunarr
+    - sabnzbd
+    - syncthing
+    - n8n
+    - actual-budget
+
 - name: Configure NFS exports
   template:
     src: exports.j2

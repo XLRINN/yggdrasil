@@ -7,6 +7,20 @@ metadata:
 automountServiceAccountToken: true
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: seer-config-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    server: 192.168.69.5
+    path: /mnt/mimmis/k8s-config/seer
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: seer-config
@@ -14,7 +28,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: manual
+  volumeName: seer-config-pv
   resources:
     requests:
       storage: 20Gi

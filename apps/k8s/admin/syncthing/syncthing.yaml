@@ -51,6 +51,20 @@ spec:
           claimName: syncthing-pvc
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: syncthing-config-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    server: 192.168.69.5
+    path: /mnt/mimmis/k8s-config/syncthing
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: syncthing-pvc
@@ -58,7 +72,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: manual
+  volumeName: syncthing-config-pv
   resources:
     requests:
       storage: 20Gi
