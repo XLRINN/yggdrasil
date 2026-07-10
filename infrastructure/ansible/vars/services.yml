@@ -102,7 +102,8 @@ services:
 
   # ---------------------------------------------------------------------------
   # HERMOD — MCP connector host (192.168.69.50)
-  # Caddy on hermod terminates TLS and reverse-proxies each MCP server.
+  # Caddy reverse-proxies each MCP server over plain HTTP — the Cloudflare
+  # tunnel handles TLS externally so Caddy doesn't need its own certs.
   # See vars/mcp_servers.yml for the underlying service definitions.
   # ---------------------------------------------------------------------------
 
@@ -110,8 +111,8 @@ services:
     description: MCP connector for Actual Budget
     hostname: budget-mcp.yggdrasil.rip
     ip: 192.168.69.50
-    port: 443
-    protocol: https
+    port: 80
+    protocol: http
     tls_verify: true
     homepage_group: MCP
     homepage_icon: actual-budget.png
@@ -120,8 +121,8 @@ services:
     description: MCP connector for Sequence personal finance
     hostname: sequence-mcp.yggdrasil.rip
     ip: 192.168.69.50
-    port: 443
-    protocol: https
+    port: 80
+    protocol: http
     tls_verify: true
     homepage_group: MCP
     homepage_icon: sequence.png

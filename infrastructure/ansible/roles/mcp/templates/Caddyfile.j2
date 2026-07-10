@@ -1,5 +1,5 @@
 {% for server in mcp_servers %}
-{{ server.hostname }} {
+http://{{ server.hostname }} {
     reverse_proxy localhost:{{ server.port }}
 }
 {% endfor %}
