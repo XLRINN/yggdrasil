@@ -1,5 +1,9 @@
 {% for server in mcp_servers %}
 http://{{ server.hostname }} {
+{% if server.caddy_config is defined %}
+{{ server.caddy_config | indent(4, true) }}
+{% else %}
     reverse_proxy localhost:{{ server.port }}
+{% endif %}
 }
 {% endfor %}

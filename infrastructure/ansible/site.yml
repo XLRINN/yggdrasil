@@ -84,6 +84,7 @@
     - common
     - tailscale
     - mcp
+    - claude_cli
 
 # -------------------------------------------------------------------------
 # VULN — Docker + Tailscale test container

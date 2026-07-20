@@ -16,12 +16,46 @@
 # =============================================================================
 
 mcp_servers:
+  # Sequence (getsequence.io) personal finance router. Their MCP server is
+  # hosted remotely at app.getsequence.io/api/mcp — nothing to run locally
+  # except an OAuth shim for claude.ai's connector flow. Caddy validates the
+  # shim-issued bearer token and swaps in the real Sequence API key.
   - name: sequence
     hostname: sequence-mcp.yggdrasil.rip
     port: 3001
-    command: "npx -y @sequence/mcp-server"
+    command: "/usr/bin/python3 /opt/mcp/sequence/oauth-server.py"
+    files:
+      - src: sequence-oauth-server.py
+        dest: oauth-server.py
     env:
-      SEQUENCE_API_KEY: "{{ sequence_api_key }}"
+      ACCESS_TOKEN: "{{ sequence_mcp_access_token }}"
+      CLIENT_SECRET: "{{ sequence_mcp_client_secret }}"
+    caddy_config: |
+      handle /.well-known/oauth-authorization-server {
+          reverse_proxy 127.0.0.1:3001
+      }
+      handle /.well-known/oauth-protected-resource {
+          reverse_proxy 127.0.0.1:3001
+      }
+      handle /oauth/* {
+          reverse_proxy 127.0.0.1:3001
+      }
+      handle /api/mcp* {
+          @valid   header     Authorization "Bearer {{ sequence_mcp_access_token }}"
+          @invalid not header Authorization "Bearer {{ sequence_mcp_access_token }}"
+          handle @valid {
+              reverse_proxy https://app.getsequence.io {
+                  header_up Host app.getsequence.io
+                  header_up Authorization "Bearer {{ sequence_api_key }}"
+                  flush_interval -1
+              }
+          }
+          handle @invalid {
+              header WWW-Authenticate `Bearer realm="Sequence MCP", resource_metadata="https://sequence-mcp.yggdrasil.rip/.well-known/oauth-protected-resource"`
+              respond 401
+          }
+      }
+      respond 404
 
   - name: budget
     hostname: budget-mcp.yggdrasil.rip

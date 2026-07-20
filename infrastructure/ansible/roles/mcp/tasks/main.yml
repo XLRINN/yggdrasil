@@ -22,6 +22,16 @@
     mode: "0755"
   loop: "{{ mcp_servers }}"
 
+- name: Copy MCP server support files
+  copy:
+    src: "{{ item.1.src }}"
+    dest: "/opt/mcp/{{ item.0.name }}/{{ item.1.dest }}"
+    mode: "0755"
+  loop: "{{ mcp_servers | subelements('files', skip_missing=True) }}"
+  loop_control:
+    label: "{{ item.0.name }}/{{ item.1.dest }}"
+  notify: reload systemd and restart mcp services
+
 - name: Template systemd unit for each MCP server
   template:
     src: mcp.service.j2
