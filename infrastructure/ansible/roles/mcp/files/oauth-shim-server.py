@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""OAuth 2.1 server with Dynamic Client Registration for Sequence MCP proxy.
+"""Generic OAuth 2.1 shim with Dynamic Client Registration, fronting an MCP
+connector that itself only understands a static bearer token.
 
 Supports authorization code + PKCE (S256), DCR (RFC 7591), and refresh tokens.
 Public clients (token_endpoint_auth_method: none) use PKCE only — no secret.
 Confidential clients verify client_secret at the token endpoint.
+Every successful flow hands back the same static ACCESS_TOKEN — Caddy is what
+checks that token and swaps in the real upstream secret (see caddy_config in
+vars/mcp_servers.yml). This script only implements the OAuth handshake.
 """
 import base64
 import os
@@ -16,8 +20,10 @@ import uuid
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs, urlparse
 
-BASE_URL = os.environ.get("BASE_URL", "https://sequence-mcp.yggdrasil.rip")
+BASE_URL = os.environ["BASE_URL"]
 ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
+CLIENT_ID = os.environ.get("CLIENT_ID", "mcp-client")
+SERVICE_LABEL = os.environ.get("SERVICE_LABEL", "MCP connector")
 ACCESS_TOKEN_TTL = 86400     # 24 h
 REFRESH_TOKEN_TTL = 2592000  # 30 days
 
@@ -25,7 +31,7 @@ REFRESH_TOKEN_TTL = 2592000  # 30 days
 # redirect_uris: empty list means accept any (pre-registered client only).
 CLIENTS = {}
 if os.environ.get("CLIENT_SECRET"):
-    CLIENTS["sequence-mcp"] = {
+    CLIENTS[CLIENT_ID] = {
         "client_secret": os.environ["CLIENT_SECRET"],
         "redirect_uris": [],
         "token_endpoint_auth_method": "client_secret_post",
@@ -213,7 +219,7 @@ class OAuthHandler(BaseHTTPRequestHandler):
         }
 
         self.send_html(200, f"""<!DOCTYPE html>
-<html><head><title>Authorize Sequence MCP</title>
+<html><head><title>Authorize {html_mod.escape(SERVICE_LABEL)}</title>
 <style>
   body {{ font-family: sans-serif; max-width: 420px; margin: 80px auto; padding: 20px; }}
   h2 {{ margin-bottom: 8px; }}
@@ -223,8 +229,8 @@ class OAuthHandler(BaseHTTPRequestHandler):
   .approve {{ background: #22c55e; color: white; }}
   .deny   {{ background: #ef4444; color: white; }}
 </style></head><body>
-<h2>Authorize Sequence MCP</h2>
-<p>claude.ai is requesting access to your Sequence finance account via this proxy.</p>
+<h2>Authorize {html_mod.escape(SERVICE_LABEL)}</h2>
+<p>claude.ai is requesting access to your {html_mod.escape(SERVICE_LABEL)} account via this proxy.</p>
 <form method="post" action="/oauth/authorize">
   <input type="hidden" name="req_token" value="{req_token}">
   <div class="buttons">

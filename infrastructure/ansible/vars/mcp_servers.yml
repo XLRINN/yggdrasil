@@ -23,13 +23,16 @@ mcp_servers:
   - name: sequence
     hostname: sequence-mcp.yggdrasil.rip
     port: 3001
-    command: "/usr/bin/python3 /opt/mcp/sequence/oauth-server.py"
+    command: "/usr/bin/python3 /opt/mcp/sequence/oauth-shim.py"
     files:
-      - src: sequence-oauth-server.py
-        dest: oauth-server.py
+      - src: oauth-shim-server.py
+        dest: oauth-shim.py
     env:
+      BASE_URL: "https://sequence-mcp.yggdrasil.rip"
       ACCESS_TOKEN: "{{ sequence_mcp_access_token }}"
       CLIENT_SECRET: "{{ sequence_mcp_client_secret }}"
+      CLIENT_ID: "sequence-mcp"
+      SERVICE_LABEL: "Sequence MCP"
     caddy_config: |
       handle /.well-known/oauth-authorization-server {
           reverse_proxy 127.0.0.1:3001
@@ -57,6 +60,10 @@ mcp_servers:
       }
       respond 404
 
+  # Actual Budget MCP server runs locally and enforces its own static bearer
+  # token (actual_mcp_token). budget-oauth below gives it the same zero-touch
+  # OAuth connector flow as Sequence: Caddy checks the shim-issued token and
+  # swaps in the real actual_mcp_token when it forwards to localhost:3002.
   - name: budget
     hostname: budget-mcp.yggdrasil.rip
     port: 3002
@@ -68,4 +75,48 @@ mcp_servers:
       MCP_BRIDGE_PORT: "3002"
       MCP_BRIDGE_DATA_DIR: "/opt/mcp/budget/actual-data"
       MCP_SSE_AUTHORIZATION: "{{ actual_mcp_token }}"
+    caddy_config: |
+      handle /.well-known/oauth-authorization-server {
+          reverse_proxy 127.0.0.1:3003
+      }
+      handle /.well-known/oauth-protected-resource {
+          reverse_proxy 127.0.0.1:3003
+      }
+      handle /oauth/* {
+          reverse_proxy 127.0.0.1:3003
+      }
+      handle /health {
+          reverse_proxy localhost:3002
+      }
+      handle /http* {
+          @valid   header     Authorization "Bearer {{ budget_mcp_access_token }}"
+          @invalid not header Authorization "Bearer {{ budget_mcp_access_token }}"
+          handle @valid {
+              reverse_proxy localhost:3002 {
+                  header_up Authorization "Bearer {{ actual_mcp_token }}"
+              }
+          }
+          handle @invalid {
+              header WWW-Authenticate `Bearer realm="Actual Budget MCP", resource_metadata="https://budget-mcp.yggdrasil.rip/.well-known/oauth-protected-resource"`
+              respond 401
+          }
+      }
+      respond 404
+
+  # Internal-only OAuth shim for budget above — no public Caddy vhost of its
+  # own (internal: true), reached only via the reverse_proxy calls in
+  # budget's caddy_config.
+  - name: budget-oauth
+    internal: true
+    port: 3003
+    command: "/usr/bin/python3 /opt/mcp/budget-oauth/oauth-shim.py"
+    files:
+      - src: oauth-shim-server.py
+        dest: oauth-shim.py
+    env:
+      BASE_URL: "https://budget-mcp.yggdrasil.rip"
+      ACCESS_TOKEN: "{{ budget_mcp_access_token }}"
+      CLIENT_SECRET: "{{ budget_mcp_client_secret }}"
+      CLIENT_ID: "budget-mcp"
+      SERVICE_LABEL: "Actual Budget MCP"
 
