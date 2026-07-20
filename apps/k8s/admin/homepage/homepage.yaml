@@ -30,6 +30,9 @@ data:
       Infrastructure:
         style: row
         columns: 4
+      Finance:
+        style: row
+        columns: 4
 
   widgets.yaml: |
     - datetime:
@@ -146,6 +149,12 @@ data:
               type: overseerr
               url: http://seer.knarr.svc.cluster.local/seer
               key: MTc3Mzk2NDU4NTMzMTc5MThhOGU5LTk1MmQtNDFjZi05MjIxLWI5Mzk1MjZiNmVmMQ==
+
+    - Finance:
+        - Actual Budget:
+            href: https://ab.yggdrasil.rip
+            icon: actual-budget.png
+            description: Personal budgeting
 
     - Infrastructure:
         - Longhorn:
