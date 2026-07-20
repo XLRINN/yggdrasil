@@ -29,6 +29,24 @@
     KUBECONFIG: /home/david/.kube/config
   no_log: true
 
+- name: Create Homepage widget secrets
+  shell: |
+    kubectl create secret generic homepage-secrets \
+      --namespace=admin \
+      --from-literal=proxmox_homepage_password="{{ proxmox_homepage_password }}" \
+      --from-literal=jellyfin_api_key="{{ jellyfin_api_key }}" \
+      --from-literal=sabnzbd_api_key="{{ sabnzbd_api_key }}" \
+      --from-literal=sonarr_api_key="{{ sonarr_api_key }}" \
+      --from-literal=radarr_api_key="{{ radarr_api_key }}" \
+      --from-literal=prowlarr_api_key="{{ prowlarr_api_key }}" \
+      --from-literal=sonarr_anime_api_key="{{ sonarr_anime_api_key }}" \
+      --from-literal=lidarr_api_key="{{ lidarr_api_key }}" \
+      --from-literal=seer_api_key="{{ seer_api_key }}" \
+      --dry-run=client -o yaml | kubectl apply -f -
+  environment:
+    KUBECONFIG: /home/david/.kube/config
+  no_log: true
+
 - name: Bootstrap Flux against yggdrasil repo
   command: >
     flux bootstrap github
