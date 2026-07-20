@@ -142,7 +142,7 @@ data:
 
     - Requests:
         - Seer:
-            href: https://yggdrasil.rip/seer
+            href: https://seer.yggdrasil.rip
             icon: overseerr.png
             description: Media Requests
             widget:
