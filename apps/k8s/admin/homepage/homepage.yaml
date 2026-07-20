@@ -30,6 +30,9 @@ data:
       Infrastructure:
         style: row
         columns: 4
+      Finance:
+        style: row
+        columns: 4
 
   widgets.yaml: |
     - datetime:
@@ -42,6 +45,9 @@ data:
   bookmarks.yaml: |
     []
 
+  kubernetes.yaml: |
+    mode: cluster
+
   services.yaml: |
     - Network:
         - Proxmox:
@@ -52,7 +58,7 @@ data:
               type: proxmox
               url: https://192.168.69.69:8006
               username: root@pam!homepage
-              password: b2bd8141-99d7-4b62-aff8-eb011dcac9df
+              password: ${PROXMOX_HOMEPAGE_PASSWORD}
         - Pi-hole:
             href: https://yggdrasil.rip/pihole/admin
             icon: pi-hole.png
@@ -80,7 +86,7 @@ data:
             widget:
               type: jellyfin
               url: http://jellyfin.knarr.svc.cluster.local/jelly
-              key: 178e48c12417485585be75a679d0c304
+              key: ${JELLYFIN_API_KEY}
               enableBlocks: true
         - Tunarr:
             href: https://tunarr.yggdrasil.rip
@@ -95,7 +101,7 @@ data:
             widget:
               type: sabnzbd
               url: http://sabnzbd.knarr.svc.cluster.local/sab
-              key: 9f1564baf2ec45f6b0937b2b00e61695
+              key: ${SABNZBD_API_KEY}
         - Sonarr:
             href: https://yggdrasil.rip/sonarr
             icon: sonarr.png
@@ -103,7 +109,7 @@ data:
             widget:
               type: sonarr
               url: http://sonarr.knarr.svc.cluster.local/sonarr
-              key: 975bcefe8c1e437ca4b27358cdd7cd1f
+              key: ${SONARR_API_KEY}
         - Radarr:
             href: https://yggdrasil.rip/radarr
             icon: radarr.png
@@ -111,7 +117,7 @@ data:
             widget:
               type: radarr
               url: http://radarr.knarr.svc.cluster.local/radarr
-              key: 08cd20c96731493b8ce039e776b56ed9
+              key: ${RADARR_API_KEY}
         - Prowlarr:
             href: https://yggdrasil.rip/prowlarr
             icon: prowlarr.png
@@ -119,7 +125,7 @@ data:
             widget:
               type: prowlarr
               url: http://prowlarr.knarr.svc.cluster.local/prowlarr
-              key: fdfebb1f940c4bc3b8c6c487c601928a
+              key: ${PROWLARR_API_KEY}
         - Anime:
             href: https://yggdrasil.rip/crunchy
             icon: sonarr.png
@@ -127,7 +133,7 @@ data:
             widget:
               type: sonarr
               url: http://sonarr-anime.knarr.svc.cluster.local/crunchy
-              key: b1a6fab58ae74b918e566407b5955923
+              key: ${SONARR_ANIME_API_KEY}
         - Lidarr:
             href: https://yggdrasil.rip/lidarr
             icon: lidarr.png
@@ -135,7 +141,7 @@ data:
             widget:
               type: lidarr
               url: http://lidarr.knarr.svc.cluster.local/lidarr
-              key: 65a7661882674961990ad55a83954e30
+              key: ${LIDARR_API_KEY}
 
     - Requests:
         - Seer:
@@ -145,7 +151,7 @@ data:
             widget:
               type: overseerr
               url: http://seer.knarr.svc.cluster.local/seer
-              key: MTc3Mzk2NDU4NTMzMTc5MThhOGU5LTk1MmQtNDFjZi05MjIxLWI5Mzk1MjZiNmVmMQ==
+              key: ${SEER_API_KEY}
 
     - Infrastructure:
         - Longhorn:
@@ -157,6 +163,54 @@ data:
             icon: n8n.png
             description: Automation
 
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: homepage
+  namespace: admin
+  labels:
+    app.kubernetes.io/name: homepage
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - pods
+      - nodes
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - extensions
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: homepage
+subjects:
+  - kind: ServiceAccount
+    name: homepage
+    namespace: admin
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -177,6 +231,7 @@ spec:
       labels:
         app: homepage
     spec:
+      serviceAccountName: homepage
       dnsConfig:
         options:
           - name: ndots
@@ -193,6 +248,51 @@ spec:
               value: "America/New_York"
             - name: HOMEPAGE_ALLOWED_HOSTS
               value: "homepage.yggdrasil.rip,yggdrasil.rip"
+            - name: PROXMOX_HOMEPAGE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secrets
+                  key: proxmox_homepage_password
+            - name: JELLYFIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secrets
+                  key: jellyfin_api_key
+            - name: SABNZBD_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secrets
+                  key: sabnzbd_api_key
+            - name: SONARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secrets
+                  key: sonarr_api_key
+            - name: RADARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secrets
+                  key: radarr_api_key
+            - name: PROWLARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secrets
+                  key: prowlarr_api_key
+            - name: SONARR_ANIME_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secrets
+                  key: sonarr_anime_api_key
+            - name: LIDARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secrets
+                  key: lidarr_api_key
+            - name: SEER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secrets
+                  key: seer_api_key
           volumeMounts:
             - name: config
               mountPath: /app/config/settings.yaml
@@ -206,6 +306,9 @@ spec:
             - name: config
               mountPath: /app/config/bookmarks.yaml
               subPath: bookmarks.yaml
+            - name: config
+              mountPath: /app/config/kubernetes.yaml
+              subPath: kubernetes.yaml
       volumes:
         - name: config
           configMap:
