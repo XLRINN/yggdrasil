@@ -45,9 +45,6 @@ data:
   bookmarks.yaml: |
     []
 
-  kubernetes.yaml: |
-    mode: cluster
-
   services.yaml: |
     - Network:
         - Proxmox:
@@ -153,6 +150,12 @@ data:
               url: http://seer.knarr.svc.cluster.local/seer
               key: MTc3Mzk2NDU4NTMzMTc5MThhOGU5LTk1MmQtNDFjZi05MjIxLWI5Mzk1MjZiNmVmMQ==
 
+    - Finance:
+        - Actual Budget:
+            href: https://ab.yggdrasil.rip
+            icon: actual-budget.png
+            description: Personal budgeting
+
     - Infrastructure:
         - Longhorn:
             href: https://longhorn.yggdrasil.rip
@@ -163,54 +166,6 @@ data:
             icon: n8n.png
             description: Automation
 
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: homepage
-  namespace: admin
-  labels:
-    app.kubernetes.io/name: homepage
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: homepage
-  labels:
-    app.kubernetes.io/name: homepage
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - namespaces
-      - pods
-      - nodes
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - extensions
-      - networking.k8s.io
-    resources:
-      - ingresses
-    verbs:
-      - get
-      - list
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: homepage
-  labels:
-    app.kubernetes.io/name: homepage
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: homepage
-subjects:
-  - kind: ServiceAccount
-    name: homepage
-    namespace: admin
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -231,7 +186,6 @@ spec:
       labels:
         app: homepage
     spec:
-      serviceAccountName: homepage
       dnsConfig:
         options:
           - name: ndots
@@ -261,9 +215,6 @@ spec:
             - name: config
               mountPath: /app/config/bookmarks.yaml
               subPath: bookmarks.yaml
-            - name: config
-              mountPath: /app/config/kubernetes.yaml
-              subPath: kubernetes.yaml
       volumes:
         - name: config
           configMap:
