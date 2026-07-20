@@ -43,10 +43,15 @@ mcp_servers:
       handle /oauth/* {
           reverse_proxy 127.0.0.1:3001
       }
-      handle /api/mcp* {
+      # Catch-all: an MCP client POSTs directly to whatever URL you gave it
+      # (the bare hostname), not a specific subpath — so this has to match
+      # everything, not just /api/mcp*, or an unauthenticated probe never
+      # sees the WWW-Authenticate header and OAuth discovery never starts.
+      handle {
           @valid   header     Authorization "Bearer {{ sequence_mcp_access_token }}"
           @invalid not header Authorization "Bearer {{ sequence_mcp_access_token }}"
           handle @valid {
+              rewrite * /api/mcp
               reverse_proxy https://app.getsequence.io {
                   header_up Host app.getsequence.io
                   header_up Authorization "Bearer {{ sequence_api_key }}"
@@ -58,7 +63,6 @@ mcp_servers:
               respond 401
           }
       }
-      respond 404
 
   # Actual Budget MCP server runs locally and enforces its own static bearer
   # token (actual_mcp_token). budget-oauth below gives it the same zero-touch
@@ -88,10 +92,15 @@ mcp_servers:
       handle /health {
           reverse_proxy localhost:3002
       }
-      handle /http* {
+      # Catch-all: an MCP client POSTs directly to whatever URL you gave it
+      # (the bare hostname), not a specific subpath — so this has to match
+      # everything, not just /http*, or an unauthenticated probe never sees
+      # the WWW-Authenticate header and OAuth discovery never starts.
+      handle {
           @valid   header     Authorization "Bearer {{ budget_mcp_access_token }}"
           @invalid not header Authorization "Bearer {{ budget_mcp_access_token }}"
           handle @valid {
+              rewrite * /http
               reverse_proxy localhost:3002 {
                   header_up Authorization "Bearer {{ actual_mcp_token }}"
               }
@@ -101,7 +110,6 @@ mcp_servers:
               respond 401
           }
       }
-      respond 404
 
   # Internal-only OAuth shim for budget above — no public Caddy vhost of its
   # own (internal: true), reached only via the reverse_proxy calls in
