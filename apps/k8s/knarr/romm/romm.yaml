@@ -200,7 +200,10 @@ spec:
           name: http
         volumeMounts:
         - name: library
-          mountPath: /romm/library
+          # RomM expects <library-root>/roms/<platform>/... — the NAS share
+          # already has platform folders directly under ROMS, so mount one
+          # level deeper to supply the "roms" layer RomM's scanner expects.
+          mountPath: /romm/library/roms
         - name: resources
           mountPath: /romm/resources
         - name: assets
