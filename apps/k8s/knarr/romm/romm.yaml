@@ -192,9 +192,10 @@ spec:
           value: "ece097e22b85ea4cf04ae3a70f3cbac32cf7dd2e793ad0d21939333e50b84893"
         - name: HASHEOUS_API_ENABLED
           value: "true"
-        # ScreenScraper, RetroAchievements, SteamGridDB credentials are
-        # configured after deployment via Administration > Metadata Providers
-        # in the RomM web UI.
+        - name: SCREENSCRAPER_USER
+          value: "xlrin.morgan@gmail.com"
+        - name: SCREENSCRAPER_PASSWORD
+          value: "7vIimrTyWlvhah"
         ports:
         - containerPort: 8080
           name: http
