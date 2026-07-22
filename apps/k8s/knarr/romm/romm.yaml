@@ -1,0 +1,259 @@
+---
+# ROMs library, mounted read-write from the mimmis NAS share
+# (already present on draupnir at /mnt/alexandria/ROMS)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: romm-library-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 60Ti
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/alexandria/ROMS"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-library-pvc
+  namespace: knarr
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 60Ti
+  volumeName: romm-library-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-resources-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-assets-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-config-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-db-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm-db
+  namespace: knarr
+  labels:
+    app: romm-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: romm-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: romm-db
+    spec:
+      containers:
+      - name: romm-db
+        image: mariadb:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          value: "8920e62d3e2345f1a92ff5f9c7cd557819b851a41e7b86fb"
+        - name: MARIADB_DATABASE
+          value: "romm"
+        - name: MARIADB_USER
+          value: "romm-user"
+        - name: MARIADB_PASSWORD
+          value: "6f92ee51306f9b1c6e642e29ab908a51aca939797ce8d0bf"
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: romm-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: romm-db
+  namespace: knarr
+spec:
+  selector:
+    app: romm-db
+  ports:
+  - port: 3306
+    targetPort: 3306
+    name: mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm
+  namespace: knarr
+  labels:
+    app: romm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: romm
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: romm
+    spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      initContainers:
+      - name: inotify-sysctl
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        command:
+        - sh
+        - -c
+        - |
+          sysctl -w fs.inotify.max_user_watches=524288
+          sysctl -w fs.inotify.max_user_instances=512
+      containers:
+      - name: romm
+        image: rommapp/romm:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DB_HOST
+          value: "romm-db"
+        - name: DB_NAME
+          value: "romm"
+        - name: DB_USER
+          value: "romm-user"
+        - name: DB_PASSWD
+          value: "6f92ee51306f9b1c6e642e29ab908a51aca939797ce8d0bf"
+        - name: ROMM_AUTH_SECRET_KEY
+          value: "ece097e22b85ea4cf04ae3a70f3cbac32cf7dd2e793ad0d21939333e50b84893"
+        - name: HASHEOUS_API_ENABLED
+          value: "true"
+        # ScreenScraper, RetroAchievements, SteamGridDB credentials are
+        # configured after deployment via Administration > Metadata Providers
+        # in the RomM web UI.
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: library
+          mountPath: /romm/library
+        - name: resources
+          mountPath: /romm/resources
+        - name: assets
+          mountPath: /romm/assets
+        - name: config
+          mountPath: /romm/config
+      volumes:
+      - name: library
+        persistentVolumeClaim:
+          claimName: romm-library-pvc
+      - name: resources
+        persistentVolumeClaim:
+          claimName: romm-resources-pvc
+      - name: assets
+        persistentVolumeClaim:
+          claimName: romm-assets-pvc
+      - name: config
+        persistentVolumeClaim:
+          claimName: romm-config-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: romm
+  namespace: knarr
+spec:
+  selector:
+    app: romm
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: romm-ingress
+  namespace: knarr
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "RomM"
+    gethomepage.dev/group: "Media"
+    gethomepage.dev/icon: "romm.png"
+    gethomepage.dev/description: "ROM/ISO library manager"
+spec:
+  rules:
+  - host: romm.yggdrasil.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: romm
+            port:
+              number: 80

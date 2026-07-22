@@ -9,6 +9,7 @@ resources:
   - lidarr/
   - prowlarr/
   - radarr/
+  - romm/
   - sabnzb/
   - seer/
   - sonarr/
