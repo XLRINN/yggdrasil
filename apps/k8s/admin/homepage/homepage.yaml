@@ -89,6 +89,10 @@ data:
             href: https://tunarr.yggdrasil.rip
             icon: tunarr.png
             description: Live TV Channels
+        - RomM:
+            href: https://romm.yggdrasil.rip
+            icon: romm.png
+            description: ROM Library
 
     - Downloads:
         - SABnzbd:
