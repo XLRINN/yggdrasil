@@ -1,0 +1,97 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyswarrm-config-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyswarrm
+  namespace: knarr
+  labels:
+    app: jellyswarrm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jellyswarrm
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jellyswarrm
+    spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      containers:
+      - name: jellyswarrm
+        image: ghcr.io/llukas22/jellyswarrm:latest
+        imagePullPolicy: Always
+        env:
+        - name: JELLYSWARRM_USERNAME
+          value: "admin"
+        - name: JELLYSWARRM_PASSWORD
+          value: "changeme"
+        - name: TZ
+          value: "America/New_York"
+        ports:
+        - containerPort: 3000
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /app/data
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: jellyswarrm-config-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyswarrm
+  namespace: knarr
+spec:
+  selector:
+    app: jellyswarrm
+  ports:
+  - port: 80
+    targetPort: 3000
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyswarrm-ingress
+  namespace: knarr
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Jellyswarrm"
+    gethomepage.dev/group: "Media"
+    gethomepage.dev/icon: "jellyfin.png"
+    gethomepage.dev/description: "Aggregates multiple Jellyfin servers into one"
+spec:
+  rules:
+  - host: jellyswarrm.yggdrasil.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jellyswarrm
+            port:
+              number: 80
