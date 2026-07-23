@@ -93,6 +93,10 @@ data:
             href: https://romm.yggdrasil.rip
             icon: romm.png
             description: ROM Library
+        - Jellyswarrm:
+            href: https://swarm.yggdrasil.rip
+            icon: jellyfin.png
+            description: Multi-server Jellyfin proxy
 
     - Downloads:
         - SABnzbd:
