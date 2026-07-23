@@ -82,6 +82,67 @@ spec:
     requests:
       storage: 10Gi
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-redis-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm-redis
+  namespace: knarr
+  labels:
+    app: romm-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: romm-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: romm-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        imagePullPolicy: IfNotPresent
+        args: ["--save", "60", "1", "--loglevel", "warning"]
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: romm-redis-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: romm-redis
+  namespace: knarr
+spec:
+  selector:
+    app: romm-redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: redis
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -192,6 +253,8 @@ spec:
           value: "ece097e22b85ea4cf04ae3a70f3cbac32cf7dd2e793ad0d21939333e50b84893"
         - name: HASHEOUS_API_ENABLED
           value: "true"
+        - name: REDIS_HOST
+          value: "romm-redis"
         - name: SCREENSCRAPER_USER
           value: "xlrin.morgan@gmail.com"
         - name: SCREENSCRAPER_PASSWORD
