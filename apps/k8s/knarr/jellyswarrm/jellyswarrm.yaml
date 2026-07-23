@@ -43,7 +43,7 @@ spec:
         - name: JELLYSWARRM_USERNAME
           value: "admin"
         - name: JELLYSWARRM_PASSWORD
-          value: "changeme"
+          value: "6!y2c87T"
         - name: TZ
           value: "America/New_York"
         ports:
@@ -85,7 +85,7 @@ metadata:
     gethomepage.dev/description: "Aggregates multiple Jellyfin servers into one"
 spec:
   rules:
-  - host: jellyswarrm.yggdrasil.rip
+  - host: swarm.yggdrasil.rip
     http:
       paths:
       - path: /
