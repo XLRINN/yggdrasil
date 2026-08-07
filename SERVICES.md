@@ -71,8 +71,14 @@ This updates:
 
 **Step 4 — (Optional) Zero Trust policy:**
 
-In Cloudflare Zero Trust → Access → Applications, add a policy for
-`myapp.yggdrasil.rip` if you want authentication before reaching the service.
+A wildcard Access Application already gates `*.yggdrasil.rip` (see
+[Cloudflare Access — Google SSO](#cloudflare-access--google-sso) below), so
+new services under `*.yggdrasil.rip` are covered automatically — no
+per-service policy needed. Only add a dedicated Access Application in
+Cloudflare Zero Trust → Access → Applications if this service needs to
+*bypass* Access (e.g. it's an API/bearer-token endpoint, like the MCP
+servers) or needs a different policy than "Google SSO, approved emails
+only".
 
 ---
 
@@ -181,6 +187,39 @@ ansible-playbook site.yml --limit cloudflared
 ansible-playbook site.yml --limit alexandria
 ansible-playbook site.yml --limit draupnir
 ```
+
+---
+
+## Cloudflare Access — Google SSO
+
+`infrastructure/network/cloudflare_access.tf` puts every hostname under
+`yggdrasil.rip` (apex + `*.yggdrasil.rip`, so the whole domain and every app
+in it) behind a Cloudflare Access login using the Google identity provider
+already configured in Zero Trust → Settings → Authentication. Only the
+emails listed in `allowed_emails` (tfvars) can sign in.
+
+Two hostnames are deliberately excluded — `budget-mcp.yggdrasil.rip` and
+`sequence-mcp.yggdrasil.rip` (the Claude MCP connectors in
+`infrastructure/ansible/vars/mcp_servers.yml`). They authenticate with their
+own OAuth-shim bearer tokens rather than an interactive browser login, so a
+second, more specific Access Application gives them a `bypass` policy
+instead — Access always applies the most specific matching hostname, so this
+wins over the domain-wide wildcard for just those two hosts. Add any future
+bearer-token/API-only hostname to that bypass application's `destinations`
+list rather than the main one, or its clients will start seeing a Google
+login page instead of a 401.
+
+**Apply:**
+
+```bash
+cd infrastructure/network
+terraform init      # first run only, pulls the cloudflare provider
+terraform apply
+```
+
+Requires `cloudflare_api_token` (account-level "Access: Apps and Policies"
+Edit permission) and `cloudflare_account_id` in `terraform.tfvars` — see
+`terraform.tfvars.example`.
 
 ---
 

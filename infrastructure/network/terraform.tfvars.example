@@ -1,2 +1,9 @@
 proxmox_password = "changeme"
 ssh_public_key   = "ssh-rsa ..."
+
+# Cloudflare → My Profile → API Tokens → Create Token → account-level
+# "Access: Apps and Policies" (Edit) permission, scoped to your account
+cloudflare_api_token   = "..."
+# Cloudflare dashboard → any domain overview page → right sidebar "Account ID"
+cloudflare_account_id  = "..."
+allowed_emails         = ["you@gmail.com"]
