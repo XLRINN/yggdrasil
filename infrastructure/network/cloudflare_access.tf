@@ -2,23 +2,31 @@
 # CLOUDFLARE ZERO TRUST ACCESS — Google SSO in front of yggdrasil.rip
 # =============================================================================
 #
-# Gates the whole yggdrasil.rip domain (homepage + every subdomain routed
-# through the cloudflared tunnel) behind a Cloudflare Access login using the
-# Google identity provider you already added in Zero Trust → Settings →
+# Gates the bare yggdrasil.rip homepage behind a Cloudflare Access login using
+# the Google identity provider you already added in Zero Trust → Settings →
 # Authentication. Only the email addresses in var.allowed_emails may sign in.
+#
+# NOT a wildcard: Cloudflare enforces destinations as unique across every
+# self-hosted Access Application in the account — a *.yggdrasil.rip app
+# cannot coexist with the narrower per-subdomain apps that already exist
+# (DripProtect on drip.yggdrasil.rip, Odin on asguard.yggdrasil.rip, ssh on
+# njord.yggdrasil.rip, plus the MCP-bypass app below), it 409s outright
+# rather than yielding to them by precedence. Confirmed live 2026-08-07.
+# So this app covers only the apex; any NEW subdomain you want Google-gated
+# needs either its own destination added here or its own Access Application —
+# it will not be picked up automatically.
 #
 # EXCLUDED on purpose: budget-mcp.yggdrasil.rip and sequence-mcp.yggdrasil.rip
 # (infrastructure/ansible/vars/mcp_servers.yml). Those are Claude MCP
 # connectors authenticated by their own OAuth-shim bearer tokens, not
 # interactive browser logins — wrapping them in required Google SSO would
-# break Claude's connection to them. A more specific Access Application
-# (below) with a "bypass" policy wins over the wildcard for those two exact
-# hostnames, leaving their existing Caddy-level auth untouched. Add any
-# future bearer-token/API-style hostname to that bypass app's destinations
-# rather than the main one.
+# break Claude's connection to them. They get their own bypass Access
+# Application (below) instead, leaving their existing Caddy-level auth
+# untouched.
 #
-# Requires a Cloudflare API token with the "Access: Apps and Policies"
-# (account-level) permission — see terraform.tfvars.example.
+# Requires a Cloudflare API token with the "Access: Apps and Policies" (Edit)
+# and "Access: Organizations, Identity Providers, and Groups" (Read)
+# account-level permissions — see terraform.tfvars.example.
 # =============================================================================
 
 provider "cloudflare" {
@@ -48,7 +56,7 @@ check "google_idp_present" {
   }
 }
 
-# --- Everything under yggdrasil.rip: Google-gated -------------------------
+# --- yggdrasil.rip apex (homepage): Google-gated ---------------------------
 
 resource "cloudflare_zero_trust_access_application" "yggdrasil" {
   account_id                = var.cloudflare_account_id
@@ -61,7 +69,6 @@ resource "cloudflare_zero_trust_access_application" "yggdrasil" {
 
   destinations = [
     { type = "public", uri = "yggdrasil.rip" },
-    { type = "public", uri = "*.yggdrasil.rip" },
   ]
 
   policies = [{

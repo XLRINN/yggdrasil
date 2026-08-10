@@ -1,15 +1,20 @@
 ---
 # Expand disk FIRST before any apt calls — ubuntu cloud images ship
 # cloud-guest-utils pre-installed, so growpart is available immediately.
+# Skipped on LXC: /dev/sda there is the Proxmox host's physical disk leaking
+# through (privileged container), not the container's own rootfs — the LXC's
+# root volume is already sized correctly by Terraform/Proxmox, so there's no
+# in-guest partition to grow.
 - name: Grow root partition to fill disk
   command: growpart /dev/sda 1
   register: growpart_result
   changed_when: "'CHANGED' in growpart_result.stdout"
   failed_when: growpart_result.rc != 0 and 'NOCHANGE' not in growpart_result.stdout
+  when: ansible_virtualization_type != "lxc"
 
 - name: Resize root filesystem
   command: resize2fs /dev/sda1
-  when: growpart_result.changed
+  when: ansible_virtualization_type != "lxc" and growpart_result.changed
 
 - name: Stop and disable unattended-upgrades and apt timers
   systemd:

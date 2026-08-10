@@ -32,5 +32,4 @@
     name: david
     groups: docker
     append: true
-  when: "'docker' in ansible_facts.packages or ansible_facts.services['docker'] is defined"
   ignore_errors: true
