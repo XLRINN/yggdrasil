@@ -6,23 +6,29 @@
 # the Google identity provider you already added in Zero Trust → Settings →
 # Authentication. Only the email addresses in var.allowed_emails may sign in.
 #
-# NOT a wildcard: Cloudflare enforces destinations as unique across every
-# self-hosted Access Application in the account — a *.yggdrasil.rip app
-# cannot coexist with the narrower per-subdomain apps that already exist
-# (DripProtect on drip.yggdrasil.rip, Odin on asguard.yggdrasil.rip, ssh on
-# njord.yggdrasil.rip, plus the MCP-bypass app below), it 409s outright
-# rather than yielding to them by precedence. Confirmed live 2026-08-07.
-# So this app covers only the apex; any NEW subdomain you want Google-gated
-# needs either its own destination added here or its own Access Application —
-# it will not be picked up automatically.
+# NOTE ON *.yggdrasil.rip: the actual wildcard covering every subdomain is
+# the pre-existing, dashboard-managed "Odin" Access Application — NOT
+# anything in this file. Terraform doesn't own it; don't recreate it here
+# (a second app on the same destination 409s — Cloudflare enforces
+# destinations as unique across every self-hosted app in the account). This
+# file only adds the apex on top of Odin's wildcard, plus narrower
+# bypass apps below for hosts that must NOT require interactive login.
+# Cloudflare does allow a more-specific destination (e.g. one exact
+# hostname) to be created after a wildcard app already exists — confirmed
+# live 2026-08-08 via the Jellyfin bypass below — it's only "new wildcard
+# on top of existing specifics" that gets rejected.
 #
-# EXCLUDED on purpose: budget-mcp.yggdrasil.rip and sequence-mcp.yggdrasil.rip
-# (infrastructure/ansible/vars/mcp_servers.yml). Those are Claude MCP
-# connectors authenticated by their own OAuth-shim bearer tokens, not
-# interactive browser logins — wrapping them in required Google SSO would
-# break Claude's connection to them. They get their own bypass Access
-# Application (below) instead, leaving their existing Caddy-level auth
-# untouched.
+# EXCLUDED on purpose:
+#   - budget-mcp.yggdrasil.rip / sequence-mcp.yggdrasil.rip
+#     (infrastructure/ansible/vars/mcp_servers.yml) — Claude MCP connectors
+#     authenticated by their own OAuth-shim bearer tokens, not interactive
+#     browser logins. Required Google SSO would break Claude's connection.
+#   - jellyfin.yggdrasil.rip (apps/k8s/knarr/jellyfin) — TVs/set-top boxes
+#     can't complete an interactive SSO redirect, so Jellyfin needs to stay
+#     reachable without the Access gate. Relies on Jellyfin's own login.
+# Both get their own bypass Access Application below, leaving their existing
+# auth (Caddy / Jellyfin's own login) untouched. Add any future
+# no-interactive-login hostname the same way.
 #
 # Requires a Cloudflare API token with the "Access: Apps and Policies" (Edit)
 # and "Access: Organizations, Identity Providers, and Groups" (Read)
@@ -96,6 +102,26 @@ resource "cloudflare_zero_trust_access_application" "yggdrasil_mcp_bypass" {
 
   policies = [{
     name       = "Bypass Access — Caddy handles auth"
+    decision   = "bypass"
+    precedence = 1
+    include    = [{ everyone = {} }]
+  }]
+}
+
+# --- Jellyfin: bypass Access, TVs/set-top boxes can't do interactive SSO ---
+
+resource "cloudflare_zero_trust_access_application" "jellyfin_bypass" {
+  account_id           = var.cloudflare_account_id
+  name                 = "Jellyfin (Access bypass)"
+  type                 = "self_hosted"
+  app_launcher_visible = false
+
+  destinations = [
+    { type = "public", uri = "jellyfin.yggdrasil.rip" },
+  ]
+
+  policies = [{
+    name       = "Bypass Access — Jellyfin handles its own login"
     decision   = "bypass"
     precedence = 1
     include    = [{ everyone = {} }]
