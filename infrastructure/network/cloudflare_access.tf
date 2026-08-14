@@ -23,12 +23,17 @@
 #     (infrastructure/ansible/vars/mcp_servers.yml) — Claude MCP connectors
 #     authenticated by their own OAuth-shim bearer tokens, not interactive
 #     browser logins. Required Google SSO would break Claude's connection.
+#   - ab.yggdrasil.rip — the actual Actual Budget server itself. The
+#     mcp-budget service on hermod calls this as a JSON API backend; when
+#     Odin's wildcard gated it, Access returned its HTML login redirect
+#     instead of JSON and the MCP connector died with a parse error
+#     (confirmed live 2026-08-14). Has its own password auth already.
 #   - jellyfin.yggdrasil.rip (apps/k8s/knarr/jellyfin) — TVs/set-top boxes
 #     can't complete an interactive SSO redirect, so Jellyfin needs to stay
 #     reachable without the Access gate. Relies on Jellyfin's own login.
-# Both get their own bypass Access Application below, leaving their existing
-# auth (Caddy / Jellyfin's own login) untouched. Add any future
-# no-interactive-login hostname the same way.
+# All three get their own bypass Access Application below, leaving their
+# existing auth (Caddy / Actual's password / Jellyfin's own login) untouched.
+# Add any future no-interactive-login hostname the same way.
 #
 # Requires a Cloudflare API token with the "Access: Apps and Policies" (Edit)
 # and "Access: Organizations, Identity Providers, and Groups" (Read)
@@ -87,7 +92,7 @@ resource "cloudflare_zero_trust_access_application" "yggdrasil" {
   }]
 }
 
-# --- MCP API endpoints: bypass Access, keep their own bearer-token auth ---
+# --- MCP API endpoints + their backends: bypass Access, own auth stands ---
 
 resource "cloudflare_zero_trust_access_application" "yggdrasil_mcp_bypass" {
   account_id           = var.cloudflare_account_id
@@ -98,6 +103,7 @@ resource "cloudflare_zero_trust_access_application" "yggdrasil_mcp_bypass" {
   destinations = [
     { type = "public", uri = "budget-mcp.yggdrasil.rip" },
     { type = "public", uri = "sequence-mcp.yggdrasil.rip" },
+    { type = "public", uri = "ab.yggdrasil.rip" },
   ]
 
   policies = [{
@@ -118,6 +124,10 @@ resource "cloudflare_zero_trust_access_application" "jellyfin_bypass" {
 
   destinations = [
     { type = "public", uri = "jellyfin.yggdrasil.rip" },
+    # Path-based route (apps/k8s/knarr/paths-ingress.yaml) added manually in
+    # the dashboard after this app was first created — folded in here so
+    # Terraform doesn't revert it on the next apply.
+    { type = "public", uri = "yggdrasil.rip/jelly" },
   ]
 
   policies = [{
