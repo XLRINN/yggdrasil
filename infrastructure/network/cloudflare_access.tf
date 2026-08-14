@@ -26,9 +26,16 @@
 #   - jellyfin.yggdrasil.rip (apps/k8s/knarr/jellyfin) — TVs/set-top boxes
 #     can't complete an interactive SSO redirect, so Jellyfin needs to stay
 #     reachable without the Access gate. Relies on Jellyfin's own login.
-# Both get their own bypass Access Application below, leaving their existing
-# auth (Caddy / Jellyfin's own login) untouched. Add any future
-# no-interactive-login hostname the same way.
+#   - ab.yggdrasil.rip (apps/k8s/admin/actual-budget) — Actual Budget has its
+#     own password auth (ACTUAL_PASSWORD), and the budget MCP server on
+#     hermod calls this hostname as a plain HTTPS API client (no browser, no
+#     SSO redirect support). hermod resolves it via public DNS
+#     (infrastructure/hermod/main.tf), not Pi-hole's *.yggdrasil.rip
+#     split-horizon shortcut, so its requests actually traverse the
+#     Cloudflare edge and would hit the Odin wildcard's Google SSO wall.
+# All three get their own bypass Access Application below, leaving their
+# existing auth (Caddy / Jellyfin's own login / Actual's own login)
+# untouched. Add any future no-interactive-login hostname the same way.
 #
 # Requires a Cloudflare API token with the "Access: Apps and Policies" (Edit)
 # and "Access: Organizations, Identity Providers, and Groups" (Read)
@@ -122,6 +129,28 @@ resource "cloudflare_zero_trust_access_application" "jellyfin_bypass" {
 
   policies = [{
     name       = "Bypass Access — Jellyfin handles its own login"
+    decision   = "bypass"
+    precedence = 1
+    include    = [{ everyone = {} }]
+  }]
+}
+
+# --- Actual Budget: bypass Access, keeps its own password auth ---
+# Also unblocks the budget MCP server on hermod, which calls this hostname
+# as a non-interactive HTTPS client (see EXCLUDED note above).
+
+resource "cloudflare_zero_trust_access_application" "actual_budget_bypass" {
+  account_id           = var.cloudflare_account_id
+  name                 = "Actual Budget (Access bypass)"
+  type                 = "self_hosted"
+  app_launcher_visible = false
+
+  destinations = [
+    { type = "public", uri = "ab.yggdrasil.rip" },
+  ]
+
+  policies = [{
+    name       = "Bypass Access — Actual Budget handles its own login"
     decision   = "bypass"
     precedence = 1
     include    = [{ everyone = {} }]
