@@ -1,0 +1,115 @@
+---
+# Config + metadata (covers/scan cache/etc.) both live on this one small PVC,
+# split by subPath - matches Audiobookshelf's own compose, which keeps /config
+# and /metadata as two separate persistent dirs.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: audiobookshelf-config-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audiobookshelf
+  namespace: knarr
+  labels:
+    app: audiobookshelf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: audiobookshelf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: audiobookshelf
+    spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      containers:
+      - name: audiobookshelf
+        image: ghcr.io/advplyr/audiobookshelf:latest
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/New_York"
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: config
+        - name: config
+          mountPath: /metadata
+          subPath: metadata
+        # Audiobookshelf does not support being served under a URL subpath
+        # (unlike the Servarr apps above) - it only works at its own host,
+        # so it's deliberately left out of knarr-paths-ingress.
+        - name: media
+          mountPath: /audiobooks
+          subPath: audiobooks # <--- create /mnt/alexandria/poeticEdda/audiobooks on njord!
+        - name: media
+          mountPath: /podcasts
+          subPath: podcasts # <--- create /mnt/alexandria/poeticEdda/podcasts on njord!
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: audiobookshelf-config-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: audiobookshelf
+  namespace: knarr
+spec:
+  selector:
+    app: audiobookshelf
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: audiobookshelf-ingress
+  namespace: knarr
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Audiobookshelf"
+    gethomepage.dev/group: "Media"
+    gethomepage.dev/icon: "audiobookshelf.png"
+    gethomepage.dev/description: "Audiobook & podcast server"
+spec:
+  rules:
+  - host: audiobookshelf.yggdrasil.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: audiobookshelf
+            port:
+              number: 80

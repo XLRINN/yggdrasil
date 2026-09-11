@@ -90,3 +90,23 @@ spec:
             name: lidarr
             port:
               number: 80
+  - host: chaptarr.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: chaptarr
+            port:
+              number: 80
+  - host: audiobookshelf.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: audiobookshelf
+            port:
+              number: 80

@@ -5,6 +5,8 @@ resources:
   - storage.yaml
   - paths-ingress.yaml
   - local-ingress.yaml
+  - audiobookshelf/
+  - chaptarr/
   - jellyfin/
   - jellyswarrm/
   - lidarr/
