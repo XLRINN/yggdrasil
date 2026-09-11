@@ -76,6 +76,14 @@ data:
             description: File Sync — Alexandria
 
     - Media:
+        - Audiobookshelf:
+            href: https://audiobookshelf.yggdrasil.rip
+            icon: audiobookshelf.png
+            description: Audiobook Library
+            widget:
+              type: audiobookshelf
+              url: http://audiobookshelf.knarr.svc.cluster.local
+              key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlJZCI6ImUzMGRmYjY5LWY4YjAtNGRiZi1iOTMzLTk2MmYyN2Y2NjYzNCIsIm5hbWUiOiJob21lcGFnZSIsInR5cGUiOiJhcGkiLCJpYXQiOjE3ODkxNDU1NzV9.cEXVYOFvmilWCgWZbLeYJBT2r8ji6IOL0a8Vya3uoHM
         - Jellyfin:
             href: https://yggdrasil.rip/jelly
             icon: jellyfin.png
@@ -97,10 +105,6 @@ data:
             href: https://swarm.yggdrasil.rip
             icon: jellyfin.png
             description: Multi-server Jellyfin proxy
-        - Audiobookshelf:
-            href: https://audiobookshelf.yggdrasil.rip
-            icon: audiobookshelf.png
-            description: Audiobook & podcast server
 
     - Downloads:
         - SABnzbd:

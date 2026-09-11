@@ -67,6 +67,8 @@ spec:
         - name: media
           mountPath: /podcasts
           subPath: podcasts # <--- create /mnt/alexandria/poeticEdda/podcasts on njord!
+        - name: media
+          mountPath: /mnt
       volumes:
       - name: config
         persistentVolumeClaim:
