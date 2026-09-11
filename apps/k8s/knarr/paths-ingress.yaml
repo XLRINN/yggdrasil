@@ -68,3 +68,10 @@ spec:
             name: lidarr
             port:
               number: 80
+      - path: /chaptarr
+        pathType: Prefix
+        backend:
+          service:
+            name: chaptarr
+            port:
+              number: 80

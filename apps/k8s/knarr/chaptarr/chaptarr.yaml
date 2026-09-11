@@ -1,0 +1,128 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chaptarr-config-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chaptarr
+  namespace: knarr
+  labels:
+    app: chaptarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chaptarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: chaptarr
+    spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      initContainers:
+      - name: inotify-sysctl
+        image: busybox
+        securityContext:
+          privileged: true
+        command:
+        - sh
+        - -c
+        - |
+          sysctl -w fs.inotify.max_user_watches=524288
+          sysctl -w fs.inotify.max_user_instances=512
+          sysctl -w net.ipv6.conf.all.disable_ipv6=1
+          sysctl -w net.ipv6.conf.default.disable_ipv6=1
+      containers:
+      - name: chaptarr
+        image: chaptarr/chaptarr:latest
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/New_York"
+        # Chaptarr is a fork of the Servarr (Sonarr/Radarr/Lidarr/Prowlarr) codebase, which
+        # exposes this same double-underscore env var to set the reverse-proxy URL base
+        # instead of hand-editing config.xml. NOT YET CONFIRMED against Chaptarr's own docs
+        # (it's beta software, ~2.5 weeks old at time of writing) - verify after first boot
+        # that /chaptarr actually resolves; if not, fall back to the sed-based set-urlbase
+        # initContainer pattern used by knarr/lidarr.
+        - name: CHAPTARR__SERVER__URLBASE
+          value: "/chaptarr"
+        - name: DOTNET_SYSTEM_NET_DISABLEIPV6
+          value: "true"
+        - name: HTTPS_PROXY
+          value: "http://10.42.0.1:3128"
+        - name: NO_PROXY
+          value: "localhost,127.0.0.1,10.42.0.0/16,10.43.0.0/16,.cluster.local"
+        ports:
+        - containerPort: 8789
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: media
+          mountPath: /media
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: chaptarr-config-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chaptarr
+  namespace: knarr
+spec:
+  selector:
+    app: chaptarr
+  ports:
+  - port: 80
+    targetPort: 8789
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chaptarr-ingress
+  namespace: knarr
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Chaptarr"
+    gethomepage.dev/group: "Downloads"
+    gethomepage.dev/icon: "chaptarr.png"
+    gethomepage.dev/description: "Audiobook & ebook manager"
+spec:
+  rules:
+  - host: chaptarr.yggdrasil.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: chaptarr
+            port:
+              number: 80
