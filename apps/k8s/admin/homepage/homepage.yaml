@@ -97,6 +97,10 @@ data:
             href: https://swarm.yggdrasil.rip
             icon: jellyfin.png
             description: Multi-server Jellyfin proxy
+        - Audiobookshelf:
+            href: https://audiobookshelf.yggdrasil.rip
+            icon: audiobookshelf.png
+            description: Audiobook & podcast server
 
     - Downloads:
         - SABnzbd:
@@ -147,6 +151,10 @@ data:
               type: lidarr
               url: http://lidarr.knarr.svc.cluster.local/lidarr
               key: 65a7661882674961990ad55a83954e30
+        - Chaptarr:
+            href: https://yggdrasil.rip/chaptarr
+            icon: chaptarr.png
+            description: Audiobook & Ebook Manager
 
     - Requests:
         - Seer:
