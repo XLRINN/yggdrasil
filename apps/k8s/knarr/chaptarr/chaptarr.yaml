@@ -80,6 +80,8 @@ spec:
           mountPath: /config
         - name: media
           mountPath: /media
+        - name: media
+          mountPath: /mnt
       volumes:
       - name: config
         persistentVolumeClaim:
