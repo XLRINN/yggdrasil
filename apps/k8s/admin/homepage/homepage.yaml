@@ -107,6 +107,15 @@ data:
             description: Multi-server Jellyfin proxy
 
     - Downloads:
+        - qBittorrent:
+            href: https://qbit.yggdrasil.rip
+            icon: qbittorrent.png
+            description: Torrent Downloader (PIA VPN)
+            widget:
+              type: qbittorrent
+              url: http://qbittorrent.knarr.svc.cluster.local
+              username: admin
+              password: adminadmin
         - SABnzbd:
             href: https://yggdrasil.rip/sab
             icon: sabnzbd.png
@@ -155,6 +164,14 @@ data:
               type: lidarr
               url: http://lidarr.knarr.svc.cluster.local/lidarr
               key: 65a7661882674961990ad55a83954e30
+        - Readarr:
+            href: https://readarr.yggdrasil.rip
+            icon: readarr.png
+            description: Books Manager
+            widget:
+              type: readarr
+              url: http://readarr.knarr.svc.cluster.local
+              key: b935ddd2af56444ea19bc33a33ac8790
         - Chaptarr:
             href: https://yggdrasil.rip/chaptarr
             icon: chaptarr.png

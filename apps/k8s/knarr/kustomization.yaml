@@ -11,6 +11,7 @@ resources:
   - jellyswarrm/
   - lidarr/
   - prowlarr/
+  - qbittorrent/
   - radarr/
   - romm/
   - sabnzb/

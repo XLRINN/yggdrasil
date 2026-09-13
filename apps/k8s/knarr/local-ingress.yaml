@@ -100,6 +100,16 @@ spec:
             name: chaptarr
             port:
               number: 80
+  - host: qbit.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: qbittorrent
+            port:
+              number: 80
   - host: audiobookshelf.skadi.rip
     http:
       paths:
