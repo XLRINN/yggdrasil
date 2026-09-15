@@ -89,29 +89,9 @@ spec:
   - port: 80
     targetPort: 80
     name: http
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: audiobookshelf-ingress
-  namespace: knarr
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/name: "Audiobookshelf"
-    gethomepage.dev/group: "Media"
-    gethomepage.dev/icon: "audiobookshelf.png"
-    gethomepage.dev/description: "Audiobook & podcast server"
-spec:
-  rules:
-  - host: audiobookshelf.yggdrasil.rip
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: audiobookshelf
-            port:
-              number: 80
+# No public Ingress here on purpose: audiobookshelf.yggdrasil.rip was routed
+# through the Cloudflare tunnel behind the Odin Access wildcard (Google SSO),
+# and the Audiobookshelf mobile app can't complete an interactive SSO
+# redirect to log in (same class of problem as Jellyfin). Dropped from
+# Cloudflare entirely; local network access remains via
+# audiobookshelf.skadi.rip (apps/k8s/knarr/local-ingress.yaml).
