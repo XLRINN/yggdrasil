@@ -31,9 +31,15 @@
 #   - jellyfin.yggdrasil.rip (apps/k8s/knarr/jellyfin) — TVs/set-top boxes
 #     can't complete an interactive SSO redirect, so Jellyfin needs to stay
 #     reachable without the Access gate. Relies on Jellyfin's own login.
-# All three get their own bypass Access Application below, leaving their
-# existing auth (Caddy / Actual's password / Jellyfin's own login) untouched.
-# Add any future no-interactive-login hostname the same way.
+#   - audiobookshelf.yggdrasil.rip (apps/k8s/knarr/audiobookshelf) — same
+#     problem as Jellyfin: the Audiobookshelf mobile app can't complete an
+#     interactive SSO redirect, so login from the app broke once Odin's
+#     wildcard started gating it (confirmed live 2026-09-15). Relies on
+#     Audiobookshelf's own login.
+# All four get their own bypass Access Application below, leaving their
+# existing auth (Caddy / Actual's password / Jellyfin's / Audiobookshelf's
+# own login) untouched. Add any future no-interactive-login hostname the
+# same way.
 #
 # Requires a Cloudflare API token with the "Access: Apps and Policies" (Edit)
 # and "Access: Organizations, Identity Providers, and Groups" (Read)
@@ -132,6 +138,26 @@ resource "cloudflare_zero_trust_access_application" "jellyfin_bypass" {
 
   policies = [{
     name       = "Bypass Access — Jellyfin handles its own login"
+    decision   = "bypass"
+    precedence = 1
+    include    = [{ everyone = {} }]
+  }]
+}
+
+# --- Audiobookshelf: bypass Access, mobile app can't do interactive SSO ---
+
+resource "cloudflare_zero_trust_access_application" "audiobookshelf_bypass" {
+  account_id           = var.cloudflare_account_id
+  name                 = "Audiobookshelf (Access bypass)"
+  type                 = "self_hosted"
+  app_launcher_visible = false
+
+  destinations = [
+    { type = "public", uri = "audiobookshelf.yggdrasil.rip" },
+  ]
+
+  policies = [{
+    name       = "Bypass Access — Audiobookshelf handles its own login"
     decision   = "bypass"
     precedence = 1
     include    = [{ everyone = {} }]

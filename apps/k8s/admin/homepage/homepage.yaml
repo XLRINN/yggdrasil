@@ -77,7 +77,7 @@ data:
 
     - Media:
         - Audiobookshelf:
-            href: http://audiobookshelf.skadi.rip
+            href: https://audiobookshelf.yggdrasil.rip
             icon: audiobookshelf.png
             description: Audiobook Library
             widget:
