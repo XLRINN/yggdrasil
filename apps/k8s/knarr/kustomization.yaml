@@ -18,3 +18,4 @@ resources:
   - sonarr/
   - sonarr-anime/
   - tunarr/
+  - qbittorrent/
