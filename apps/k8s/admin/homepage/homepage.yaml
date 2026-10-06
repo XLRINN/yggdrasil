@@ -114,8 +114,8 @@ data:
             widget:
               type: qbittorrent
               url: http://qbittorrent.knarr.svc.cluster.local
-              username: admin
-              password: adminadmin
+              username: david
+              password: nkuhv2DtFtK8R0
         - SABnzbd:
             href: https://yggdrasil.rip/sab
             icon: sabnzbd.png

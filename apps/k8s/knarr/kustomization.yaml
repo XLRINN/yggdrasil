@@ -10,6 +10,7 @@ resources:
   - jellyfin/
   - jellyswarrm/
   - lidarr/
+  - flaresolverr/
   - prowlarr/
   - qbittorrent/
   - radarr/
