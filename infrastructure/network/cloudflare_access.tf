@@ -36,9 +36,13 @@
 #     interactive SSO redirect, so login from the app broke once Odin's
 #     wildcard started gating it (confirmed live 2026-09-15). Relies on
 #     Audiobookshelf's own login.
-# All four get their own bypass Access Application below, leaving their
-# existing auth (Caddy / Actual's password / Jellyfin's / Audiobookshelf's
-# own login) untouched. Add any future no-interactive-login hostname the
+#   - the *arr stack (Sonarr, Sonarr-anime, Radarr, Prowlarr, Lidarr,
+#     Chaptarr), qBittorrent, SABnzbd and Seer — subdomains and their
+#     yggdrasil.rip/<path> routes. Double SSO was a hassle; each app's own
+#     login (set to Required) stands.
+# Each group gets its own bypass Access Application below, leaving their
+# existing auth (Caddy / Actual's password / each app's own login)
+# untouched. Add any future no-interactive-login hostname the
 # same way.
 #
 # Requires a Cloudflare API token with the "Access: Apps and Policies" (Edit)
@@ -158,6 +162,46 @@ resource "cloudflare_zero_trust_access_application" "audiobookshelf_bypass" {
 
   policies = [{
     name       = "Bypass Access — Audiobookshelf handles its own login"
+    decision   = "bypass"
+    precedence = 1
+    include    = [{ everyone = {} }]
+  }]
+}
+
+# --- *arr stack, downloaders, Seer: bypass Access, each app's own login ----
+# Every app below has its own auth set to "Required" (not "Disabled for
+# Local Addresses" — tunnel traffic arrives from inside the cluster, so that
+# setting would leave them open to the internet). Re-check that before
+# adding anything here.
+
+resource "cloudflare_zero_trust_access_application" "arr_stack_bypass" {
+  account_id           = var.cloudflare_account_id
+  name                 = "*arr stack (Access bypass)"
+  type                 = "self_hosted"
+  app_launcher_visible = false
+
+  destinations = [
+    { type = "public", uri = "sonarr.yggdrasil.rip" },
+    { type = "public", uri = "yggdrasil.rip/sonarr" },
+    { type = "public", uri = "anime.yggdrasil.rip" },
+    { type = "public", uri = "yggdrasil.rip/crunchy" },
+    { type = "public", uri = "radarr.yggdrasil.rip" },
+    { type = "public", uri = "yggdrasil.rip/radarr" },
+    { type = "public", uri = "prowlarr.yggdrasil.rip" },
+    { type = "public", uri = "yggdrasil.rip/prowlarr" },
+    { type = "public", uri = "lidarr.yggdrasil.rip" },
+    { type = "public", uri = "yggdrasil.rip/lidarr" },
+    { type = "public", uri = "chaptarr.yggdrasil.rip" },
+    { type = "public", uri = "yggdrasil.rip/chaptarr" },
+    { type = "public", uri = "qbit.yggdrasil.rip" },
+    { type = "public", uri = "sabnzbd.yggdrasil.rip" },
+    { type = "public", uri = "yggdrasil.rip/sab" },
+    { type = "public", uri = "seer.yggdrasil.rip" },
+    { type = "public", uri = "yggdrasil.rip/seer" },
+  ]
+
+  policies = [{
+    name       = "Bypass Access — each app handles its own login"
     decision   = "bypass"
     precedence = 1
     include    = [{ everyone = {} }]
