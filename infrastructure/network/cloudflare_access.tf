@@ -40,6 +40,9 @@
 #     Chaptarr), qBittorrent, SABnzbd and Seer — subdomains and their
 #     yggdrasil.rip/<path> routes. Double SSO was a hassle; each app's own
 #     login (set to Required) stands.
+#   - tunarr.yggdrasil.rip — ONLY its M3U/XMLTV/stream/HDHomeRun paths, so
+#     IPTV clients and Jellyfin Live TV can fetch them. Tunarr has no login,
+#     so its web UI stays behind Odin's Google SSO.
 # Each group gets its own bypass Access Application below, leaving their
 # existing auth (Caddy / Actual's password / each app's own login)
 # untouched. Add any future no-interactive-login hostname the
@@ -202,6 +205,37 @@ resource "cloudflare_zero_trust_access_application" "arr_stack_bypass" {
 
   policies = [{
     name       = "Bypass Access — each app handles its own login"
+    decision   = "bypass"
+    precedence = 1
+    include    = [{ everyone = {} }]
+  }]
+}
+
+# --- Tunarr: bypass Access for the stream/guide endpoints only ------------
+# Tunarr has no login of its own, so the web UI stays behind Odin's Google
+# SSO. Only the paths IPTV clients and Jellyfin's Live TV fetch
+# non-interactively are opened: M3U playlist, XMLTV guide, the streams, and
+# the HDHomeRun emulation endpoints.
+
+resource "cloudflare_zero_trust_access_application" "tunarr_streams_bypass" {
+  account_id           = var.cloudflare_account_id
+  name                 = "Tunarr streams (Access bypass)"
+  type                 = "self_hosted"
+  app_launcher_visible = false
+
+  destinations = [
+    { type = "public", uri = "tunarr.yggdrasil.rip/api/channels.m3u" },
+    { type = "public", uri = "tunarr.yggdrasil.rip/api/xmltv.xml" },
+    { type = "public", uri = "tunarr.yggdrasil.rip/stream" },
+    { type = "public", uri = "tunarr.yggdrasil.rip/media-player" },
+    { type = "public", uri = "tunarr.yggdrasil.rip/discover.json" },
+    { type = "public", uri = "tunarr.yggdrasil.rip/lineup.json" },
+    { type = "public", uri = "tunarr.yggdrasil.rip/lineup_status.json" },
+    { type = "public", uri = "tunarr.yggdrasil.rip/device.xml" },
+  ]
+
+  policies = [{
+    name       = "Bypass Access — stream/guide endpoints, UI stays gated"
     decision   = "bypass"
     precedence = 1
     include    = [{ everyone = {} }]
