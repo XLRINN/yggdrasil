@@ -67,8 +67,8 @@ spec:
           mountPath: /config
       containers:
       - name: jellyfin
-        image: lscr.io/linuxserver/jellyfin@sha256:c123ef2f82195e377d8ca3df275f13f9dfa5c6e61b195958662b42b5e54362ab
-        imagePullPolicy: IfNotPresent
+        image: lscr.io/linuxserver/jellyfin:latest
+        imagePullPolicy: Always
         env:
         - name: PUID
           value: "1000"
