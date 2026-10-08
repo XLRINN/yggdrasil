@@ -43,6 +43,10 @@
 #   - tunarr.yggdrasil.rip — ONLY its M3U/XMLTV/stream/HDHomeRun paths, so
 #     IPTV clients and Jellyfin Live TV can fetch them. Tunarr has no login,
 #     so its web UI stays behind Odin's Google SSO.
+#   - swarm.yggdrasil.rip (apps/k8s/knarr/jellyswarrm) — same problem as
+#     Jellyfin: it's a Jellyfin-proxy, so Jellyfin clients hit it directly
+#     and can't complete an interactive SSO redirect. Relies on its own
+#     JELLYSWARRM_USERNAME/PASSWORD auth.
 # Each group gets its own bypass Access Application below, leaving their
 # existing auth (Caddy / Actual's password / each app's own login)
 # untouched. Add any future no-interactive-login hostname the
@@ -236,6 +240,26 @@ resource "cloudflare_zero_trust_access_application" "tunarr_streams_bypass" {
 
   policies = [{
     name       = "Bypass Access — stream/guide endpoints, UI stays gated"
+    decision   = "bypass"
+    precedence = 1
+    include    = [{ everyone = {} }]
+  }]
+}
+
+# --- Jellyswarrm: bypass Access, Jellyfin clients can't do interactive SSO -
+
+resource "cloudflare_zero_trust_access_application" "jellyswarrm_bypass" {
+  account_id           = var.cloudflare_account_id
+  name                 = "Jellyswarrm (Access bypass)"
+  type                 = "self_hosted"
+  app_launcher_visible = false
+
+  destinations = [
+    { type = "public", uri = "swarm.yggdrasil.rip" },
+  ]
+
+  policies = [{
+    name       = "Bypass Access — Jellyswarrm handles its own login"
     decision   = "bypass"
     precedence = 1
     include    = [{ everyone = {} }]
