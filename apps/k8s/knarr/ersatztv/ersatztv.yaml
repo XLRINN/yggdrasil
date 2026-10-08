@@ -1,0 +1,98 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ersatztv-config-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ersatztv
+  namespace: knarr
+  labels:
+    app: ersatztv
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ersatztv
+  template:
+    metadata:
+      labels:
+        app: ersatztv
+    spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      containers:
+      - name: ersatztv
+        image: jasongdove/ersatztv:latest
+        imagePullPolicy: Always
+        env:
+        - name: TZ
+          value: "America/New_York"
+        ports:
+        - containerPort: 8409
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /root/.local/share/ersatztv
+        - name: media
+          mountPath: /media
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ersatztv-config-pvc
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ersatztv
+  namespace: knarr
+spec:
+  selector:
+    app: ersatztv
+  ports:
+  - port: 80
+    targetPort: 8409
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ersatztv-ingress
+  namespace: knarr
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "ErsatzTV"
+    gethomepage.dev/group: "Media"
+    gethomepage.dev/icon: "ersatztv.png"
+    gethomepage.dev/description: "Virtual channel DVR"
+spec:
+  rules:
+  - host: ersatztv.yggdrasil.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ersatztv
+            port:
+              number: 80

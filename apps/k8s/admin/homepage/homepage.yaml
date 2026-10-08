@@ -97,6 +97,10 @@ data:
             href: https://tunarr.yggdrasil.rip
             icon: tunarr.png
             description: Live TV Channels
+        - ErsatzTV:
+            href: https://ersatztv.yggdrasil.rip
+            icon: ersatztv.png
+            description: Virtual Channel DVR
         - RomM:
             href: https://romm.yggdrasil.rip
             icon: romm.png
