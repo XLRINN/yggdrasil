@@ -114,7 +114,7 @@ data:
             icon: jellyfin.png
             description: Block Programming & Commercials
         - Jellyswarrm:
-            href: https://swarm.yggdrasil.rip
+            href: https://swarmm.yggdrasil.rip
             icon: jellyfin.png
             description: Multi-server Jellyfin proxy
 

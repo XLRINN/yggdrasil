@@ -110,7 +110,7 @@ spec:
             name: qbittorrent
             port:
               number: 80
-  - host: swarm.skadi.rip
+  - host: swarmm.skadi.rip
     http:
       paths:
       - path: /
