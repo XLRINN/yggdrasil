@@ -110,6 +110,16 @@ spec:
             name: qbittorrent
             port:
               number: 80
+  - host: tv.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ersatztv
+            port:
+              number: 8409
   - host: audiobookshelf.skadi.rip
     http:
       paths:
