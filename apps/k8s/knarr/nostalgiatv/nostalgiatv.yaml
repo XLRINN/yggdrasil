@@ -95,7 +95,7 @@ metadata:
     gethomepage.dev/description: "Retro TV experience"
 spec:
   rules:
-  - host: nostalgia.yggdrasil.rip
+  - host: ntv.yggdrasil.rip
     http:
       paths:
       - path: /
