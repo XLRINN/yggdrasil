@@ -101,6 +101,10 @@ data:
             href: https://tv.yggdrasil.rip
             icon: ersatztv.png
             description: Virtual Channel DVR
+        - NostalgiaTV:
+            href: https://nostalgia.yggdrasil.rip
+            icon: jellyfin.png
+            description: Retro TV experience
         - RomM:
             href: https://romm.yggdrasil.rip
             icon: romm.png
