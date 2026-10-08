@@ -101,8 +101,8 @@ data:
             href: https://romm.yggdrasil.rip
             icon: romm.png
             description: ROM Library
-        - Flock:
-            href: https://flock.yggdrasil.rip
+        - Flok:
+            href: https://flok.yggdrasil.rip
             icon: jellyfin.png
             description: Block Programming & Commercials
         - Jellyswarrm:
