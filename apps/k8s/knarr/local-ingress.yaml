@@ -110,6 +110,26 @@ spec:
             name: qbittorrent
             port:
               number: 80
+  - host: swarm.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jellyswarrm
+            port:
+              number: 80
+  - host: ntv.skadi.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nostalgiatv
+            port:
+              number: 19850
   - host: tv.skadi.rip
     http:
       paths:
