@@ -89,7 +89,7 @@ data:
             widget:
               type: jellyfin
               url: http://jellyfin.knarr.svc.cluster.local/jelly
-              key: cb6d68a02a1d449c90e87f522456cdf3
+              key: c2e48bd672384d67b000897dcdd1e6a2
               enableBlocks: true
         - Njord:
             href: https://fin.xlrin.io
@@ -98,7 +98,7 @@ data:
             widget:
               type: jellyfin
               url: http://njord.knarr.svc.cluster.local
-              key: 178e48c12417485585be75a679d0c304
+              key: 39118298b2b74d6d81a0b319d0ff0d7c
               enableBlocks: true
         - Flok:
             href: https://flok.yggdrasil.rip
