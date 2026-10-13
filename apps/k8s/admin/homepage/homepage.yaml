@@ -18,9 +18,15 @@ data:
       Storage:
         style: row
         columns: 4
+      Jellyfin:
+        style: row
+        columns: 4
       Media:
         style: row
-        columns: 2
+        columns: 4
+      Arr Stack:
+        style: row
+        columns: 4
       Downloads:
         style: row
         columns: 4
@@ -75,6 +81,29 @@ data:
             icon: syncthing.png
             description: File Sync — Alexandria
 
+    - Jellyfin:
+        - Skadi:
+            href: https://yggdrasil.rip/jelly
+            icon: jellyfin.png
+            description: Main Media Server
+            widget:
+              type: jellyfin
+              url: http://jellyfin.knarr.svc.cluster.local/jelly
+              key: 178e48c12417485585be75a679d0c304
+              enableBlocks: true
+        - Njord:
+            href: https://fin.xlrin.io
+            icon: jellyfin.png
+            description: Public Jellyfin
+        - Flok:
+            href: https://flok.yggdrasil.rip
+            icon: jellyfin.png
+            description: Block Programming & Commercials
+        - Swarmm:
+            href: https://swarmm.yggdrasil.rip
+            icon: jellyfin.png
+            description: Multi-server Jellyfin proxy
+
     - Media:
         - Audiobookshelf:
             href: https://audiobookshelf.yggdrasil.rip
@@ -84,19 +113,6 @@ data:
               type: audiobookshelf
               url: http://audiobookshelf.knarr.svc.cluster.local
               key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlJZCI6ImUzMGRmYjY5LWY4YjAtNGRiZi1iOTMzLTk2MmYyN2Y2NjYzNCIsIm5hbWUiOiJob21lcGFnZSIsInR5cGUiOiJhcGkiLCJpYXQiOjE3ODkxNDU1NzV9.cEXVYOFvmilWCgWZbLeYJBT2r8ji6IOL0a8Vya3uoHM
-        - Njord:
-            href: https://fin.xlrin.io
-            icon: jellyfin.png
-            description: Public Jellyfin
-        - Jellyfin:
-            href: https://yggdrasil.rip/jelly
-            icon: jellyfin.png
-            description: Media Server
-            widget:
-              type: jellyfin
-              url: http://jellyfin.knarr.svc.cluster.local/jelly
-              key: 178e48c12417485585be75a679d0c304
-              enableBlocks: true
         - Tunarr:
             href: https://tunarr.yggdrasil.rip
             icon: tunarr.png
@@ -107,38 +123,14 @@ data:
             description: Virtual Channel DVR
         - NostalgiaTV:
             href: https://ntv.yggdrasil.rip
-            icon: jellyfin.png
+            icon: telly.png
             description: Retro TV experience
         - RomM:
             href: https://romm.yggdrasil.rip
             icon: romm.png
             description: ROM Library
-        - Flok:
-            href: https://flok.yggdrasil.rip
-            icon: jellyfin.png
-            description: Block Programming & Commercials
-        - Swarmm:
-            href: https://swarmm.yggdrasil.rip
-            icon: jellyfin.png
-            description: Multi-server Jellyfin proxy
 
-    - Downloads:
-        - qBittorrent:
-            href: https://qbit.yggdrasil.rip
-            icon: qbittorrent.png
-            description: Torrent Downloader (PIA VPN)
-            widget:
-              type: qbittorrent
-              url: http://qbittorrent.knarr.svc.cluster.local
-              password: qbt_KhPDkLmqUQY2bQ8w9yLeb5QIsNyF
-        - SABnzbd:
-            href: https://yggdrasil.rip/sab
-            icon: sabnzbd.png
-            description: Usenet Downloader
-            widget:
-              type: sabnzbd
-              url: http://sabnzbd.knarr.svc.cluster.local/sab
-              key: 9f1564baf2ec45f6b0937b2b00e61695
+    - Arr Stack:
         - Sonarr:
             href: https://yggdrasil.rip/sonarr
             icon: sonarr.png
@@ -179,18 +171,28 @@ data:
               type: lidarr
               url: http://lidarr.knarr.svc.cluster.local/lidarr
               key: 65a7661882674961990ad55a83954e30
-        - Readarr:
-            href: https://readarr.yggdrasil.rip
-            icon: readarr.png
-            description: Books Manager
-            widget:
-              type: readarr
-              url: http://readarr.knarr.svc.cluster.local
-              key: b935ddd2af56444ea19bc33a33ac8790
         - Chaptarr:
             href: https://yggdrasil.rip/chaptarr
             icon: chaptarr.png
             description: Audiobook & Ebook Manager
+
+    - Downloads:
+        - qBittorrent:
+            href: https://qbit.yggdrasil.rip
+            icon: qbittorrent.png
+            description: Torrent Downloader (PIA VPN)
+            widget:
+              type: qbittorrent
+              url: http://qbittorrent.knarr.svc.cluster.local
+              password: qbt_KhPDkLmqUQY2bQ8w9yLeb5QIsNyF
+        - SABnzbd:
+            href: https://yggdrasil.rip/sab
+            icon: sabnzbd.png
+            description: Usenet Downloader
+            widget:
+              type: sabnzbd
+              url: http://sabnzbd.knarr.svc.cluster.local/sab
+              key: 9f1564baf2ec45f6b0937b2b00e61695
 
     - Requests:
         - Seer:
