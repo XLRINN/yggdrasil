@@ -95,6 +95,11 @@ data:
             href: https://fin.xlrin.io
             icon: jellyfin.png
             description: Public Jellyfin
+            widget:
+              type: jellyfin
+              url: http://njord.knarr.svc.cluster.local
+              key: 178e48c12417485585be75a679d0c304
+              enableBlocks: true
         - Flok:
             href: https://flok.yggdrasil.rip
             icon: jellyfin.png
