@@ -89,7 +89,7 @@ data:
             widget:
               type: jellyfin
               url: http://jellyfin.knarr.svc.cluster.local/jelly
-              key: c2e48bd672384d67b000897dcdd1e6a2
+              key: 3ed7450a2c4d4a779cf0b5d7801b1b72
               enableBlocks: true
         - Njord:
             href: https://fin.xlrin.io
