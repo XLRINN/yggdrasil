@@ -98,7 +98,7 @@ data:
             widget:
               type: jellyfin
               url: http://njord.knarr.svc.cluster.local
-              key: 39118298b2b74d6d81a0b319d0ff0d7c
+              key: 4b2ccd148f684ef79c47ce490e77df42
               enableBlocks: true
         - Flok:
             href: https://flok.yggdrasil.rip
