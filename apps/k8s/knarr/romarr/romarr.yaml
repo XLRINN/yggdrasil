@@ -60,6 +60,8 @@ spec:
           value: "http://qbittorrent.knarr.svc.cluster.local"
         - name: SABNZBD_URL
           value: "http://sabnzbd.knarr.svc.cluster.local/sab"
+        - name: ROMARR_PORT
+          value: "6868"
         ports:
         - containerPort: 6868
           name: http
