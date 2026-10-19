@@ -130,6 +130,10 @@ data:
             href: https://ntv.yggdrasil.rip
             icon: telly.png
             description: Retro TV experience
+        - ROMarr:
+            href: https://romarr.yggdrasil.rip
+            icon: radarr.png
+            description: ROM acquisition manager
         - RomM:
             href: https://romm.yggdrasil.rip
             icon: romm.png
