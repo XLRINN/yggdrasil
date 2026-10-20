@@ -57,7 +57,7 @@ spec:
         - name: LIBRARY_PATH
           value: "/roms"
         - name: QBITTORRENT_URL
-          value: "http://qbittorrent.knarr.svc.cluster.local"
+          value: "http://qbittorrent.knarr.svc.cluster.local:80"
         - name: SABNZBD_URL
           value: "http://sabnzbd.knarr.svc.cluster.local/sab"
         - name: ROMARR_PORT
