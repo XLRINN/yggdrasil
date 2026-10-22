@@ -79,6 +79,8 @@ spec:
               mountPath: /incomplete
             - name: media
               mountPath: /media
+            - name: roms
+              mountPath: /media/ROMS
       volumes:
         - name: config
           persistentVolumeClaim:
@@ -86,6 +88,9 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: media-pvc
+        - name: roms
+          persistentVolumeClaim:
+            claimName: romm-library-pvc
         - name: incomplete
           hostPath:
             path: /home/david/k8s/knarr/sabnzb/incomplete # <--- Create this folder on your host!

@@ -98,11 +98,13 @@ metadata:
   name: jellyfin
   namespace: knarr
 spec:
+  type: NodePort
   selector:
     app: jellyfin
   ports:
   - port: 80
     targetPort: 8096
+    nodePort: 30096
     name: http
 ---
 apiVersion: networking.k8s.io/v1

@@ -53,13 +53,15 @@ spec:
         - name: LIBRARY_KIND
           value: "romm"
         - name: LIBRARY_URL
-          value: "http://romm.knarr.svc.cluster.local:8080"
+          value: "http://romm.knarr.svc.cluster.local"
         - name: LIBRARY_PATH
           value: "/roms"
         - name: QBITTORRENT_URL
           value: "http://qbittorrent.knarr.svc.cluster.local:80"
         - name: SABNZBD_URL
           value: "http://sabnzbd.knarr.svc.cluster.local/sab"
+        - name: SABNZBD_API_KEY
+          value: "9f1564baf2ec45f6b0937b2b00e61695"
         - name: ROMARR_PORT
           value: "6868"
         ports:
@@ -70,12 +72,16 @@ spec:
           mountPath: /config
         - name: media
           mountPath: /roms
-          subPath: ROMS
+        - name: downloads
+          mountPath: /media
       volumes:
       - name: config
         persistentVolumeClaim:
           claimName: romarr-config-pvc
       - name: media
+        persistentVolumeClaim:
+          claimName: romm-library-pvc
+      - name: downloads
         persistentVolumeClaim:
           claimName: media-pvc
 ---
