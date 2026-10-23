@@ -65,6 +65,11 @@ spec:
           image: lscr.io/linuxserver/sabnzbd:latest
           ports:
             - containerPort: 8080
+          resources:
+            limits:
+              cpu: "4"
+            requests:
+              cpu: "1"
           env:
             - name: PUID
               value: "1000"
