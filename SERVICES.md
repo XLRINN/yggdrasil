@@ -22,7 +22,7 @@ local DNS, and your dashboard.
 192.168.69.2  pihole       LXC 102  — DNS, ad blocking
 192.168.69.3  cloudflared  LXC 103  — Cloudflare tunnel + Homepage dashboard
 192.168.69.5  alexandria   LXC 111  — NAS, file sharing (mimmisbrunnr 60TB)
-192.168.69.20 code         LXC 105  — code-server (VS Code in the browser)
+192.168.69.20 code         LXC 105  — code-server (VS Code in the browser), alexandria at /mnt/alexandria
 192.168.69.69 asgard               — Proxmox hypervisor
 192.168.69.77 draupnir     VM  777  — k3s Kubernetes cluster
 ```

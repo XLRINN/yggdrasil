@@ -113,6 +113,7 @@
   roles:
     - common
     - tailscale
+    - alexandria_mount
     - users
     - claude_cli
     - code_server

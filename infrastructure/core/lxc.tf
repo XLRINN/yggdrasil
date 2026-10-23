@@ -136,7 +136,7 @@ resource "proxmox_virtual_environment_container" "vuln" {
 resource "proxmox_virtual_environment_container" "code" {
   node_name    = "asgard"
   vm_id        = 105
-  unprivileged = true
+  unprivileged = false # privileged container — required to mount alexandria over NFS
 
   initialization {
     hostname = "code"
@@ -184,6 +184,7 @@ resource "proxmox_virtual_environment_container" "code" {
 
   features {
     nesting = true # required for systemd on Ubuntu 24.04
+    mount   = ["nfs"] # allow NFS client mount of alexandria
   }
 
   startup {
