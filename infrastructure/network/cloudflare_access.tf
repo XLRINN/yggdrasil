@@ -109,6 +109,35 @@ resource "cloudflare_zero_trust_access_application" "yggdrasil" {
   }]
 }
 
+# --- code-server: Google-gated, explicitly ----------------------------------
+# Odin's wildcard already gates code.yggdrasil.rip, but code-server is a
+# shell on the code LXC (and runs with auth: none unless code_server_password
+# is set), so its gate is pinned here in Terraform rather than left to the
+# dashboard-managed wildcard. Never move this host into a bypass app.
+
+resource "cloudflare_zero_trust_access_application" "code_server" {
+  account_id                = var.cloudflare_account_id
+  name                      = "Code Server"
+  type                      = "self_hosted"
+  session_duration          = "24h"
+  auto_redirect_to_identity = true
+  app_launcher_visible      = true
+  allowed_idps              = [local.google_idp_id]
+
+  destinations = [
+    { type = "public", uri = "code.yggdrasil.rip" },
+  ]
+
+  policies = [{
+    name       = "Allow Google SSO — approved emails"
+    decision   = "allow"
+    precedence = 1
+    include = [
+      for email in var.allowed_emails : { email = { email = email } }
+    ]
+  }]
+}
+
 # --- MCP API endpoints + their backends: bypass Access, own auth stands ---
 
 resource "cloudflare_zero_trust_access_application" "yggdrasil_mcp_bypass" {

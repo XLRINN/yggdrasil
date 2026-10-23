@@ -133,13 +133,13 @@ resource "proxmox_virtual_environment_container" "vuln" {
 }
 
 
-resource "proxmox_virtual_environment_container" "mimir" {
+resource "proxmox_virtual_environment_container" "code" {
   node_name    = "asgard"
   vm_id        = 105
   unprivileged = true
 
   initialization {
-    hostname = "mimir"
+    hostname = "code"
 
     ip_config {
       ipv4 {
@@ -250,8 +250,8 @@ resource "null_resource" "vuln_post_create" {
   }
 }
 
-resource "null_resource" "mimir_post_create" {
-  depends_on = [proxmox_virtual_environment_container.mimir]
+resource "null_resource" "code_post_create" {
+  depends_on = [proxmox_virtual_environment_container.code]
 
   connection {
     type     = "ssh"

@@ -22,7 +22,7 @@ local DNS, and your dashboard.
 192.168.69.2  pihole       LXC 102  — DNS, ad blocking
 192.168.69.3  cloudflared  LXC 103  — Cloudflare tunnel + Homepage dashboard
 192.168.69.5  alexandria   LXC 111  — NAS, file sharing (mimmisbrunnr 60TB)
-192.168.69.20 mimir        LXC 105  — code-server (VS Code in the browser)
+192.168.69.20 code         LXC 105  — code-server (VS Code in the browser)
 192.168.69.69 asgard               — Proxmox hypervisor
 192.168.69.77 draupnir     VM  777  — k3s Kubernetes cluster
 ```
@@ -188,7 +188,7 @@ ansible-playbook site.yml --limit pihole
 ansible-playbook site.yml --limit cloudflared
 ansible-playbook site.yml --limit alexandria
 ansible-playbook site.yml --limit draupnir
-ansible-playbook site.yml --limit mimir
+ansible-playbook site.yml --limit code
 ```
 
 ---
@@ -200,6 +200,11 @@ ansible-playbook site.yml --limit mimir
 in it) behind a Cloudflare Access login using the Google identity provider
 already configured in Zero Trust → Settings → Authentication. Only the
 emails listed in `allowed_emails` (tfvars) can sign in.
+
+`code.yggdrasil.rip` (code-server on the `code` LXC) also has its own
+dedicated Google-gated Access Application in that file, so its gate doesn't
+depend on the dashboard-managed wildcard — it's a shell, so never add it to
+a bypass list.
 
 Two hostnames are deliberately excluded — `budget-mcp.yggdrasil.rip` and
 `sequence-mcp.yggdrasil.rip` (the Claude MCP connectors in
