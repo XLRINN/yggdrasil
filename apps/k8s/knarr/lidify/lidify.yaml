@@ -1,0 +1,104 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lidify-config-pvc
+  namespace: knarr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lidify
+  namespace: knarr
+  labels:
+    app: lidify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lidify
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: lidify
+    spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      containers:
+      - name: lidify
+        image: thewicklowwolf/lidify:latest
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/New_York"
+        # Spotify's API no longer works with Lidify — Last.fm only. Set the
+        # Lidarr API key, Last.fm API key/secret and root folder path in the
+        # Lidify settings UI; they persist to the config PVC.
+        - name: mode
+          value: "LastFM"
+        # Lidarr runs with UrlBase /lidarr (see knarr/lidarr set-urlbase)
+        - name: lidarr_address
+          value: "http://lidarr.knarr.svc.cluster.local/lidarr"
+        ports:
+        - containerPort: 5000
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /lidify/config
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: lidify-config-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lidify
+  namespace: knarr
+spec:
+  selector:
+    app: lidify
+  ports:
+  - port: 80
+    targetPort: 5000
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lidify-ingress
+  namespace: knarr
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/target: "14dba35c-b082-4cf5-8319-05b87f07357c.cfargotunnel.com"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Lidify"
+    gethomepage.dev/group: "Arr Stack"
+    gethomepage.dev/icon: "lidify.png"
+    gethomepage.dev/description: "Music discovery for Lidarr"
+spec:
+  rules:
+  - host: lidify.yggdrasil.rip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: lidify
+            port:
+              number: 80

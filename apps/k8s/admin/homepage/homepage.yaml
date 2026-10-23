@@ -183,6 +183,10 @@ data:
               type: lidarr
               url: http://lidarr.knarr.svc.cluster.local/lidarr
               key: 65a7661882674961990ad55a83954e30
+        - Lidify:
+            href: https://lidify.yggdrasil.rip
+            icon: lidify.png
+            description: Music discovery for Lidarr
         - Chaptarr:
             href: https://yggdrasil.rip/chaptarr
             icon: chaptarr.png
