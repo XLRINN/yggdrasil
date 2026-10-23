@@ -25,3 +25,4 @@ resources:
   - nostalgiatv/
   - romarr/
   - njord/
+  - update-cronjob.yaml

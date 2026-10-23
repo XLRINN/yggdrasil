@@ -1,0 +1,58 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: weekly-image-update
+  namespace: knarr
+spec:
+  schedule: "0 4 * * 1"  # Every Monday at 4am
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+      template:
+        spec:
+          serviceAccountName: image-updater
+          restartPolicy: OnFailure
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command:
+            - sh
+            - -c
+            - |
+              for deploy in romm jellyfin sonarr radarr prowlarr romarr sabnzbd qbittorrent; do
+                echo "Restarting $deploy..."
+                kubectl rollout restart deployment/$deploy -n knarr
+                kubectl rollout status deployment/$deploy -n knarr --timeout=120s
+              done
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: image-updater
+  namespace: knarr
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: image-updater
+  namespace: knarr
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: image-updater
+  namespace: knarr
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: image-updater
+subjects:
+- kind: ServiceAccount
+  name: image-updater
+  namespace: knarr

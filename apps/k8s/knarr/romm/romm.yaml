@@ -237,7 +237,7 @@ spec:
       containers:
       - name: romm
         image: rommapp/romm:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: ROMM_PORT
           value: "8080"
