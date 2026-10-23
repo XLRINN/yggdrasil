@@ -27,6 +27,39 @@ spec:
                 kubectl rollout status deployment/$deploy -n knarr --timeout=120s
               done
 ---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: romm-maintenance
+  namespace: knarr
+spec:
+  schedule: "30 4 * * 1"  # Every Monday at 4:30am (30min after image update)
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: curl
+            image: curlimages/curl:latest
+            env:
+            - name: ROMM_USER
+              value: "xlrin"
+            - name: ROMM_PASS
+              value: "gumdrop;wielder;dock;cache;subtitle;zookeeper;mutable5"
+            command:
+            - sh
+            - -c
+            - |
+              BASE="http://romm.knarr.svc.cluster.local/api"
+              AUTH="-u ${ROMM_USER}:${ROMM_PASS}"
+              echo "Running cleanup_missing_roms..."
+              curl -sf -X POST $AUTH "$BASE/tasks/run/cleanup_missing_roms"
+              echo "Running cleanup_missing_firmware..."
+              curl -sf -X POST $AUTH "$BASE/tasks/run/cleanup_missing_firmware"
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
