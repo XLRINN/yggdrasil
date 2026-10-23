@@ -150,6 +150,4 @@ services:
 #
 # To apply changes: ansible-playbook site.yml --limit network
 #
-dns_hosts:
-  - hostname: vuln.yggdrasil.rip
-    ip: 192.168.69.85
+dns_hosts: []

@@ -10,7 +10,7 @@
 #   Single host:        ansible-playbook site.yml --limit draupnir
 #
 # GROUPS:
-#   core     — draupnir (k8s) + alexandria (NAS) + vuln + code (code-server) — frequently rebuilt
+#   core     — draupnir (k8s) + alexandria (NAS) + code (code-server) — frequently rebuilt
 #   network  — pihole + cloudflared — stable, survive core rebuilds
 #
 # SECRETS:
@@ -85,21 +85,6 @@
     - tailscale
     - mcp
     - claude_cli
-
-# -------------------------------------------------------------------------
-# VULN — Docker + Tailscale test container
-# -------------------------------------------------------------------------
-
-- name: Configure vuln
-  hosts: vuln
-  become: true
-  vars_files:
-    - vars/secrets.yml
-  roles:
-    - common
-    - docker
-    - tailscale
-    - users
 
 # -------------------------------------------------------------------------
 # CODE — code-server (VS Code in the browser) dev box

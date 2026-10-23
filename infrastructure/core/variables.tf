@@ -19,7 +19,7 @@ variable "vm_id" {
 variable "cpu_cores" {
   description = "Number of vCPU cores"
   type        = number
-  default     = 8
+  default     = 20
 }
 
 variable "vm_ip" {

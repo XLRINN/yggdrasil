@@ -35,14 +35,14 @@ resource "proxmox_virtual_environment_vm" "draupnir" {
   }
 
   memory {
-    dedicated = 32768 # 32GB
+    dedicated = 65000 # ~64GB, matches live VM spec
   }
 
   disk {
     datastore_id = "disks-fast"
     interface    = "scsi0"
     file_format  = "raw"
-    size         = 128
+    size         = 256
     discard      = "on"
     iothread     = true
   }
