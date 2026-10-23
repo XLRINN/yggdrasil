@@ -261,6 +261,70 @@ resource "proxmox_virtual_environment_container" "host" {
   }
 }
 
+resource "proxmox_virtual_environment_container" "immich" {
+  node_name    = "asgard"
+  vm_id        = 107
+  unprivileged = false # privileged container — required to mount alexandria over NFS
+
+  initialization {
+    hostname = "immich"
+
+    ip_config {
+      ipv4 {
+        address = "192.168.69.22/24"
+        gateway = var.gateway
+      }
+    }
+
+    dns {
+      servers = ["192.168.69.2", "1.1.1.1"]
+    }
+
+    user_account {
+      password = var.proxmox_password
+      keys     = var.ssh_public_key != "" ? [var.ssh_public_key] : []
+    }
+  }
+
+  cpu {
+    cores = 4
+  }
+
+  memory {
+    dedicated = 8192 # machine-learning (faces, CLIP search) is the big consumer
+    swap      = 0
+  }
+
+  disk {
+    datastore_id = "disks-fast"
+    size         = 64 # postgres + ML model cache; photos live on alexandria
+  }
+
+  network_interface {
+    name   = "eth0"
+    bridge = "vmbr0"
+  }
+
+  operating_system {
+    template_file_id = var.ubuntu_lxc_template
+    type             = "ubuntu"
+  }
+
+  features {
+    nesting = true    # required for Docker
+    mount   = ["nfs"] # allow NFS client mount of alexandria
+  }
+
+  startup {
+    order = 2
+  }
+
+  provisioner "local-exec" {
+    when    = create
+    command = "ssh-keygen -R 192.168.69.22 || true"
+  }
+}
+
 resource "null_resource" "alexandria_post_create" {
   depends_on = [proxmox_virtual_environment_container.alexandria]
 
@@ -361,6 +425,31 @@ resource "null_resource" "host_post_create" {
       "grep -q 'dev/net/tun' /etc/pve/lxc/106.conf || echo 'lxc.cgroup2.devices.allow: c 10:200 rwm' >> /etc/pve/lxc/106.conf",
       "grep -q 'dev/net/tun' /etc/pve/lxc/106.conf || echo 'lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file 0 0' >> /etc/pve/lxc/106.conf",
       "pct reboot 106"
+    ]
+  }
+}
+
+resource "null_resource" "immich_post_create" {
+  depends_on = [proxmox_virtual_environment_container.immich]
+
+  connection {
+    type     = "ssh"
+    host     = "asgard"
+    user     = "root"
+    password = var.proxmox_password
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      # Inject SSH key directly into container filesystem
+      "pct exec 107 -- mkdir -p /root/.ssh",
+      "pct exec 107 -- chmod 700 /root/.ssh",
+      "echo '${var.ssh_public_key}' | pct exec 107 -- tee /root/.ssh/authorized_keys",
+      "pct exec 107 -- chmod 600 /root/.ssh/authorized_keys",
+      # Add TUN device for Tailscale
+      "grep -q 'dev/net/tun' /etc/pve/lxc/107.conf || echo 'lxc.cgroup2.devices.allow: c 10:200 rwm' >> /etc/pve/lxc/107.conf",
+      "grep -q 'dev/net/tun' /etc/pve/lxc/107.conf || echo 'lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file 0 0' >> /etc/pve/lxc/107.conf",
+      "pct reboot 107"
     ]
   }
 }

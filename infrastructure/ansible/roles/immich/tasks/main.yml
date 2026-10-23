@@ -1,0 +1,85 @@
+---
+# Immich — self-hosted photo/video backup (https://immich.app), run with the
+# upstream Docker Compose file. Photos go to alexandria over NFS; postgres,
+# redis and the ML model cache stay local.
+
+- name: Require an Immich database password
+  assert:
+    that: immich_db_password | default('') is match('^[A-Za-z0-9]{16,}$')
+    fail_msg: "Set immich_db_password in vars/secrets.yml — 16+ chars, A-Za-z0-9 only (generate with: openssl rand -hex 24)"
+
+- name: Require alexandria to be mounted
+  command: mountpoint -q /mnt/alexandria
+  changed_when: false
+
+- name: Create Immich directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  loop:
+    - "{{ immich_dir }}"
+    - "{{ immich_db_location }}"
+
+- name: Create Immich library folder on alexandria
+  file:
+    path: "{{ immich_upload_location }}"
+    state: directory
+    mode: "0755"
+
+# Don't let Docker (and with it Immich) start before alexandria is mounted —
+# otherwise uploads would land on the LXC's local disk under the mount point.
+- name: Create Docker systemd drop-in directory
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    mode: "0755"
+
+- name: Make Docker wait for the alexandria mount
+  copy:
+    dest: /etc/systemd/system/docker.service.d/alexandria.conf
+    content: |
+      [Unit]
+      RequiresMountsFor=/mnt/alexandria
+    mode: "0644"
+  register: immich_docker_dropin
+
+- name: Reload systemd for the Docker drop-in
+  systemd:
+    daemon_reload: true
+  when: immich_docker_dropin.changed
+
+- name: Copy Immich compose file
+  copy:
+    src: docker-compose.yml
+    dest: "{{ immich_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart immich
+
+- name: Write Immich environment file
+  template:
+    src: env.j2
+    dest: "{{ immich_dir }}/.env"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+  notify: restart immich
+
+- name: Pull Immich images
+  command: docker compose pull
+  args:
+    chdir: "{{ immich_dir }}"
+  register: immich_pull
+  changed_when: "'Pulled' in immich_pull.stderr"
+
+- name: Start Immich
+  command: docker compose up -d
+  args:
+    chdir: "{{ immich_dir }}"
+  register: immich_up
+  changed_when: "'Started' in immich_up.stderr or 'Recreated' in immich_up.stderr or 'Created' in immich_up.stderr"

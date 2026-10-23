@@ -43,6 +43,10 @@
 #   - tunarr.yggdrasil.rip — ONLY its M3U/XMLTV/stream/HDHomeRun paths, so
 #     IPTV clients and Jellyfin Live TV can fetch them. Tunarr has no login,
 #     so its web UI stays behind Odin's Google SSO.
+#   - photos.yggdrasil.rip (Immich on the immich LXC) — same problem as
+#     Jellyfin: the Immich mobile app can't complete an interactive SSO
+#     redirect, so photo backup from the phone would break. Relies on
+#     Immich's own login.
 #   - swarm.yggdrasil.rip (apps/k8s/knarr/jellyswarrm) — same problem as
 #     Jellyfin: it's a Jellyfin-proxy, so Jellyfin clients hit it directly
 #     and can't complete an interactive SSO redirect. Relies on its own
@@ -317,6 +321,26 @@ resource "cloudflare_zero_trust_access_application" "jellyswarrm_bypass" {
 
   policies = [{
     name       = "Bypass Access — Jellyswarrm handles its own login"
+    decision   = "bypass"
+    precedence = 1
+    include    = [{ everyone = {} }]
+  }]
+}
+
+# --- Immich: bypass Access, mobile app can't do interactive SSO ------------
+
+resource "cloudflare_zero_trust_access_application" "immich_bypass" {
+  account_id           = var.cloudflare_account_id
+  name                 = "Immich (Access bypass)"
+  type                 = "self_hosted"
+  app_launcher_visible = false
+
+  destinations = [
+    { type = "public", uri = "photos.yggdrasil.rip" },
+  ]
+
+  policies = [{
+    name       = "Bypass Access — Immich handles its own login"
     decision   = "bypass"
     precedence = 1
     include    = [{ everyone = {} }]

@@ -10,7 +10,7 @@
 #   Single host:        ansible-playbook site.yml --limit draupnir
 #
 # GROUPS:
-#   core     — draupnir (k8s) + alexandria (NAS) + vuln + code (code-server) + host (Nexterm) — frequently rebuilt
+#   core     — draupnir (k8s) + alexandria (NAS) + vuln + code (code-server) + host (Nexterm) + immich — frequently rebuilt
 #   network  — pihole + cloudflared — stable, survive core rebuilds
 #
 # SECRETS:
@@ -132,3 +132,19 @@
     - tailscale
     - docker
     - nexterm
+
+# -------------------------------------------------------------------------
+# IMMICH — photo/video backup; library on alexandria
+# -------------------------------------------------------------------------
+
+- name: Configure immich
+  hosts: immich
+  become: true
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - common
+    - tailscale
+    - alexandria_mount
+    - docker
+    - immich
