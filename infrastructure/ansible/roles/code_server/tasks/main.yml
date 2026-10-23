@@ -1,0 +1,41 @@
+---
+# Ansible port of the community-scripts "coder-code-server" addon:
+# https://github.com/community-scripts/ProxmoxVE/blob/main/tools/addon/coder-code-server.sh
+# Installs the latest code-server .deb from GitHub and runs it as
+# code-server@<user> on port 8680. Re-running the play upgrades to the
+# latest release.
+
+- name: Get latest code-server release
+  uri:
+    url: https://api.github.com/repos/coder/code-server/releases/latest
+    return_content: true
+  register: code_server_release
+
+- name: Install code-server
+  apt:
+    deb: "{{ code_server_release.json.assets | selectattr('name', 'match', 'code-server_.*_amd64\\.deb$') | map(attribute='browser_download_url') | first }}"
+    state: present
+  notify: restart code-server
+
+- name: Create code-server config directory
+  file:
+    path: "/home/{{ code_server_user }}/.config/code-server"
+    state: directory
+    owner: "{{ code_server_user }}"
+    group: "{{ code_server_user }}"
+    mode: "0755"
+
+- name: Write code-server config
+  template:
+    src: config.yaml.j2
+    dest: "/home/{{ code_server_user }}/.config/code-server/config.yaml"
+    owner: "{{ code_server_user }}"
+    group: "{{ code_server_user }}"
+    mode: "0600"
+  notify: restart code-server
+
+- name: Enable and start code-server
+  systemd:
+    name: "code-server@{{ code_server_user }}"
+    enabled: true
+    state: started

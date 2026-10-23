@@ -1,0 +1,11 @@
+# Managed by Ansible — roles/code_server
+bind-addr: 0.0.0.0:{{ code_server_port }}
+{% if code_server_password | default('') %}
+auth: password
+password: {{ code_server_password }}
+{% else %}
+# No password set — relies on Cloudflare Access (Google SSO) for remote access.
+# Set code_server_password in vars/secrets.yml to also require a password on the LAN.
+auth: none
+{% endif %}
+cert: false

@@ -133,6 +133,69 @@ resource "proxmox_virtual_environment_container" "vuln" {
 }
 
 
+resource "proxmox_virtual_environment_container" "mimir" {
+  node_name    = "asgard"
+  vm_id        = 105
+  unprivileged = true
+
+  initialization {
+    hostname = "mimir"
+
+    ip_config {
+      ipv4 {
+        address = "192.168.69.20/24"
+        gateway = var.gateway
+      }
+    }
+
+    dns {
+      servers = ["192.168.69.2", "1.1.1.1"]
+    }
+
+    user_account {
+      password = var.proxmox_password
+      keys     = var.ssh_public_key != "" ? [var.ssh_public_key] : []
+    }
+  }
+
+  cpu {
+    cores = 4
+  }
+
+  memory {
+    dedicated = 4096
+    swap      = 0
+  }
+
+  disk {
+    datastore_id = "disks-fast"
+    size         = 32
+  }
+
+  network_interface {
+    name   = "eth0"
+    bridge = "vmbr0"
+  }
+
+  operating_system {
+    template_file_id = var.ubuntu_lxc_template
+    type             = "ubuntu"
+  }
+
+  features {
+    nesting = true # required for systemd on Ubuntu 24.04
+  }
+
+  startup {
+    order = 2
+  }
+
+  provisioner "local-exec" {
+    when    = create
+    command = "ssh-keygen -R 192.168.69.20 || true"
+  }
+}
+
 resource "null_resource" "alexandria_post_create" {
   depends_on = [proxmox_virtual_environment_container.alexandria]
 
@@ -183,6 +246,31 @@ resource "null_resource" "vuln_post_create" {
       "grep -q 'dev/net/tun' /etc/pve/lxc/104.conf || echo 'lxc.cgroup2.devices.allow: c 10:200 rwm' >> /etc/pve/lxc/104.conf",
       "grep -q 'dev/net/tun' /etc/pve/lxc/104.conf || echo 'lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file 0 0' >> /etc/pve/lxc/104.conf",
       "pct reboot 104"
+    ]
+  }
+}
+
+resource "null_resource" "mimir_post_create" {
+  depends_on = [proxmox_virtual_environment_container.mimir]
+
+  connection {
+    type     = "ssh"
+    host     = "asgard"
+    user     = "root"
+    password = var.proxmox_password
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      # Inject SSH key directly into container filesystem
+      "pct exec 105 -- mkdir -p /root/.ssh",
+      "pct exec 105 -- chmod 700 /root/.ssh",
+      "echo '${var.ssh_public_key}' | pct exec 105 -- tee /root/.ssh/authorized_keys",
+      "pct exec 105 -- chmod 600 /root/.ssh/authorized_keys",
+      # Add TUN device for Tailscale
+      "grep -q 'dev/net/tun' /etc/pve/lxc/105.conf || echo 'lxc.cgroup2.devices.allow: c 10:200 rwm' >> /etc/pve/lxc/105.conf",
+      "grep -q 'dev/net/tun' /etc/pve/lxc/105.conf || echo 'lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file 0 0' >> /etc/pve/lxc/105.conf",
+      "pct reboot 105"
     ]
   }
 }

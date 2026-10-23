@@ -10,7 +10,7 @@
 #   Single host:        ansible-playbook site.yml --limit draupnir
 #
 # GROUPS:
-#   core     — draupnir (k8s) + alexandria (NAS) — frequently rebuilt
+#   core     — draupnir (k8s) + alexandria (NAS) + vuln + mimir (code-server) — frequently rebuilt
 #   network  — pihole + cloudflared — stable, survive core rebuilds
 #
 # SECRETS:
@@ -100,3 +100,19 @@
     - docker
     - tailscale
     - users
+
+# -------------------------------------------------------------------------
+# MIMIR — code-server (VS Code in the browser) dev box
+# -------------------------------------------------------------------------
+
+- name: Configure mimir
+  hosts: mimir
+  become: true
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - common
+    - tailscale
+    - users
+    - claude_cli
+    - code_server

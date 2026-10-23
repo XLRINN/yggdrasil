@@ -22,6 +22,7 @@ local DNS, and your dashboard.
 192.168.69.2  pihole       LXC 102  — DNS, ad blocking
 192.168.69.3  cloudflared  LXC 103  — Cloudflare tunnel + Homepage dashboard
 192.168.69.5  alexandria   LXC 111  — NAS, file sharing (mimmisbrunnr 60TB)
+192.168.69.20 mimir        LXC 105  — code-server (VS Code in the browser)
 192.168.69.69 asgard               — Proxmox hypervisor
 192.168.69.77 draupnir     VM  777  — k3s Kubernetes cluster
 ```
@@ -163,6 +164,7 @@ Flux picks it up automatically. Within ~1 minute:
 | `sops_age_key` | flux_bootstrap role | Age private key for SOPS decryption |
 | `proxmox_password` | rclone_mount, fileshare | Used for rclone SFTP auth to njord |
 | `ssh_public_key` | fileshare role | Public key added to david's authorized_keys |
+| `code_server_password` | code_server role | Optional code-server password (empty = rely on Cloudflare Access) |
 | `pihole_password` | pihole role | Pi-hole web UI admin password |
 | `cloudflare_tunnel_id` | cloudflared role | Tunnel ID from Cloudflare dashboard |
 | `cloudflare_credentials_json` | cloudflared role | Tunnel credentials JSON file contents |
@@ -186,6 +188,7 @@ ansible-playbook site.yml --limit pihole
 ansible-playbook site.yml --limit cloudflared
 ansible-playbook site.yml --limit alexandria
 ansible-playbook site.yml --limit draupnir
+ansible-playbook site.yml --limit mimir
 ```
 
 ---

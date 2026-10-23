@@ -127,6 +127,20 @@ services:
     homepage_group: MCP
     homepage_icon: sequence.png
 
+  # ---------------------------------------------------------------------------
+  # MIMIR — code-server dev box (192.168.69.20)
+  # ---------------------------------------------------------------------------
+
+  - name: Code Server
+    description: VS Code in the browser
+    hostname: code.yggdrasil.rip
+    ip: 192.168.69.20
+    port: 8680
+    protocol: http
+    tls_verify: true
+    homepage_group: Dev
+    homepage_icon: code-server.png
+
 # =============================================================================
 # DNS-ONLY HOSTS
 # =============================================================================
