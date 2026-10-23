@@ -26,6 +26,8 @@ spec:
           value: "on"
         - name: REDLIB_DEFAULT_SHOW_NSFW
           value: "off"
+        - name: REDLIB_DEFAULT_USE_HLS
+          value: "on"
         readinessProbe:
           httpGet:
             path: /settings

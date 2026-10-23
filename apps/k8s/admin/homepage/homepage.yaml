@@ -91,7 +91,7 @@ data:
             description: Main Media Server
             widget:
               type: jellyfin
-              url: http://jellyfin.knarr.svc.cluster.local/jelly
+              url: http://jellyfin.knarr.svc.cluster.local
               key: 3ed7450a2c4d4a779cf0b5d7801b1b72
               enableBlocks: true
         - Njord:
@@ -204,6 +204,7 @@ data:
             widget:
               type: qbittorrent
               url: http://qbittorrent.knarr.svc.cluster.local
+              username: david
               password: nkuhv2DtFtK8R0
         - SABnzbd:
             href: https://yggdrasil.rip/sab
