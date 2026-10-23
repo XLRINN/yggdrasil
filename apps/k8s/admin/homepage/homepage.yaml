@@ -39,6 +39,9 @@ data:
       Finance:
         style: row
         columns: 4
+      Tools:
+        style: row
+        columns: 4
 
   widgets.yaml: |
     - datetime:
@@ -218,6 +221,16 @@ data:
             href: https://ab.yggdrasil.rip
             icon: actual-budget.png
             description: Personal budgeting
+
+    - Tools:
+        - Code Server:
+            href: https://code.yggdrasil.rip
+            icon: code-server.png
+            description: VS Code in the browser
+        - Redlib:
+            href: https://rt.yggdrasil.rip
+            icon: redlib.png
+            description: Private Reddit front-end
 
     - Infrastructure:
         - Longhorn:

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redlib
+  namespace: admin
+  labels:
+    app: redlib
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redlib
+  template:
+    metadata:
+      labels:
+        app: redlib
+    spec:
+      containers:
+      - name: redlib
+        image: quay.io/redlib/redlib:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: REDLIB_ROBOTS_DISABLE_INDEXING
+          value: "on"
+        - name: REDLIB_DEFAULT_SHOW_NSFW
+          value: "off"
+        readinessProbe:
+          httpGet:
+            path: /settings
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 256Mi

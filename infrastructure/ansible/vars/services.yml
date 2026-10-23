@@ -138,7 +138,7 @@ services:
     port: 8680
     protocol: http
     tls_verify: true
-    homepage_group: Dev
+    homepage_group: Tools
     homepage_icon: code-server.png
 
 # =============================================================================
