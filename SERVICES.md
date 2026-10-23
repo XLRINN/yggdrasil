@@ -22,6 +22,7 @@ local DNS, and your dashboard.
 192.168.69.2  pihole       LXC 102  — DNS, ad blocking
 192.168.69.3  cloudflared  LXC 103  — Cloudflare tunnel + Homepage dashboard
 192.168.69.5  alexandria   LXC 111  — NAS, file sharing (mimmisbrunnr 60TB)
+192.168.69.21 host         LXC 106  — Nexterm (web SSH/SFTP/RDP/VNC)
 192.168.69.20 code         LXC 105  — code-server (VS Code in the browser), alexandria at /mnt/alexandria
 192.168.69.69 asgard               — Proxmox hypervisor
 192.168.69.77 draupnir     VM  777  — k3s Kubernetes cluster
@@ -165,6 +166,7 @@ Flux picks it up automatically. Within ~1 minute:
 | `proxmox_password` | rclone_mount, fileshare | Used for rclone SFTP auth to njord |
 | `ssh_public_key` | fileshare role | Public key added to david's authorized_keys |
 | `code_server_password` | code_server role | Optional code-server password (empty = rely on Cloudflare Access) |
+| `nexterm_encryption_key` | nexterm role | Encrypts Nexterm's saved credentials — losing it makes them unreadable |
 | `pihole_password` | pihole role | Pi-hole web UI admin password |
 | `cloudflare_tunnel_id` | cloudflared role | Tunnel ID from Cloudflare dashboard |
 | `cloudflare_credentials_json` | cloudflared role | Tunnel credentials JSON file contents |
@@ -189,6 +191,7 @@ ansible-playbook site.yml --limit cloudflared
 ansible-playbook site.yml --limit alexandria
 ansible-playbook site.yml --limit draupnir
 ansible-playbook site.yml --limit code
+ansible-playbook site.yml --limit host
 ```
 
 ---
@@ -204,7 +207,8 @@ emails listed in `allowed_emails` (tfvars) can sign in.
 `code.yggdrasil.rip` (code-server on the `code` LXC) also has its own
 dedicated Google-gated Access Application in that file, so its gate doesn't
 depend on the dashboard-managed wildcard — it's a shell, so never add it to
-a bypass list.
+a bypass list. `host.yggdrasil.rip` (Nexterm on the `host` LXC) is pinned
+the same way, for the same reason.
 
 Two hostnames are deliberately excluded — `budget-mcp.yggdrasil.rip` and
 `sequence-mcp.yggdrasil.rip` (the Claude MCP connectors in

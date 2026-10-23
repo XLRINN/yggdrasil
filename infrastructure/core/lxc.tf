@@ -197,6 +197,70 @@ resource "proxmox_virtual_environment_container" "code" {
   }
 }
 
+resource "proxmox_virtual_environment_container" "host" {
+  node_name    = "asgard"
+  vm_id        = 106
+  unprivileged = true
+
+  initialization {
+    hostname = "host"
+
+    ip_config {
+      ipv4 {
+        address = "192.168.69.21/24"
+        gateway = var.gateway
+      }
+    }
+
+    dns {
+      servers = ["192.168.69.2", "1.1.1.1"]
+    }
+
+    user_account {
+      password = var.proxmox_password
+      keys     = var.ssh_public_key != "" ? [var.ssh_public_key] : []
+    }
+  }
+
+  cpu {
+    cores = 2
+  }
+
+  memory {
+    dedicated = 2048
+    swap      = 0
+  }
+
+  disk {
+    datastore_id = "disks-fast"
+    size         = 16
+  }
+
+  network_interface {
+    name   = "eth0"
+    bridge = "vmbr0"
+  }
+
+  operating_system {
+    template_file_id = var.ubuntu_lxc_template
+    type             = "ubuntu"
+  }
+
+  features {
+    nesting = true # required for Docker
+    keyctl  = true # required for Docker in an unprivileged container
+  }
+
+  startup {
+    order = 2
+  }
+
+  provisioner "local-exec" {
+    when    = create
+    command = "ssh-keygen -R 192.168.69.21 || true"
+  }
+}
+
 resource "null_resource" "alexandria_post_create" {
   depends_on = [proxmox_virtual_environment_container.alexandria]
 
@@ -272,6 +336,31 @@ resource "null_resource" "code_post_create" {
       "grep -q 'dev/net/tun' /etc/pve/lxc/105.conf || echo 'lxc.cgroup2.devices.allow: c 10:200 rwm' >> /etc/pve/lxc/105.conf",
       "grep -q 'dev/net/tun' /etc/pve/lxc/105.conf || echo 'lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file 0 0' >> /etc/pve/lxc/105.conf",
       "pct reboot 105"
+    ]
+  }
+}
+
+resource "null_resource" "host_post_create" {
+  depends_on = [proxmox_virtual_environment_container.host]
+
+  connection {
+    type     = "ssh"
+    host     = "asgard"
+    user     = "root"
+    password = var.proxmox_password
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      # Inject SSH key directly into container filesystem
+      "pct exec 106 -- mkdir -p /root/.ssh",
+      "pct exec 106 -- chmod 700 /root/.ssh",
+      "echo '${var.ssh_public_key}' | pct exec 106 -- tee /root/.ssh/authorized_keys",
+      "pct exec 106 -- chmod 600 /root/.ssh/authorized_keys",
+      # Add TUN device for Tailscale
+      "grep -q 'dev/net/tun' /etc/pve/lxc/106.conf || echo 'lxc.cgroup2.devices.allow: c 10:200 rwm' >> /etc/pve/lxc/106.conf",
+      "grep -q 'dev/net/tun' /etc/pve/lxc/106.conf || echo 'lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file 0 0' >> /etc/pve/lxc/106.conf",
+      "pct reboot 106"
     ]
   }
 }

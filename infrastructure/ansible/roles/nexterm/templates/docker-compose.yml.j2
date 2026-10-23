@@ -1,0 +1,14 @@
+# Managed by Ansible — roles/nexterm
+services:
+  nexterm:
+    image: nexterm/aio:latest
+    container_name: nexterm
+    # Host networking (upstream recommendation) — lets Nexterm reach LAN and
+    # tailnet hosts directly and use Wake-on-LAN.
+    network_mode: host
+    restart: always
+    environment:
+      ENCRYPTION_KEY: "{{ nexterm_encryption_key }}"
+      SERVER_PORT: "{{ nexterm_port }}"
+    volumes:
+      - {{ nexterm_dir }}/data:/app/data

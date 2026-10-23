@@ -10,7 +10,7 @@
 #   Single host:        ansible-playbook site.yml --limit draupnir
 #
 # GROUPS:
-#   core     — draupnir (k8s) + alexandria (NAS) + vuln + code (code-server) — frequently rebuilt
+#   core     — draupnir (k8s) + alexandria (NAS) + vuln + code (code-server) + host (Nexterm) — frequently rebuilt
 #   network  — pihole + cloudflared — stable, survive core rebuilds
 #
 # SECRETS:
@@ -117,3 +117,18 @@
     - users
     - claude_cli
     - code_server
+
+# -------------------------------------------------------------------------
+# HOST — Nexterm (web SSH/SFTP/RDP/VNC with jump hosts)
+# -------------------------------------------------------------------------
+
+- name: Configure host
+  hosts: host
+  become: true
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - common
+    - tailscale
+    - docker
+    - nexterm

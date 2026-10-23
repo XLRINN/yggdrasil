@@ -231,6 +231,10 @@ data:
             href: https://code.yggdrasil.rip
             icon: code-server.png
             description: VS Code in the browser
+        - Nexterm:
+            href: https://host.yggdrasil.rip
+            icon: nexterm.png
+            description: Web SSH, SFTP, RDP and VNC
         - Redlib:
             href: https://rt.yggdrasil.rip
             icon: redlib.png

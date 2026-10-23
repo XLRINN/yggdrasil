@@ -1,0 +1,46 @@
+---
+# Nexterm — web SSH/SFTP/RDP/VNC client (https://github.com/gnmyt/Nexterm).
+# Runs the all-in-one image (server + engine) under Docker Compose. Saved
+# servers and credentials live in {{ nexterm_dir }}/data and are encrypted
+# with nexterm_encryption_key — lose the key and every saved credential is
+# unreadable, so keep it in vars/secrets.yml.
+
+- name: Require a Nexterm encryption key
+  assert:
+    that: nexterm_encryption_key | default('') | length >= 32
+    fail_msg: "Set nexterm_encryption_key in vars/secrets.yml (generate with: openssl rand -hex 32)"
+
+- name: Create Nexterm directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  loop:
+    - "{{ nexterm_dir }}"
+    - "{{ nexterm_dir }}/data"
+
+- name: Write Nexterm compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ nexterm_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+  notify: restart nexterm
+
+- name: Pull latest Nexterm image
+  command: docker compose pull
+  args:
+    chdir: "{{ nexterm_dir }}"
+  register: nexterm_pull
+  changed_when: "'Downloaded newer image' in nexterm_pull.stderr or 'Pulled' in nexterm_pull.stderr"
+
+- name: Start Nexterm
+  command: docker compose up -d
+  args:
+    chdir: "{{ nexterm_dir }}"
+  register: nexterm_up
+  changed_when: "'Started' in nexterm_up.stderr or 'Recreated' in nexterm_up.stderr or 'Created' in nexterm_up.stderr"
