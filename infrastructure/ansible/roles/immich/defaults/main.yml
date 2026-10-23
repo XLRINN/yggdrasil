@@ -1,0 +1,14 @@
+---
+immich_dir: /opt/immich
+# Major version tag — follows v3.x releases. files/docker-compose.yml is the
+# upstream compose file for this major; refresh it from
+# https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
+# when bumping to a new major.
+immich_version: v3
+# Photo library on alexandria (mimmisbrunnr /mnt/mimmis/immich), via the
+# alexandria_mount role
+immich_upload_location: /mnt/alexandria/immich
+# Postgres stays on the LXC's local disk — Immich doesn't support the
+# database on a network share
+immich_db_location: /opt/immich/postgres
+immich_tz: America/New_York

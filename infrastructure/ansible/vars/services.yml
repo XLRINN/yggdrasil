@@ -141,6 +141,34 @@ services:
     homepage_group: Tools
     homepage_icon: code-server.png
 
+  # ---------------------------------------------------------------------------
+  # HOST — Nexterm (192.168.69.21)
+  # ---------------------------------------------------------------------------
+
+  - name: Nexterm
+    description: Web SSH, SFTP, RDP and VNC
+    hostname: host.yggdrasil.rip
+    ip: 192.168.69.21
+    port: 6989
+    protocol: http
+    tls_verify: true
+    homepage_group: Tools
+    homepage_icon: nexterm.png
+
+  # ---------------------------------------------------------------------------
+  # IMMICH — photo/video backup (192.168.69.22), library on alexandria
+  # ---------------------------------------------------------------------------
+
+  - name: Immich
+    description: Photo and video backup
+    hostname: photos.yggdrasil.rip
+    ip: 192.168.69.22
+    port: 2283
+    protocol: http
+    tls_verify: true
+    homepage_group: Media
+    homepage_icon: immich.png
+
 # =============================================================================
 # DNS-ONLY HOSTS
 # =============================================================================

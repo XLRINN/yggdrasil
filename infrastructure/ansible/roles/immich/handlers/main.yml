@@ -1,0 +1,5 @@
+---
+- name: restart immich
+  command: docker compose up -d --force-recreate
+  args:
+    chdir: "{{ immich_dir }}"

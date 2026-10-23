@@ -1,0 +1,5 @@
+---
+- name: restart nexterm
+  command: docker compose up -d --force-recreate
+  args:
+    chdir: "{{ nexterm_dir }}"

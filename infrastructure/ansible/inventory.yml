@@ -19,6 +19,14 @@ all:
           ansible_host: 192.168.69.20
           ansible_user: root
           ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+        host:
+          ansible_host: 192.168.69.21
+          ansible_user: root
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+        immich:
+          ansible_host: 192.168.69.22
+          ansible_user: root
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
 
     # -------------------------------------------------------------------------
     # MCP — Hosts MCP connectors for Claude (sequence, budget, mail, ...)
