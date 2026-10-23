@@ -23,7 +23,7 @@ local DNS, and your dashboard.
 192.168.69.3  cloudflared  LXC 103  — Cloudflare tunnel + Homepage dashboard
 192.168.69.5  alexandria   LXC 111  — NAS, file sharing (mimmisbrunnr 60TB)
 192.168.69.22 immich       LXC 107  — Immich photos (library on alexandria /mnt/mimmis/immich)
-192.168.69.21 host         LXC 106  — Nexterm (web SSH/SFTP/RDP/VNC)
+192.168.69.21 host         LXC 108  — Nexterm (web SSH/SFTP/RDP/VNC)
 192.168.69.20 code         LXC 105  — code-server (VS Code in the browser), alexandria at /mnt/alexandria
 192.168.69.69 asgard               — Proxmox hypervisor
 192.168.69.77 draupnir     VM  777  — k3s Kubernetes cluster

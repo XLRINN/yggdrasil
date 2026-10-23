@@ -133,7 +133,7 @@ resource "proxmox_virtual_environment_container" "code" {
 
 resource "proxmox_virtual_environment_container" "host" {
   node_name    = "asgard"
-  vm_id        = 106
+  vm_id        = 108
   unprivileged = true
 
   initialization {
@@ -324,14 +324,14 @@ resource "null_resource" "host_post_create" {
   provisioner "remote-exec" {
     inline = [
       # Inject SSH key directly into container filesystem
-      "pct exec 106 -- mkdir -p /root/.ssh",
-      "pct exec 106 -- chmod 700 /root/.ssh",
-      "echo '${var.ssh_public_key}' | pct exec 106 -- tee /root/.ssh/authorized_keys",
-      "pct exec 106 -- chmod 600 /root/.ssh/authorized_keys",
+      "pct exec 108 -- mkdir -p /root/.ssh",
+      "pct exec 108 -- chmod 700 /root/.ssh",
+      "echo '${var.ssh_public_key}' | pct exec 108 -- tee /root/.ssh/authorized_keys",
+      "pct exec 108 -- chmod 600 /root/.ssh/authorized_keys",
       # Add TUN device for Tailscale
-      "grep -q 'dev/net/tun' /etc/pve/lxc/106.conf || echo 'lxc.cgroup2.devices.allow: c 10:200 rwm' >> /etc/pve/lxc/106.conf",
-      "grep -q 'dev/net/tun' /etc/pve/lxc/106.conf || echo 'lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file 0 0' >> /etc/pve/lxc/106.conf",
-      "pct reboot 106"
+      "grep -q 'dev/net/tun' /etc/pve/lxc/108.conf || echo 'lxc.cgroup2.devices.allow: c 10:200 rwm' >> /etc/pve/lxc/108.conf",
+      "grep -q 'dev/net/tun' /etc/pve/lxc/108.conf || echo 'lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file 0 0' >> /etc/pve/lxc/108.conf",
+      "pct reboot 108"
     ]
   }
 }
