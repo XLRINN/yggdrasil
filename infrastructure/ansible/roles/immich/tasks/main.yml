@@ -12,16 +12,22 @@
   command: mountpoint -q /mnt/alexandria
   changed_when: false
 
-- name: Create Immich directories
+- name: Create Immich directory
   file:
-    path: "{{ item }}"
+    path: "{{ immich_dir }}"
     state: directory
     owner: root
     group: root
     mode: "0700"
-  loop:
-    - "{{ immich_dir }}"
-    - "{{ immich_db_location }}"
+
+# No owner/group/mode here: Postgres chowns this to its own uid on first
+# init, and re-asserting root ownership on later runs locks Postgres out of
+# its own data directory (it can still run, but any file it didn't already
+# have open fails with "Permission denied").
+- name: Create Immich database directory
+  file:
+    path: "{{ immich_db_location }}"
+    state: directory
 
 - name: Create Immich library folder on alexandria
   file:
