@@ -128,13 +128,13 @@ services:
     homepage_icon: sequence.png
 
   # ---------------------------------------------------------------------------
-  # CODE — code-server dev box (192.168.69.20)
+  # CODE — code-server dev box (192.168.69.201)
   # ---------------------------------------------------------------------------
 
   - name: Code Server
     description: VS Code in the browser
     hostname: code.yggdrasil.rip
-    ip: 192.168.69.20
+    ip: 192.168.69.201
     port: 8680
     protocol: http
     tls_verify: true
@@ -142,13 +142,13 @@ services:
     homepage_icon: code-server.png
 
   # ---------------------------------------------------------------------------
-  # HOST — Nexterm (192.168.69.21)
+  # HOST — Nexterm (192.168.69.202)
   # ---------------------------------------------------------------------------
 
   - name: Nexterm
     description: Web SSH, SFTP, RDP and VNC
     hostname: host.yggdrasil.rip
-    ip: 192.168.69.21
+    ip: 192.168.69.202
     port: 6989
     protocol: http
     tls_verify: true
@@ -156,13 +156,13 @@ services:
     homepage_icon: nexterm.png
 
   # ---------------------------------------------------------------------------
-  # IMMICH — photo/video backup (192.168.69.22), library on alexandria
+  # IMMICH — photo/video backup (192.168.69.203), library on alexandria
   # ---------------------------------------------------------------------------
 
   - name: Immich
     description: Photo and video backup
     hostname: photos.yggdrasil.rip
-    ip: 192.168.69.22
+    ip: 192.168.69.203
     port: 2283
     protocol: http
     tls_verify: true

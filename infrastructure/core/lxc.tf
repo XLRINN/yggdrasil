@@ -77,7 +77,7 @@ resource "proxmox_virtual_environment_container" "code" {
 
     ip_config {
       ipv4 {
-        address = "192.168.69.20/24"
+        address = "192.168.69.201/24" # .20 collided with an existing LAN device
         gateway = var.gateway
       }
     }
@@ -127,7 +127,7 @@ resource "proxmox_virtual_environment_container" "code" {
 
   provisioner "local-exec" {
     when    = create
-    command = "ssh-keygen -R 192.168.69.20 || true"
+    command = "ssh-keygen -R 192.168.69.201 || true"
   }
 }
 
@@ -141,7 +141,7 @@ resource "proxmox_virtual_environment_container" "host" {
 
     ip_config {
       ipv4 {
-        address = "192.168.69.21/24"
+        address = "192.168.69.202/24" # .21 collided with an existing LAN device
         gateway = var.gateway
       }
     }
@@ -191,7 +191,7 @@ resource "proxmox_virtual_environment_container" "host" {
 
   provisioner "local-exec" {
     when    = create
-    command = "ssh-keygen -R 192.168.69.21 || true"
+    command = "ssh-keygen -R 192.168.69.202 || true"
   }
 }
 
@@ -205,7 +205,7 @@ resource "proxmox_virtual_environment_container" "immich" {
 
     ip_config {
       ipv4 {
-        address = "192.168.69.22/24"
+        address = "192.168.69.203/24" # .22 collided with an existing LAN device
         gateway = var.gateway
       }
     }
@@ -255,7 +255,7 @@ resource "proxmox_virtual_environment_container" "immich" {
 
   provisioner "local-exec" {
     when    = create
-    command = "ssh-keygen -R 192.168.69.22 || true"
+    command = "ssh-keygen -R 192.168.69.203 || true"
   }
 }
 
